@@ -49,6 +49,15 @@ chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
   provider.connection.send(load)
 })
 
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  if (changeInfo.status !== 'complete') return
+  if (tab.url.indexOf('twitter.com') !== -1) {
+    chrome.tabs.executeScript(tabId, {
+      file: 'verification.js'
+    })
+  }
+})
+
 // chrome.browserAction.onClicked.addListener(tab => {
 //   if (provider.connected) {
 //     const load = { jsonrpc: '2.0', id: 1, method: 'frame_summon', params: [] }

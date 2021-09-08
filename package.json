@@ -1,6 +1,6 @@
 {
   "name": "frame-extension",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/floating/frame-extension.git"
@@ -9,12 +9,16 @@
   "main": "src",
   "scripts": {
     "test": "standard",
-    "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js && cp ./src/pop.html ./dist/pop.html"
+    "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js && cp ./src/pop.html ./dist/pop.html",
+    "watch": "webpack --config webpack.dev.config.js"
   },
   "author": "Jordan Muir",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "7.15.0",
+    "@babel/preset-react": "7.14.5",
     "ncp": "2.0.0",
+    "nodemon": "2.0.12",
     "rimraf": "3.0.2",
     "standard": "16.0.3",
     "terser-webpack-plugin": "5.2.3",
@@ -22,7 +26,21 @@
     "webpack-cli": "4.8.0"
   },
   "dependencies": {
+    "@babel/preset-env": "7.15.4",
+    "@babel/runtime": "7.15.4",
+    "@ensdomains/address-encoder": "0.2.8",
+    "@ensdomains/content-hash": "2.5.7",
+    "@ensdomains/resolver": "0.3.1",
+    "abi-codec": "0.0.9",
+    "babel-loader": "8.2.2",
+    "content-hash": "2.5.2",
+    "eth-ens-namehash": "2.0.8",
     "eth-provider": "0.9.4",
-    "ethereum-provider": "0.4.4"
+    "ethereum-provider": "0.4.4",
+    "ethers": "5.4.6",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-restore": "0.5.0",
+    "styled-components": "5.3.1"
   }
 }
