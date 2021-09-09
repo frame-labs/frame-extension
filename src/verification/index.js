@@ -144,7 +144,7 @@ const callback = function (mutationsList, observer) {
         const tweet = addedNode.querySelector('[data-testid=tweet]')
         if (tweet) {
           const avatar = firstChild(tweet, 1)
-          const name = tweet.children[1].children[0].querySelectorAll('a')[0]
+          const name = firstChild(tweet, 3).children[1].children[1].querySelectorAll('a')[0]
           const nameInfo = firstChild(name, 4)
           // const nameRef = firstChild(name, 5)
           const handle = name.children[0].children[1].textContent

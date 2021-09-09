@@ -18,11 +18,10 @@ layer.style.cssText = `
 `
 ReactDOM.render(<Layer  />, layer)
 
-if (false) {
-  const name = 'brantly.eth'
-  const user = require('./dev/user.json')
-  store.setUser(name, user)
-  const position = { x: 100, y: 50}
-  store.setLayerPop({ position, active: true, ensName: name, created: Date.now() })
-}
+// Only in dev env
+// const name = 'brantly.eth'
+// const user = require('./dev/user.json')
+// store.setUser(name, user)
+// const position = { x: 100, y: 50}
+// store.setLayerPop({ position, active: true, ensName: name, created: Date.now() })
 

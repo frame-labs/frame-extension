@@ -54,7 +54,6 @@ themes['rgb(255, 255, 255)'] = {
 }
 
 export default (backgroundColor) => {
-  console.log('backgroundColor', backgroundColor)
   if (themes[backgroundColor]) return themes[backgroundColor]
   return defaultTheme
 }

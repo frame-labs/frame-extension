@@ -27,6 +27,9 @@ const initialState = {
     top2: 'rgb(235, 235, 255)',
     top3: 'rgb(225, 225, 255)',
     top4: 'rgb(215, 215, 255)' // Darkest Top
+  },
+  inventory: {
+    selected: ''
   }
 }
 

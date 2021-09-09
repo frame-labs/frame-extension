@@ -13,3 +13,7 @@ export const setUser = (u, name, user) => {
 export const setTheme = (u, theme) => {
   u('theme', () => theme)
 }
+
+export const setCurrentCollection = (u, collection) => {
+  u('inventory.selected', () => collection)
+}

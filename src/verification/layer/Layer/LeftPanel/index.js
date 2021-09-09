@@ -34,19 +34,6 @@ const PopName = styled.div`
   background: ${props => props.theme.base2};
 `
 
-const VerifiedLabel = styled.div`
-  text-align: center;
-  font-size: 8px;
-  font-weight: 600;
-  text-transform: uppercase;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-  height: 22px;
-  padding: 0px 5px;
-`
-
 const AvatarLabel = styled.div`
   text-align: center;
   font-size: 8px;
@@ -58,9 +45,37 @@ const AvatarLabel = styled.div`
   padding: 0px 5px;
 `
 
+const VerifiedLabel = styled.div`
+  text-align: center;
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  width: 26px;
+  height: 26px;
+`
+
 const PopNameVerifed = styled(VerifiedLabel)`
   position: absolute;
   right: 5px;
+`
+
+const PopLogo = styled.div`
+  position: absolute;
+  left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  
+  svg {
+    height: 22px;
+    fill: ${props => props.theme.top0};
+  }
+
 `
 
 const PopInset = styled.div`
@@ -135,6 +150,11 @@ class LeftPanel extends React.Component {
       <PopLeft>
         <PopInset>
           <PopName>
+            <PopLogo>
+              <svg viewBox="0 0 245 247">
+                <path d="M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z"/>
+              </svg>
+            </PopLogo>
             {user.name}
             {user.verified.name ? (
               <PopNameVerifed style={{ backgroundColor: theme.good, color: theme.goodOver }}>
