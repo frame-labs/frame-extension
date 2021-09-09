@@ -10,20 +10,25 @@
   "scripts": {
     "test": "standard",
     "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js && cp ./src/pop.html ./dist/pop.html",
-    "watch": "webpack --config webpack.dev.config.js"
+    "watch": "webpack --config webpack.dev.config.js",
+    "serve": "webpack serve --config webpack.dev.layer.config.js"
   },
   "author": "Jordan Muir",
   "license": "GPL-3.0",
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.15.0",
     "@babel/preset-react": "7.14.5",
+    "html-webpack-plugin": "^5.3.2",
     "ncp": "2.0.0",
+    "node-polyfill-webpack-plugin": "^1.1.4",
     "nodemon": "2.0.12",
+    "react-hot-loader": "^4.13.0",
     "rimraf": "3.0.2",
     "standard": "16.0.3",
     "terser-webpack-plugin": "5.2.3",
     "webpack": "5.52.0",
-    "webpack-cli": "4.8.0"
+    "webpack-cli": "4.8.0",
+    "webpack-dev-server": "^4.1.1"
   },
   "dependencies": {
     "@babel/preset-env": "7.15.4",

@@ -1,10 +1,11 @@
 const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
 module.exports = [
   {
     mode: 'development',
-    entry: './src/verification/index.js',
+    entry: './src/verification/layer/index.js',
     module: {
       rules: [
         {
@@ -19,14 +20,18 @@ module.exports = [
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'verification.js'
+      filename: 'layer.js'
     },
     performance: {
       hints: false
     },
+    devServer: {
+      hot: true,
+      open: true
+    },
     plugins: [
+      new HtmlWebpackPlugin(),
       new NodePolyfillPlugin()
-    ],
-    watch: true
+    ]
   }
 ]
