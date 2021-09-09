@@ -129,10 +129,8 @@ class LeftPanel extends React.Component {
   }
   render () {
     const theme = this.store('theme')
-    console.log('this.props', this.props)
-    const { active, position, ensName, created } = this.store('layerPop')
+    const { ensName } = this.store('layerPop')
     const user = this.store('users', ensName)
-    console.log('USER IN LEFT PANEL', user)
     return (
       <PopLeft>
         <PopInset>

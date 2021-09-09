@@ -55,7 +55,6 @@ class RightPanel extends React.Component {
   }
   render () {
     const rightPanel = this.store('rightPanel')
-    console.log(rightPanel)
     return rightPanel ? (
       <PopRight key={rightPanel}>
         <CollectionSummary>

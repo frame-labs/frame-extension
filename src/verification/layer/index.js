@@ -18,7 +18,7 @@ layer.style.cssText = `
 `
 ReactDOM.render(<Layer  />, layer)
 
-if (true) {
+if (false) {
   const name = 'brantly.eth'
   const user = require('./dev/user.json')
   store.setUser(name, user)

@@ -15,7 +15,7 @@ const PopWrap = styled.div`
   left: 0px;
   bottom: 0px;
   right: 0px;
-  pointer-events: none;
+  pointer-events: auto;
   cursor: pointer;
 `
 

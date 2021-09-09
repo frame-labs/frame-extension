@@ -3,9 +3,9 @@ import Restore from 'react-restore'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
-// import ensInterface from '../ens'
-import inventory from '../inventory'
+import inventory from './inventory'
 import store from './store'
+import themes from './themes'
 import n from 'nebula'
 
 import './layer'
@@ -36,8 +36,11 @@ class Badge extends React.Component {
       showEthPanel: false
     }
   }
-  badge (size, badgeColor = 'currentColor', ethColor = 'currentColor') {
+  badge (size) {
     const theme = store('theme')
+    let ethColor = theme.base0
+    let badgeColor = theme.badgeColor
+    
     const { ensName } = this.props
     const user = ensName ? this.store('users', ensName) : ''
     if (user && !user.verified.name) {
@@ -118,6 +121,7 @@ const callback = function (mutationsList, observer) {
 
   // TODO: Only update current style if something has changed
   // setTheme in store
+  store.setTheme(themes(backgroundColor))
 
   const mouseBlocker = (mount) => {
     const blocker  = document.createElement('div')
@@ -174,8 +178,6 @@ const callback = function (mutationsList, observer) {
             const { record } = await nebula.resolve(ensName)
             if (!record) return
 
-            console.log('record via nebula', record)
-
             // Need to verify eth
 
             const user = {
@@ -184,8 +186,6 @@ const callback = function (mutationsList, observer) {
               address: record.addresses && record.addresses.eth ? record.addresses.eth.toLowerCase() : '',
               twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
             }
-
-            console.log('user', user)
 
             user.verified = {
               name: handle.toLowerCase() === '@' + user.twitter.toLowerCase(),
@@ -201,8 +201,7 @@ const callback = function (mutationsList, observer) {
             }
             user.inventory = await inventory(user.address)
             store.setUser(ensName, user)
-            console.log('resolved', ensName, JSON.stringify(user))
-            
+  
             // if (avatar.querySelector('.__frameMount2__')) return
             // const mount2  = document.createElement('div')
             // mount2.className = '__frameMount2__'

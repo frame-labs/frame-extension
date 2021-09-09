@@ -9,3 +9,7 @@ export const setRightPanel = (u, panel) => {
 export const setUser = (u, name, user) => {
   u('users', name, () => user)
 }
+
+export const setTheme = (u, theme) => {
+  u('theme', () => theme)
+}
