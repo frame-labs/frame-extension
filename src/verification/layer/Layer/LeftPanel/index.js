@@ -46,6 +46,18 @@ const VerifiedLabel = styled.div`
   height: 22px;
   padding: 0px 5px;
 `
+
+const AvatarLabel = styled.div`
+  text-align: center;
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline;
+  border-radius: 5px;
+  height: 8px;
+  padding: 0px 5px;
+`
+
 const PopNameVerifed = styled(VerifiedLabel)`
   position: absolute;
   right: 5px;
@@ -145,13 +157,13 @@ class LeftPanel extends React.Component {
               <PopAvatarMetaId>#192034</PopAvatarMetaId>
               <PopAvatarMetaVerified>
                 {user.verified.avatar ? (
-                  <VerifiedLabel style={{ backgroundColor: theme.good}}>
+                  <AvatarLabel style={{ backgroundColor: theme.good}}>
                     Verified
-                  </VerifiedLabel>    
+                  </AvatarLabel>    
                 ) : (
-                  <VerifiedLabel style={{ backgroundColor: theme.bad}}>
+                  <AvatarLabel style={{ backgroundColor: theme.bad}}>
                     Not verified
-                  </VerifiedLabel>
+                  </AvatarLabel>
                 )}
               </PopAvatarMetaVerified>
             </PopAvatarMeta>

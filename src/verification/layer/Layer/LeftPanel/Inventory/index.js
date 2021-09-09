@@ -58,35 +58,36 @@ class Inventory extends React.Component {
   render () {
     const { ensName } = this.store('layerPop')
     const user = this.store('users', ensName)
+
     return (
       <InventoryWrap>
         <InventoryHeader>
           Inventory
         </InventoryHeader>
         <PopCollectionsWrapper>
-          {Object.keys(user.inventory).map(key => {
+          {Object.keys(user.inventory).sort((key1, key2) => {
+            const c1 = user.inventory[key1]
+            const c2 = user.inventory[key2]
+            if (c1.meta.img && c2.meta.img) return 0
+            if (c1.meta.img && !c2.meta.img) return -1
+            if (!c1.meta.img && c2.meta.img) return 1
+          }).map(key => {
             const collection = user.inventory[key]
-            if (collection.meta.img) {
-              return (
-                <PopCollection 
-                  onMouseEnter={() => {
-                    this.popCollectionHover = setTimeout(() => {
-                      this.store.setRightPanel(collection)
-                    }, 100)  
-                  }}
-                  onMouseLeave={() => {
-                    clearTimeout(this.popCollectionHover)
-                    this.store.setRightPanel(false)
-                  }}
-                >
-                  <img src={collection.meta.img} />
-                </PopCollection>
-              )
-            } else {
-              return (
-                null
-              )
-            }
+            return (
+              <PopCollection 
+                onMouseEnter={() => {
+                  this.popCollectionHover = setTimeout(() => {
+                    this.store.setRightPanel(collection)
+                  }, 100)  
+                }}
+                onMouseLeave={() => {
+                  clearTimeout(this.popCollectionHover)
+                  this.store.setRightPanel(false)
+                }}
+              >
+                {collection.meta.img ? <img src={collection.meta.img} /> : collection.meta.name.substr(0,3)}
+              </PopCollection>
+            )
           })}
         </PopCollectionsWrapper>
       </InventoryWrap>
