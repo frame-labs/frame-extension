@@ -3,13 +3,14 @@ import Restore from 'react-restore'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
-import ensInterface from '../ens'
+// import ensInterface from '../ens'
 import inventory from '../inventory'
 import store from './store'
-import colors from './colors'
+import n from 'nebula'
+
 import './layer'
 
-const ens = ensInterface()
+const nebula = n()
 
 const firstChild = (element, count, i = 0) => {
   element = element.children[0]
@@ -36,15 +37,16 @@ class Badge extends React.Component {
     }
   }
   badge (size, badgeColor = 'currentColor', ethColor = 'currentColor') {
+    const theme = store('theme')
     const { ensName } = this.props
-    const record = ensName ? this.store('ensRecords', ensName) : undefined
-    if (record && !record.verified.name) {
-      ethColor =  colors.bad
-    } else if (record && record.verified.avatar) {
-      ethColor =  colors.good
+    const user = ensName ? this.store('users', ensName) : ''
+    if (user && !user.verified.name) {
+      ethColor =  theme.bad
+    } else if (user && user.verified.avatar) {
+      ethColor = theme.good
     }
 
-    if (!record) {
+    if (!user) {
       ethColor = `rgba(0, 0, 0, 0.3)`
       badgeColor = `rgba(255, 255, 255, 0.3)`
     }
@@ -57,8 +59,6 @@ class Badge extends React.Component {
     )
   }
   render () {
-    const currentStyle = this.store('currentStyle')
-    // const ensRecord = this.store('ensRecords', this.props.ensName)
     return (
       <Container onClick={e => {
         e.preventDefault()
@@ -86,7 +86,7 @@ class Badge extends React.Component {
             this.store.setLayerPop({ position, active: true, ensName: this.props.ensName, created: Date.now() })
           }
         }>
-          {this.badge(16, currentStyle.badgeColor, currentStyle.backgroundColor)}
+          {this.badge(16)}
         </div>
       </Container>
   )}
@@ -117,7 +117,7 @@ const callback = function (mutationsList, observer) {
   } 
 
   // TODO: Only update current style if something has changed
-  store.setCurrentStyle({ backgroundColor, color, badgeColor, boxShadow })
+  // setTheme in store
 
   const mouseBlocker = (mount) => {
     const blocker  = document.createElement('div')
@@ -171,23 +171,37 @@ const callback = function (mutationsList, observer) {
             ReactDOM.render(<ConnectedBadge ensName={ensName} />, mount)
 
             mouseBlocker(tweet)
-            const record = await ens.resolve(ensName)
-            record.verified = {
-              name: handle.toLowerCase() === '@' + record.twitter.toLowerCase(),
+            const { record } = await nebula.resolve(ensName)
+            if (!record) return
+
+            console.log('record via nebula', record)
+
+            // Need to verify eth
+
+            const user = {
+              name: record.name || '',
+              avatar: record.text && record.text.avatar ? record.text.avatar : '',
+              address: record.addresses && record.addresses.eth ? record.addresses.eth.toLowerCase() : '',
+              twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
+            }
+
+            console.log('user', user)
+
+            user.verified = {
+              name: handle.toLowerCase() === '@' + user.twitter.toLowerCase(),
               avatar: false
             }
             const compatible = 'eip155:1/erc721:'
-            const index = record.avatar.indexOf(compatible)
+            const index = user.avatar.indexOf(compatible)
             const nftAvatar = index > -1
             if (nftAvatar) {
-              const location = record.avatar.subsrt(index + compatible.length)
+              const location = user.avatar.subsrt(index + compatible.length)
               const [contract, tokenId] = location.split('/')
-              console.log('We have an NFT record', contract, tokenId)
+              console.log('We have an NFT avatar', contract, tokenId)
             }
-            record.address = await ens.getAddress0(ensName)
-            record.inventory = await inventory(record.address)
-            store.setENSRecord(ensName, record)
-            console.log('resolved', ensName, record)
+            user.inventory = await inventory(user.address)
+            store.setUser(ensName, user)
+            console.log('resolved', ensName, JSON.stringify(user))
             
             // if (avatar.querySelector('.__frameMount2__')) return
             // const mount2  = document.createElement('div')
@@ -259,7 +273,6 @@ class PFP extends React.Component {
     )
   }
   render () {
-    const currentStyle = this.store('currentStyle')
     return (
       <PFPContainer onClick={e => {
         e.preventDefault()
@@ -300,7 +313,7 @@ class PFP extends React.Component {
             ReactDOM.render(<Panel />, layer)
           }
         }>
-          {this.bagde(16, currentStyle.color, currentStyle.backgroundColor)}
+          {this.bagde(16)}
         </VerifyBadge>
       </PFPContainer>
   )}

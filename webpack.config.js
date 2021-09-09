@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const TerserPlugin = require('terser-webpack-plugin')
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
 module.exports = [
   {
@@ -51,10 +52,7 @@ module.exports = [
       hints: false
     },
     plugins: [
-      new webpack.ProvidePlugin({
-        Buffer: ['buffer', 'Buffer'],
-        process: 'process',
-      })
+      new NodePolyfillPlugin()
     ]
   },
   {
