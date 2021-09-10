@@ -142,21 +142,20 @@ const callback = function (mutationsList, observer) {
       if (mutation.addedNodes.length > 0) {
         const addedNode = mutation.addedNodes[0]
         const tweet = addedNode.querySelector('[data-testid=tweet]')
+
         if (tweet) {
-          const avatar = firstChild(tweet, 1)
-          const name = firstChild(tweet, 3).children[1].children[1].querySelectorAll('a')[0]
-          const nameInfo = firstChild(name, 4)
-          // const nameRef = firstChild(name, 5)
-          const handle = name.children[0].children[1].textContent
-          const nameBlocks = nameInfo.textContent.split(' ')
-          const ensName = nameBlocks.filter(nameBlock => {
-            const i = nameBlock.indexOf('.eth')
-            if (i === -1) return false
-            return nameBlock.slice(0, i + 4)
-          })[0]
+          const [avatar, nameSection] = tweet.querySelectorAll('a[role=link]')
+          
+          const nameBlocks = [...nameSection.querySelectorAll('span')]
+          
+          const handleBlock = nameBlocks.find(block => (block.textContent || '').startsWith('@'))
+          const handle = (handleBlock || {}).textContent || ''
+
+          const ensNameBlock = nameBlocks.find(block => (block.textContent || '').includes('.eth'))
+          const ensName = ((ensNameBlock || {}).textContent || '').match(/[\w_\-\.]+.eth/)[0]
 
           if (ensName) {
-            if (name.querySelector('.__frameMount__')) return
+            if (nameSection.querySelector('.__frameMount__')) return
             const mount  = document.createElement('div')
             mount.className = '__frameMount__'
             mount.style.cssText = `
@@ -169,7 +168,7 @@ const callback = function (mutationsList, observer) {
               margin-right: 4px;
               margin-left: -2px;
             `
-            insertAfter(mount, firstChild(name, 3))
+            insertAfter(mount, firstChild(nameSection, 3))
 
             const ConnectedBadge = Restore.connect(Badge, store)
             ReactDOM.render(<ConnectedBadge ensName={ensName} />, mount)
@@ -199,6 +198,7 @@ const callback = function (mutationsList, observer) {
               const [contract, tokenId] = location.split('/')
               console.log('We have an NFT avatar', contract, tokenId)
             }
+
             user.inventory = await inventory(user.address)
             store.setUser(ensName, user)
   
