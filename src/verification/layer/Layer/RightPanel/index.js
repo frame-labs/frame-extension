@@ -34,7 +34,7 @@ const CollectionSummary = styled.div`
 
 const CollectionSummaryTitle = styled.div`
   width: 100%;
-  font-size: 11px;
+  font-size: 12px;
   text-align: center;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -52,17 +52,21 @@ const CollectionSummaryImage = styled.div`
   justify-content: center;
   align-items: center;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 56px;
   overflow: hidden;
   background: ${props => props.theme.base1};
   text-align: center;
-  padding: 16px;
+  margin: 16px;
 
   img {
-    width: 96px;
-    height: 96px;
+    width: 112px;
+    height: 112px;
     object-fit: cover;
     border-radius: 2px;
+  }
+
+  span {
+    padding: 16px;
   }
 `
 
@@ -95,20 +99,83 @@ const CollectionItemCountNumber = styled.div`
   background: ${props => props.theme.base1};
 `
 
+const AssetSummayImage = styled.div`
+  width: 160px;
+  height: 160px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  border-radius: 8px;
+  overflow: hidden;
+  background: ${props => props.theme.base1};
+  text-align: center;
+
+  img {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+`
+
 class RightPanel extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {}
   }
-  render () {
-    const rightPanel = this.store('rightPanel')
+  renderContent () {
+    const { ensName } = this.store('layerPop')
+    const user = this.store('users', ensName)
+    const { currentCollection, currentAsset } = this.store('rightPanel')
 
-    const defaultPayload = {
-      name: 'default',
-      img: 'image',
+    if (currentAsset) {
+      const collectionName = user.inventory[currentCollection].meta.name
+      const asset = user.inventory[currentCollection].assets[currentAsset]
+      console.log('Asset', asset)
 
+      return (
+        <PopRight key={asset.name}>
+          <AssetSummayImage>
+            {asset.img ? <img src={asset.img} /> : asset.name}
+          </AssetSummayImage>
+          <CollectionSummaryTitle>
+            {asset.name}
+          </CollectionSummaryTitle>
+          <CollectionItemCount>
+            <CollectionItemCountNumber>
+            {'#' + asset.tokenId}
+            </CollectionItemCountNumber>
+            <div>{collectionName}</div>
+          </CollectionItemCount>
+        </PopRight>
+      )
+    } else if (currentCollection) {
+      const collection = user.inventory[currentCollection]
+      const count = Object.keys(collection.assets).length || 0
+
+      return (
+        <PopRight key={collection.meta.name}>
+          <CollectionSummaryTitle>
+            {collection.meta.name === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collection.meta.name}
+          </CollectionSummaryTitle>
+          <CollectionSummaryImage>
+            {collection.meta.img ? <img src={collection.meta.img} /> : <span>{collection.meta.name}</span> }
+          </CollectionSummaryImage>
+          <CollectionItemCount>
+            <CollectionItemCountNumber>
+              {count}
+            </CollectionItemCountNumber>
+            <div>{count === 1 ? 'item' : 'items'}</div>
+          </CollectionItemCount>
+        </PopRight>
+      )
+    } else {
+      return null
     }
-    const count = rightPanel ? Object.keys(rightPanel.assets).length : 0
+
+  }
+  render () {
     return (
       <>
         <PopRightLogo key='logo'>
@@ -116,22 +183,7 @@ class RightPanel extends React.Component {
             <path d="M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z"/>
           </svg>
         </PopRightLogo>
-        {rightPanel ? (
-          <PopRight key={rightPanel}>
-            <CollectionSummaryTitle>
-              {rightPanel.meta.name}
-            </CollectionSummaryTitle>
-            <CollectionSummaryImage>
-             {rightPanel.meta.img ? <img src={rightPanel.meta.img} /> : rightPanel.meta.name}
-            </CollectionSummaryImage>
-            <CollectionItemCount>
-              <CollectionItemCountNumber>
-                {count}
-              </CollectionItemCountNumber>
-              <div>{count === 1 ? 'item' : 'items'}</div>
-            </CollectionItemCount>
-          </PopRight>
-        ) : null}
+        {this.renderContent()}
       </>
     )
   }

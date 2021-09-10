@@ -3,21 +3,26 @@ import Restore from 'react-restore'
 import styled, { keyframes, ThemeProvider } from 'styled-components'
 
 const PopCollection = styled.div`
-  width: 36px;
-  height: 36px;
-  padding: 10px;
+  width: 56px;
+  height: 56px;
+  // padding: 10px;
   border-radius: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 2px;
   background: ${props => props.theme.base2};
+  cursor: pointer;
 
   img {
-    width: 34px;
-    height: 34px;
+    width: 56px;
+    height: 56px;
     object-fit: cover;
-    border-radius: 3px;
+    border-radius: 6px;
+  }
+
+  &:hover {
+    background: ${props => props.theme.base3};
   }
 `
 
@@ -34,6 +39,12 @@ class InventoryItem extends React.Component {
   unsetCollection () {
     this.store.setCurrentCollection()
   }
+  setAsset (asset) {
+    this.store.setCurrentAsset(asset)
+  }
+  unsetAsset () {
+    this.store.setCurrentAsset()
+  }
   render () {
     const { ensName } = this.store('layerPop')
     const user = this.store('users', ensName)
@@ -43,20 +54,18 @@ class InventoryItem extends React.Component {
       console.log('asset in ', asset)
       return (
         <PopCollection 
-          style={this.state.hovered ? { background: 'red'} : {}}
           onClick={() => {
-            this.setCollection(this.props.collection)
+            this.setAsset(this.props.collection)
+            this.store.setRightPanelAsset(this.props.asset)
           }}
           onMouseEnter={() => {
-            this.setState({ hovered: true })
-            // this.popCollectionHover = setTimeout(() => {
-            //   this.store.setRightPanel(collection)
-            // }, 100)
+            this.popCollectionHover = setTimeout(() => {
+              this.store.setRightPanelAsset(this.props.asset)
+            }, 100)
           }}
           onMouseLeave={() => {
-            this.setState({ hovered: false })
             clearTimeout(this.popCollectionHover)
-            // this.store.setRightPanel(false)
+            this.store.setRightPanelAsset(false)
           }}
         >
           {asset.img ? <img src={asset.img} /> : asset.name}
@@ -66,24 +75,24 @@ class InventoryItem extends React.Component {
       const collection = user.inventory[this.props.collection]
       return (
         <PopCollection 
-        style={this.state.hovered ? { background: 'red'} : {}}
-        onClick={() => {
-          this.setCollection(this.props.collection)
-        }}
-        onMouseEnter={() => {
-          this.setState({ hovered: true })
-          this.popCollectionHover = setTimeout(() => {
-            this.store.setRightPanel(collection)
-          }, 100)
-        }}
-        onMouseLeave={() => {
-          this.setState({ hovered: false })
-          clearTimeout(this.popCollectionHover)
-          this.store.setRightPanel(false)
-        }}
-      >
-        {collection.meta.img ? <img src={collection.meta.img} /> : collection.meta.name.substr(0,3)}
-      </PopCollection>
+          onClick={() => {
+            this.store.setCurrentCollection(this.props.collection)
+            this.store.setRightPanelCollection(this.props.collection)
+          }}
+          onMouseEnter={() => {
+            this.setState({ hovered: true })
+            this.popCollectionHover = setTimeout(() => {
+              this.store.setRightPanelCollection(this.props.collection)
+            }, 100)
+          }}
+          onMouseLeave={() => {
+            this.setState({ hovered: false })
+            clearTimeout(this.popCollectionHover)
+            this.store.clearRightPanel()
+          }}
+        >
+          {collection.meta.img ? <img src={collection.meta.img} /> : collection.meta.name.substr(0,3)}
+        </PopCollection>
        )
     } else {
       return null

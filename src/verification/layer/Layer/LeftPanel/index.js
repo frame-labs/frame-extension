@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 import styled, { keyframes, ThemeProvider } from 'styled-components'
 
 import Inventory from './Inventory'
+import Avatar from './Avatar'
 import { cardShow } from '../style'
 
 const PopLeft = styled.div`
@@ -34,33 +35,56 @@ const PopName = styled.div`
   background: ${props => props.theme.base2};
 `
 
-const AvatarLabel = styled.div`
+const PopNameVerifed  = styled.div`
   text-align: center;
-  font-size: 8px;
-  font-weight: 600;
-  text-transform: uppercase;
-  display: inline;
-  border-radius: 5px;
-  height: 8px;
-  padding: 0px 5px;
-`
-
-const VerifiedLabel = styled.div`
-  text-align: center;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 5px;
-  width: 26px;
-  height: 26px;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  right: 9px;
+  overflow: hidden;
+  pointer-events: auto;
+  transition: 200ms cubic-bezier(.82,0,.12,1) all;
+
+  &:hover {
+    width: 164px;
+  }
 `
 
-const PopNameVerifed = styled(VerifiedLabel)`
+const PopNameVerifedIcon = styled.div`
   position: absolute;
-  right: 5px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  svg {
+    height: 16px;
+  }
+`
+
+const PopNameVerifedMessage = styled.div`
+  position: absolute;
+  top: 0;
+  right: 24px;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 24px;
+  padding: 0px 1px 0px 5px;
+  pointer-events: none;
+  min-width: 130px;
 `
 
 const PopLogo = styled.div`
@@ -92,50 +116,6 @@ const PopInset = styled.div`
   overscroll-behavior: contain;
 `
 
-const PopAvatar = styled.div`
-  width: 100%;
-  height: 96px;
-  position: relative;
-`
-const PopAvatarImg = styled.div`
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  bottom: 5px;
-  width: 86px;
-  height: 86px;
-  border-radius: 6px;
-  background: ${props => props.theme.base2};
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 6px;
-  }
-`
-const PopAvatarMeta = styled.div`
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  bottom: 5px;
-  left: 96px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 6px;
-  background: ${props => props.theme.base2};
-  padding: 5px;
-`
-const PopAvatarMetaName = styled.div`
-  font-size: 12px;
-  font-weight: 400;
-
-`
-const PopAvatarMetaId = styled.div`
-`
-const PopAvatarMetaVerified = styled.div`
-`
 
 class LeftPanel extends React.Component {
   constructor (...args) {
@@ -158,34 +138,29 @@ class LeftPanel extends React.Component {
             {user.name}
             {user.verified.name ? (
               <PopNameVerifed style={{ backgroundColor: theme.good, color: theme.goodOver }}>
-                Verified
+                <PopNameVerifedIcon>
+                  <svg viewBox="0 0 512 512">
+                    <path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z" />
+                  </svg>
+                </PopNameVerifedIcon>
+                <PopNameVerifedMessage>
+                  ENS NAME VERIFIED
+                </PopNameVerifedMessage>
               </PopNameVerifed>    
             ) : (
               <PopNameVerifed style={{ backgroundColor: theme.bad, color: theme.badOver }}>
-                Unverified
-              </PopNameVerifed>
+                <PopNameVerifedIcon>
+                  <svg viewBox="0 0 640 512">
+                    <path fill="currentColor" d="M594.53 508.63L6.18 53.9c-6.97-5.42-8.23-15.47-2.81-22.45L23.01 6.18C28.43-.8 38.49-2.06 45.47 3.37L633.82 458.1c6.97 5.42 8.23 15.47 2.81 22.45l-19.64 25.27c-5.42 6.98-15.48 8.23-22.46 2.81z" />
+                  </svg>
+                </PopNameVerifedIcon>
+                <PopNameVerifedMessage>
+                  ENS NAME UNVERIFIED
+                </PopNameVerifedMessage>
+              </PopNameVerifed>   
             )}
           </PopName>
-          <PopAvatar>
-            <PopAvatarImg>
-              <img src={user.avatar} />
-            </PopAvatarImg>
-            <PopAvatarMeta>
-              <PopAvatarMetaName>TOKEN</PopAvatarMetaName>
-              <PopAvatarMetaId>#192034</PopAvatarMetaId>
-              <PopAvatarMetaVerified>
-                {user.verified.avatar ? (
-                  <AvatarLabel style={{ backgroundColor: theme.good}}>
-                    Verified
-                  </AvatarLabel>    
-                ) : (
-                  <AvatarLabel style={{ backgroundColor: theme.bad}}>
-                    Not verified
-                  </AvatarLabel>
-                )}
-              </PopAvatarMetaVerified>
-            </PopAvatarMeta>
-          </PopAvatar>
+          <Avatar />
           <Inventory />
         </PopInset>
       </PopLeft>

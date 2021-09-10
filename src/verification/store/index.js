@@ -9,6 +9,7 @@ const initialState = {
     },
     name: ''
   },
+  rightPanel: {},
   users: {},
   theme: {
     moon: 'rgba(245, 110, 110, 1)',
