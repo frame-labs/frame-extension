@@ -148,11 +148,11 @@ const callback = function (mutationsList, observer) {
           
           const nameBlocks = [...nameSection.querySelectorAll('span')]
           
-          const handleBlock = nameBlocks.find(block => (block.textContent || '').startsWith('@'))
-          const handle = (handleBlock || {}).textContent || ''
+          const handleHref = (nameSection || {}).href || ''
+          const handle = handleHref.split('/').reverse()[0].toLowerCase()
 
           const ensNameBlock = nameBlocks.find(block => (block.textContent || '').includes('.eth'))
-          const ensName = ((ensNameBlock || {}).textContent || '').match(/[\w_\-\.]+.eth/)[0]
+          const ensName = (((ensNameBlock || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0]
 
           if (ensName) {
             if (nameSection.querySelector('.__frameMount__')) return
@@ -187,7 +187,7 @@ const callback = function (mutationsList, observer) {
             }
 
             user.verified = {
-              name: handle.toLowerCase() === '@' + user.twitter.toLowerCase(),
+              name: handle.toLowerCase() === user.twitter.toLowerCase(),
               avatar: false
             }
             const compatible = 'eip155:1/erc721:'
