@@ -15,6 +15,7 @@ layer.style.cssText = `
   left: 0px;
   pointer-events: none;
   z-index: 2000;
+  overscroll-behavior: none;
 `
 ReactDOM.render(<Layer  />, layer)
 

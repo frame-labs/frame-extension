@@ -4,16 +4,18 @@ import styled, { keyframes, ThemeProvider } from 'styled-components'
 
 import InventoryItem from './InventoryItem'
 
+import { float, shake } from '../../style'
+
 const InventoryWrap = styled.div`
-  border-radius: 8px;
-  // background: ${props => props.theme.base2};
-  margin: 0px 5px 5px 5px;
+  border-radius: 6px;
+  background: ${props => props.theme.base1};
+  margin: 5px;
 `
 
 const InventoryHeader = styled.div`
   position: relative;
   font-size: 10px;
-  margin: 8px 4px 4px 4px;
+  padding-top: 2px;
   text-align: center;
   width; 100%;
   text-transform: uppercase;
@@ -21,41 +23,51 @@ const InventoryHeader = styled.div`
   letter-spacing: 1px;
   // background: ${props => props.theme.base2};
   position: realative;
-  height: 12px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 const InventoryHeaderBack = styled.div`
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 10px;
+  top: 7px;
   bottom: 0px;
-  width: 24px;
-  height; 12px;
-  border-radius: 6px;
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
-  background: ${props => props.theme.base3};
-  color: ${props => props.theme.top0};
+  width: 26px;
+  height: 14px;
+  border-radius: 7px;
+  background: ${props => props.theme.top2};
+  color: ${props => props.theme.base0};
   cursor: pointer;
 
   svg {
     position: relative;
     width: 12px;
-    top: -1px;
+    top: 0px;
   }
 
   &:hover {
-    background: ${props => props.theme.base4};
+    background: ${props => props.theme.top0};
+    animation: 5s ${float} ease-in-out infinite alternate;
+    box-shadow: 0px 3px 5px 0px ${props => props.theme.baseShadow};
+  }
+
+  &:active {
+    background: ${props => props.theme.top0};
+    animation: ${shake} 2s ease-in-out infinite;
+    box-shadow: 0px 1px 2px 0px ${props => props.theme.baseShadow};
   }
 `
 
 const PopCollectionsWrapper = styled.div`
   text-align: center;
-  // padding: 10px 0px 40px 10px;
   display: flex;
   flex-wrap: wrap;
-  margin-top: 3px;
-  border-radius: 10px;
+  align-content: flex-start;
+  border-radius: 7px;
+  padding: 0px 5px 5px 5px;
+  min-height: 154px;
 `
 
 class Inventory extends React.Component {
@@ -70,7 +82,7 @@ class Inventory extends React.Component {
     const user = this.store('users', ensName)
     const selectedCollection = this.store('inventory.selectedCollection')
 
-    if (selectedCollection) console.log(user.inventory[selectedCollection])
+    // if (selectedCollection) console.log(user.inventory[selectedCollection])
 
     return (
       <InventoryWrap>
@@ -95,7 +107,11 @@ class Inventory extends React.Component {
           <>
             <InventoryHeader>
               <InventoryHeaderBack
-                onClick={() => this.store.setCurrentCollection()}
+                onClick={() => {
+                  this.store.setCurrentCollection()
+                  this.store.setCurrentAsset()
+                  this.store.clearRightPanel()
+                }}
               >
                 <svg viewBox="0 0 448 512">
                   <path fill="currentColor" d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />

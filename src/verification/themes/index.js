@@ -4,7 +4,8 @@ const defaultTheme = {
   good: 'rgb(0, 186, 124)', // 'rgb(0, 175, 145)'
   moonOver: 'rgba(60, 20, 20, 1)',
   badOver: 'rgb(100, 0, 0)',
-  goodOver: 'rgb(0, 86, 24)',
+  goodOver: 'rgb(0, 60, 0)',
+  baseShadow: 'rgba(20, 20, 30, 0.3)',
   base0: 'rgb(40, 40, 50)', // Darkest Base
   base1: 'rgb(50, 50, 60)',
   base2: 'rgb(60, 60, 70)',
@@ -22,24 +23,27 @@ const themes = {}
 
 themes['rgb(21, 32, 43)'] = {
   ...defaultTheme,
-  base0: 'rgb(26, 37, 48)', // Darkest Base
-  base1: 'rgb(31, 42, 53)',
-  base2: 'rgb(36, 47, 58)',
-  base3: 'rgb(41, 52, 63)',
-  base4: 'rgb(46, 57, 68)' // Lightest Base
+  baseShadow: 'rgba(21, 32, 43, 0.3)',
+  base0: 'rgb(30, 41, 52)', // Darkest Base
+  base1: 'rgb(35, 46, 57)',
+  base2: 'rgb(40, 51, 62)',
+  base3: 'rgb(45, 56, 67)',
+  base4: 'rgb(50, 61, 72)' // Lightest Base
 }
 
 themes['rgb(0, 0, 0)'] = {
   ...defaultTheme,
-  base0: 'rgb(8, 8, 10)', // Darkest Base
-  base1: 'rgb(13, 13, 15)',
-  base2: 'rgb(18, 18, 20)',
-  base3: 'rgb(23, 23, 25)',
-  base4: 'rgb(28, 28, 30)' // Lightest Base
+  baseShadow: 'rgba(0, 0, 0, 0.3)',
+  base0: 'rgb(16, 16, 18)', // Darkest Base
+  base1: 'rgb(21, 21, 23)',
+  base2: 'rgb(26, 26, 28)',
+  base3: 'rgb(31, 31, 33)',
+  base4: 'rgb(36, 36, 38)' // Lightest Base
 }
 
 themes['rgb(255, 255, 255)'] = {
   ...defaultTheme,
+  baseShadow: 'rgba(220, 220, 223, 0.3)',
   base0: 'rgb(240, 240, 243)', // Darkest Base
   base1: 'rgb(245, 245, 248)',
   base2: 'rgb(250, 250, 253)',

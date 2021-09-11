@@ -2,27 +2,59 @@ import React from 'react'
 import Restore from 'react-restore'
 import styled, { keyframes, ThemeProvider } from 'styled-components'
 
+import { float, shake } from '../../../style'
+
 const PopCollection = styled.div`
-  width: 56px;
-  height: 56px;
-  // padding: 10px;
+  width: 48px;
+  height: 48px;
   border-radius: 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 2px;
-  background: ${props => props.theme.base2};
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+  padding: 5px 4px 4px 5px;
+  // transform: translate3d(180, 180, 180);
   cursor: pointer;
+  word-break: break-word;
+  user-select: none;
 
   img {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: 7px;
+    background: ${props => props.theme.base2};
+  }
+
+  div {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 7px;
+    font-size: 8px;
+    padding: 5px;
+    box-sizing: border-box;
+    background: ${props => props.theme.base2};
+    position: relative;
   }
 
   &:hover {
-    background: ${props => props.theme.base3};
+    transform: scale(1.2);
+    z-index: 2000;
+    img, div {
+      animation: 5s ${float} ease-in-out infinite alternate;
+      box-shadow: 0px 8px 6px -2px ${props => props.theme.baseShadow};
+    }
+  }
+
+  &:active {
+    // transform: scale(1);
+    z-index: 2000;
+    img, div {
+      animation: ${shake} 2s ease-in-out infinite;
+      box-shadow: 0px 1px 1px -2px ${props => props.theme.baseShadow};
+    }
   }
 `
 
@@ -51,20 +83,27 @@ class InventoryItem extends React.Component {
 
     if (this.props.asset) {
       const asset = user.inventory[this.props.collection].assets[this.props.asset]
-      console.log('asset in ', asset)
+      // console.log('asset in ', asset)
       return (
         <PopCollection 
           onClick={() => {
-            this.setAsset(this.props.collection)
+            this.setAsset(this.props.asset)
             this.store.setRightPanelAsset(this.props.asset)
           }}
+          onMouseMove = {() => {
+            this.store.setRightPanelAsset(this.props.asset)
+            // this.popCollectionHover = setTimeout(() => {
+              
+            // }, 100)
+          }}
           onMouseEnter={() => {
-            this.popCollectionHover = setTimeout(() => {
-              this.store.setRightPanelAsset(this.props.asset)
-            }, 100)
+            this.store.setRightPanelAsset(this.props.asset)
+            // this.popCollectionHover = setTimeout(() => {
+              
+            // }, 100)
           }}
           onMouseLeave={() => {
-            clearTimeout(this.popCollectionHover)
+            // clearTimeout(this.popCollectionHover)
             this.store.setRightPanelAsset(false)
           }}
         >
@@ -80,18 +119,23 @@ class InventoryItem extends React.Component {
             this.store.setRightPanelCollection(this.props.collection)
           }}
           onMouseEnter={() => {
-            this.setState({ hovered: true })
-            this.popCollectionHover = setTimeout(() => {
-              this.store.setRightPanelCollection(this.props.collection)
-            }, 100)
+            // this.setState({ hovered: true })
+            this.store.setRightPanelCollection(this.props.collection)
+            // this.popCollectionHover = setTimeout(() => {
+              
+            // }, 100)
           }}
           onMouseLeave={() => {
-            this.setState({ hovered: false })
-            clearTimeout(this.popCollectionHover)
+            // this.setState({ hovered: false })
+            // clearTimeout(this.popCollectionHover)
             this.store.clearRightPanel()
           }}
         >
-          {collection.meta.img ? <img src={collection.meta.img} /> : collection.meta.name.substr(0,3)}
+          {collection.meta.img ? (
+            <img src={collection.meta.img} /> 
+          ) : (
+            <div>{collection.meta.name}</div>
+          )}
         </PopCollection>
        )
     } else {

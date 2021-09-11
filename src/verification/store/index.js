@@ -17,7 +17,8 @@ const initialState = {
     good: 'rgb(0, 186, 124)', // 'rgb(0, 175, 145)'
     moonOver: 'rgba(60, 20, 20, 1)',
     badOver: 'rgb(100, 0, 0)',
-    goodOver: 'rgb(0, 86, 24)',
+    goodOver: 'rgb(0, 60, 0)',
+    baseShadow: 'rgba(20, 20, 30, 0.3)',
     base0: 'rgb(40, 40, 50)', // Darkest Base
     base1: 'rgb(50, 50, 60)',
     base2: 'rgb(60, 60, 70)',
@@ -27,7 +28,8 @@ const initialState = {
     top1: 'rgb(245, 245, 255)',
     top2: 'rgb(235, 235, 255)',
     top3: 'rgb(225, 225, 255)',
-    top4: 'rgb(215, 215, 255)' // Darkest Top
+    top4: 'rgb(215, 215, 255)', // Darkest Top
+    badgeColor: 'rgb(245, 245, 255)'
   },
   inventory: {
     selected: ''

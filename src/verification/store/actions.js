@@ -2,6 +2,10 @@ export const setLayerPop = (u, pop) => {
   u('layerPop', () => pop)
 }
 
+export const setHover = (u, hover) => {
+  u('hover', () => hover)
+}
+
 export const setRightPanelCollection = (u, collection) => {
   u('rightPanel', (rp = {}) => {
     rp.currentCollection = collection
@@ -16,7 +20,7 @@ export const setRightPanelAsset = (u, asset) => {
   })
 }
 
-export const clearRightPanelAsset = (u) => {
+export const clearRightPanel = (u) => {
   u('rightPanel', () => ({}))
 }
 
@@ -32,6 +36,6 @@ export const setCurrentCollection = (u, collection) => {
   u('inventory.selectedCollection', () => collection)
 }
 
-export const setCurrentAsset = (u, collection) => {
-  u('inventory.selectedAsset', () => collection)
+export const setCurrentAsset = (u, asset) => {
+  u('inventory.selectedAsset', () => asset)
 }
