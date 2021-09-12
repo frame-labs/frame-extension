@@ -31,14 +31,17 @@ export default async (address) => {
         assets: {}
       }
     }
-    const { name, id, token_id, image_url, description, external_link, permalink, traits, asset_contract } = i[a]
+    const { name, id, token_id, image_url, image_thumbnail_url, animation_url, description, external_link, permalink, traits, asset_contract, display_data } = i[a]
     inventory[collection.slug].assets[id] = { 
       name, 
       id,
       tokenId: token_id,
+      thumbnail: image_thumbnail_url || image_url,
       img: image_url, 
+      animation: animation_url,
       description, 
       link: external_link,
+      display: display_data,
       openSeaLink: permalink,
       traits,
       contract: {

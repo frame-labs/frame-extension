@@ -23,6 +23,18 @@ const PopRight = styled.div`
   color: ${props => props.theme.top0};
 `
 
+const AssetSummaryWrap = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overscroll-behavior: contain;
+`
+
 const PopRightLogo = styled(PopRight)`
   svg {
     height: 80px;
@@ -61,7 +73,7 @@ const CollectionSummaryImage = styled.div`
   text-align: center;
   margin: 8px;
 
-  img {
+  img, video {
     width: 112px;
     height: 112px;
     object-fit: cover;
@@ -96,8 +108,8 @@ const CollectionItemCountNumber = styled.div`
   borx-sizing: border-box;
   justify-content: center;
   align-items: center;
-  background: ${props => props.theme.good};
-  color: ${props => props.theme.goodOver};
+  background: ${props => props.theme.top0};
+  color: ${props => props.theme.base0};
 `
 
 const CollectionItemCountLabel = styled.div`
@@ -107,18 +119,17 @@ const CollectionItemCountLabel = styled.div`
   margin-left: 1px;
 `
 
-const AssetSummayImage = styled.div`
+const AssetSummaryImage = styled.div`
   width: 185x;
   height: 185px;
   margin-top: 5px;
-  // margin: 9px 11px 10px 10px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-weight: 600;
   text-align: center;
 
-  img {
+  img, video {
     width: 185px;
     height: 185px;
     object-fit: contain;
@@ -126,7 +137,7 @@ const AssetSummayImage = styled.div`
   }
 `
 
-const AssetSummayName = styled.div`
+const AssetSummaryName = styled.div`
   font-size: 12px;
   height: 44px;
   padding-top: 2px;
@@ -142,7 +153,7 @@ const AssetSummayName = styled.div`
   align-items: center;
 `
 
-const AssetSummayCollection = styled.div`
+const AssetSummaryCollection = styled.div`
   font-size: 9px;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -152,11 +163,34 @@ const AssetSummayCollection = styled.div`
 `
 
 const AssetLink = styled.div`
+  margin-top: 14px;
   width: 160px;
-  height: 80px;
+  height: 16px;
+  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: 600;
+  border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: ${props => props.theme.top1};
+  color: ${props => props.theme.base0};
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    animation: 5s ${float} ease-in-out infinite alternate;
+    box-shadow: 0px 3px 5px 2px ${props => props.theme.base0};
+    background: ${props => props.theme.top0};
+    z-index: 2000;
+  }
+
+  &:active {
+    animation: ${shake} 2s ease-in-out infinite;
+    box-shadow: 0px 2px 3px 2px ${props => props.theme.base0};
+    background: ${props => props.theme.top0};
+    z-index: 2000;
+  }
 `
 
 class RightPanel extends React.Component {
@@ -227,28 +261,42 @@ class RightPanel extends React.Component {
 
       const tokenId = '#' + (assetData.tokenId.length > 10 ? assetData.tokenId.substr(0, 4) + '...' + assetData.tokenId.substr(-4) : assetData.tokenId)
 
+      const img = assetData?.animation || assetData?.img
+      console.log('img!!!!', img)
       return (
         <PopRight key={assetData.name}>
-          <AssetSummayImage>
-            {assetData.img ? <img src={assetData.img} /> : assetData.name}
-          </AssetSummayImage>
-          <AssetSummayName>
-            {assetData.name}
-          </AssetSummayName>
-          <AssetSummayCollection>
-            <div>{collectionName === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collectionName}</div>
-            <div>{tokenId}</div>
-          </AssetSummayCollection>
-          <AssetLink onClick={()=>{
-            window.open(assetData.openSeaLink, '_blank')
-          }}>
-            View on OpenSea
-          </AssetLink>
+          <AssetSummaryWrap>
+            <AssetSummaryImage>
+              {img?.endsWith('.mp4') || img?.endsWith('.mov') ? (
+                <video autoPlay loop>
+                  <source src={img} type={'video/mp4'} />
+                </video> 
+              ) : img ? (
+                <img style={{
+                  objectFit: 'cover'
+                }} src={img} /> 
+              ) : asset.name}
+            </AssetSummaryImage>
+            <AssetSummaryName>
+              {assetData.name}
+            </AssetSummaryName>
+            <AssetSummaryCollection>
+              <div>{collectionName === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collectionName}</div>
+              <div>{tokenId}</div>
+            </AssetSummaryCollection>
+            <AssetLink onClick={()=>{
+              window.open(assetData.openSeaLink, '_blank')
+            }}>
+              View on OpenSea
+            </AssetLink>
+          </AssetSummaryWrap>
         </PopRight>
       )
     } else if (collection) {
       const collectionData = user.inventory[collection]
       const count = Object.keys(collectionData.assets).length || 0
+
+      const img = collectionData.meta.img
 
       return (
         <PopRight key={collectionData.meta.name}>
@@ -256,7 +304,15 @@ class RightPanel extends React.Component {
             {collectionData.meta.name === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collectionData.meta.name}
           </CollectionSummaryTitle>
           <CollectionSummaryImage>
-            {collectionData.meta.img ? <img src={collectionData.meta.img} /> : <span>{collectionData.meta.name}</span> }
+            {img?.endsWith('.mp4') || img?.endsWith('.mov') ? (
+              <video autoPlay loop>
+                <source src={img} type={'video/mp4'} />
+              </video> 
+            ) : img ? (
+              <img style={{
+                objectFit: 'cover'
+              }} src={img} /> 
+            ) : collectionData.meta.name}
           </CollectionSummaryImage>
           <CollectionItemCount>
             <CollectionItemCountNumber>

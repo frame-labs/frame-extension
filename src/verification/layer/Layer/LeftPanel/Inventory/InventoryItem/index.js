@@ -7,7 +7,7 @@ import { float, shake } from '../../../style'
 const PopCollection = styled.div`
   width: 48px;
   height: 48px;
-  border-radius: 6px;
+  border-radius: 3px;
   // display: flex;
   // justify-content: center;
   // align-items: center;
@@ -21,7 +21,15 @@ const PopCollection = styled.div`
     width: 48px;
     height: 48px;
     object-fit: cover;
-    border-radius: 7px;
+    border-radius: 3px;
+    background: ${props => props.theme.base2};
+  }
+
+  video {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 3px;
     background: ${props => props.theme.base2};
   }
 
@@ -31,7 +39,7 @@ const PopCollection = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 7px;
+    border-radius: 3px;
     font-size: 8px;
     padding: 5px;
     box-sizing: border-box;
@@ -84,6 +92,7 @@ class InventoryItem extends React.Component {
     if (this.props.asset) {
       const asset = user.inventory[this.props.collection].assets[this.props.asset]
       // console.log('asset in ', asset)
+      const img = asset.thumbnail || asset.animation || asset.img
       return (
         <PopCollection 
           onClick={() => {
@@ -107,11 +116,20 @@ class InventoryItem extends React.Component {
             this.store.setRightPanelAsset(false)
           }}
         >
-          {asset.img ? <img src={asset.img} /> : asset.name}
+          {img?.endsWith('.mp4') || img?.endsWith('.mov') ? (
+            <video autoPlay loop>
+              <source src={img} type={'video/mp4'} />
+            </video> 
+          ) : img ? (
+            <img style={{
+              objectFit: 'cover'
+            }} src={asset.img} /> 
+          ) : asset.name}
         </PopCollection>
       )
     } else if (this.props.collection) {
       const collection = user.inventory[this.props.collection]
+      const img = collection.meta.img
       return (
         <PopCollection 
           onClick={() => {
@@ -131,11 +149,15 @@ class InventoryItem extends React.Component {
             this.store.clearRightPanel()
           }}
         >
-          {collection.meta.img ? (
-            <img src={collection.meta.img} /> 
-          ) : (
-            <div>{collection.meta.name}</div>
-          )}
+          {img?.endsWith('.mp4') || img?.endsWith('.mov') ? (
+            <video autoPlay loop>
+              <source src={img} type={'video/mp4'} />
+            </video> 
+          ) : img ? (
+            <img style={{
+              objectFit: 'cover'
+            }} src={img} /> 
+          ) : collection.meta.name}
         </PopCollection>
        )
     } else {

@@ -1,12 +1,12 @@
 import React from 'react'
 import Restore from 'react-restore'
 import styled, { keyframes, ThemeProvider } from 'styled-components'
-import { cardShow, float, shake } from '../../style'
+import { cardShow, float, shake } from '../../../style'
 
 const PopAvatarImg = styled.div`
   position: absolute;
   top: 0px;
-  left: 10px;
+  left: 0px;
   bottom: 0px;
   width: 48px;
   height: 48px;
@@ -37,7 +37,7 @@ const PopAvatar = styled.div`
     box-shadow: 0px 3px 5px 2px ${props => props.theme.base0};
     background: ${props => props.theme.base2};
     z-index: 2000;
-    
+
     ${PopAvatarImg} {
       background: ${props => props.theme.base3};
     }

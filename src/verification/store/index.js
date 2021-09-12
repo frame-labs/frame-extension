@@ -1,5 +1,8 @@
 import Restore from 'react-restore'
 import * as actions from './actions'
+
+import themes from '../themes'
+
 const initialState = {
   layerPop: {
     active: false,
@@ -11,26 +14,7 @@ const initialState = {
   },
   rightPanel: {},
   users: {},
-  theme: {
-    moon: 'rgba(245, 110, 110, 1)',
-    bad: 'rgb(249, 24, 128)', // 'rgba(235, 90, 140, 1)'
-    good: 'rgb(0, 186, 124)', // 'rgb(0, 175, 145)'
-    moonOver: 'rgba(60, 20, 20, 1)',
-    badOver: 'rgb(100, 0, 0)',
-    goodOver: 'rgb(0, 60, 0)',
-    baseShadow: 'rgba(20, 20, 30, 0.3)',
-    base0: 'rgb(40, 40, 50)', // Darkest Base
-    base1: 'rgb(50, 50, 60)',
-    base2: 'rgb(60, 60, 70)',
-    base3: 'rgb(70, 70, 80)',
-    base4: 'rgb(80, 80, 90)', // Lightest Base
-    top0: 'rgb(255, 255, 255)', // Lightest Top
-    top1: 'rgb(245, 245, 255)',
-    top2: 'rgb(235, 235, 255)',
-    top3: 'rgb(225, 225, 255)',
-    top4: 'rgb(215, 215, 255)', // Darkest Top
-    badgeColor: 'rgb(245, 245, 255)'
-  },
+  theme: themes(), // Fill default theme
   inventory: {
     selected: ''
   }

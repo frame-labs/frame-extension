@@ -4,7 +4,7 @@ const defaultTheme = {
   good: 'rgb(0, 186, 124)', // 'rgb(0, 175, 145)'
   moonOver: 'rgba(60, 20, 20, 1)',
   badOver: 'rgb(100, 0, 0)',
-  goodOver: 'rgb(0, 60, 0)',
+  goodOver: 'rgb(255, 255, 255)',
   baseShadow: 'rgba(20, 20, 30, 0.3)',
   base0: 'rgb(40, 40, 50)', // Darkest Base
   base1: 'rgb(50, 50, 60)',
@@ -16,7 +16,20 @@ const defaultTheme = {
   top2: 'rgb(235, 235, 255)',
   top3: 'rgb(225, 225, 255)',
   top4: 'rgb(215, 215, 255)', // Darkest Top
-  badgeColor: 'rgb(245, 245, 255)'
+  badge: {
+    verified: {
+      background: 'rgb(255, 255, 255)',
+      color: 'rgb(0, 186, 124)'
+    },
+    unverified: {
+      background: 'rgb(255, 255, 255)',
+      color: 'rgb(249, 24, 128)'
+    },
+    default: {
+      background: 'rgb(255, 255, 255)',
+      color: 'rgb(0, 0, 0)'
+    }
+  }
 }
 
 const themes = {}
@@ -54,7 +67,28 @@ themes['rgb(255, 255, 255)'] = {
   top2: 'rgb(35, 35, 55)',
   top3: 'rgb(25, 25, 55)',
   top4: 'rgb(15, 15, 55)', // Darkest Top
-  badgeColor: 'rgb(55, 55, 55)'
+  verifiedBadge: {
+    background: 'rgb(0, 186, 124)',
+    color: 'rgb(255, 255, 255)'
+  },
+  unverifiedBadge: {
+    background: 'rgb(249, 24, 128)',
+    color: 'rgb(255, 255, 255)'
+  },
+  badge: {
+    verified: {
+      background: 'rgb(0, 186, 124)',
+      color: 'rgb(255, 255, 255)'
+    },
+    unverified: {
+      background: 'rgb(249, 24, 128)',
+      color: 'rgb(255, 255, 255)'
+    },
+    default: {
+      background: 'rgb(83, 100, 113)',
+      color: 'rgb(255, 255, 255)'
+    }
+  }
 }
 
 export default (backgroundColor) => {

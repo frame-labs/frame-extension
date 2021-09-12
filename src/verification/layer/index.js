@@ -20,7 +20,7 @@ layer.style.cssText = `
 ReactDOM.render(<Layer  />, layer)
 
 // Only in dev env
-// const name = 'brantly.eth'
+// const name = 'liquiddensity.eth'
 // const user = require('./dev/user.json')
 // store.setUser(name, user)
 // const position = { x: 100, y: 50}

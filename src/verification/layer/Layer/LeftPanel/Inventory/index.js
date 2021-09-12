@@ -7,15 +7,16 @@ import InventoryItem from './InventoryItem'
 import { float, shake } from '../../style'
 
 const InventoryWrap = styled.div`
-  border-radius: 6px;
-  background: ${props => props.theme.base1};
-  margin: 5px;
+  position: absolute;
+  top: 58px;
+  left: 5px;
+  bottom: 5px;
+  right: 5px;
 `
 
 const InventoryHeader = styled.div`
   position: relative;
-  font-size: 10px;
-  padding-top: 2px;
+  font-size: 9px;
   text-align: center;
   width; 100%;
   text-transform: uppercase;
@@ -23,7 +24,7 @@ const InventoryHeader = styled.div`
   letter-spacing: 1px;
   // background: ${props => props.theme.base2};
   position: realative;
-  height: 24px;
+  height: 19px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,13 +32,13 @@ const InventoryHeader = styled.div`
 
 const InventoryHeaderBack = styled.div`
   position: absolute;
-  left: 10px;
-  top: 7px;
+  left: 3px;
+  top: 3px;
   bottom: 0px;
   width: 26px;
   height: 14px;
   border-radius: 7px;
-  background: ${props => props.theme.top2};
+  background: ${props => props.theme.top0};
   color: ${props => props.theme.base0};
   cursor: pointer;
 
@@ -48,16 +49,35 @@ const InventoryHeaderBack = styled.div`
   }
 
   &:hover {
-    background: ${props => props.theme.top0};
     animation: 5s ${float} ease-in-out infinite alternate;
     box-shadow: 0px 3px 5px 0px ${props => props.theme.baseShadow};
   }
 
   &:active {
-    background: ${props => props.theme.top0};
     animation: ${shake} 2s ease-in-out infinite;
     box-shadow: 0px 1px 2px 0px ${props => props.theme.baseShadow};
   }
+`
+
+const ItemWrap = styled.div`
+  position: absolute;
+  top: 24px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  border-radius: 6px;
+  background: ${props => props.theme.base1};
+`
+const ItemScroll = styled.div`
+  position: absolute;
+  top: 0;
+  right: -15px;
+  bottom: 0;
+  left: 0;
+  padding: 6px 15px 0px 0px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
 `
 
 const PopCollectionsWrapper = styled.div`
@@ -88,20 +108,25 @@ class Inventory extends React.Component {
       <InventoryWrap>
         {!selectedCollection ? (
           <>
-            <InventoryHeader>
+            <InventoryHeader>   
               Inventory
             </InventoryHeader>
-            <PopCollectionsWrapper>
-              {Object.keys(user.inventory).sort((key1, key2) => {
-                const c1 = user.inventory[key1]
-                const c2 = user.inventory[key2]
-                if (c1.meta.img && c2.meta.img) return 0
-                if (c1.meta.img && !c2.meta.img) return -1
-                if (!c1.meta.img && c2.meta.img) return 1
-              }).map(key => {
-                return <InventoryItem key={key} collection={key} />
-              })}
-            </PopCollectionsWrapper>
+            <ItemWrap>
+              <ItemScroll>
+                <PopCollectionsWrapper>
+                  {Object.keys(user.inventory).sort((key1, key2) => {
+                    const c1 = user.inventory[key1]
+                    const c2 = user.inventory[key2]
+                    console.log(c1, c2)
+                    if (c1.meta.priority === c2.meta.priority) return 0
+                    if (c1.meta.priority > c2.meta.priority) return -1
+                    if (c1.meta.priority < c2.meta.priority) return 1
+                  }).map(key => {
+                    return <InventoryItem key={key} collection={key} />
+                  })}
+                </PopCollectionsWrapper>
+              </ItemScroll>
+            </ItemWrap>
           </>
         ) : (
           <>
@@ -119,11 +144,15 @@ class Inventory extends React.Component {
               </InventoryHeaderBack>
               {user.inventory[selectedCollection].meta.name === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : user.inventory[selectedCollection].meta.name}
             </InventoryHeader>
-            <PopCollectionsWrapper>
-              {Object.keys(user.inventory[selectedCollection].assets).map(key => {
-                return <InventoryItem key={key} collection={selectedCollection} asset={key} />
-              })}
-            </PopCollectionsWrapper>
+            <ItemWrap>
+              <ItemScroll>
+                <PopCollectionsWrapper>
+                  {Object.keys(user.inventory[selectedCollection].assets).map(key => {
+                    return <InventoryItem key={key} collection={selectedCollection} asset={key} />
+                  })}
+                </PopCollectionsWrapper>
+              </ItemScroll>
+            </ItemWrap>
           </>
         )}
       </InventoryWrap>
