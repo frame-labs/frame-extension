@@ -97,26 +97,27 @@ const CollectionItemCount = styled.div`
 `
 
 const CollectionItemCountNumber = styled.div`
-  font-size: 20px;
-  font-weight: 400;
+  font-size: 18px;
+  font-weight: 500;
   text-transform: uppercase;
-  height: 24px;
-  border-radius: 12px;
+  height: 20px;
+  border-radius: 11px;
   padding: 2px 8px 0px 8px;
   min-width 60px;
   display: flex;
   borx-sizing: border-box;
   justify-content: center;
   align-items: center;
-  background: ${props => props.theme.top0};
-  color: ${props => props.theme.base0};
+  background: ${props => props.theme.base1};
+  color: ${props => props.theme.top0};
 `
 
 const CollectionItemCountLabel = styled.div`
   font-size: 10px;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  margin-left: 1px;
+  margin-left: 2px;
+  margin-top: 2px;
 `
 
 const AssetSummaryImage = styled.div`
@@ -133,24 +134,28 @@ const AssetSummaryImage = styled.div`
     width: 185px;
     height: 185px;
     object-fit: contain;
-    border-radius: 5px;
+    border-radius: 6px;
   }
 `
 
 const AssetSummaryName = styled.div`
   font-size: 12px;
-  height: 44px;
-  padding-top: 2px;
+  height: 21px;
+  margin: 19px 5px 0px 5px;
+  padding: 4px 7px 4px 7px;
+  border-radius: 12px;
   text-align: center;
   font-weight: 600;
-  text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  max-width: 100%;
+  max-width: calc(100% - 10px);
+  min-width: 60px;
   box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  // display: flex;
+  text-align: center;
+  // align-items: center;
+  background: ${props => props.theme.base1};
+  text-overflow: ellipsis;
 `
 
 const AssetSummaryCollection = styled.div`
@@ -160,16 +165,19 @@ const AssetSummaryCollection = styled.div`
   padding-left: 1px;
   text-align: center;
   font-weight: 600;
+  margin-top: 9px;
 `
 
 const AssetLink = styled.div`
-  margin-top: 14px;
-  width: 160px;
-  height: 16px;
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+  height: 20px;
   text-transform: uppercase;
   font-size: 9px;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -257,12 +265,9 @@ class RightPanel extends React.Component {
     } else if (asset) {
       const collectionName = user.inventory[collection].meta.name
       const assetData = user.inventory[collection].assets[asset]
-      console.log('Asset', asset, assetData)
-
-      const tokenId = '#' + (assetData.tokenId.length > 10 ? assetData.tokenId.substr(0, 4) + '...' + assetData.tokenId.substr(-4) : assetData.tokenId)
-
+      // console.log('Asset', asset, assetData)
+      const tokenId = '#' + (assetData.tokenId.length > 9 ? assetData.tokenId.substr(0, 3) + '...' + assetData.tokenId.substr(-3) : assetData.tokenId)
       const img = assetData?.animation || assetData?.img
-      console.log('img!!!!', img)
       return (
         <PopRight key={assetData.name}>
           <AssetSummaryWrap>

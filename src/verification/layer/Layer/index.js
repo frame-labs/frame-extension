@@ -31,6 +31,7 @@ const Pop = styled.div`
   overscroll-behavior: contain;
   color: ${props => props.theme.top0};
   background: ${props => props.theme.base0};
+  overflow: hidden;
 `
 
 const Loading = styled.div`

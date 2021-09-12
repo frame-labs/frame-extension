@@ -4,6 +4,53 @@ import styled, { keyframes, ThemeProvider } from 'styled-components'
 
 import { float, shake } from '../../style'
 
+
+const PopAvatarImg = styled.div`
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background: ${props => props.theme.base2};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${props => props.theme.base3};
+
+  img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 3px;
+    margin: 4px;
+  }
+
+  svg {
+    height: 22px;
+    width: 22px;
+  }
+`
+
+const PopNameVerifed = styled.div`
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  position: absolute;
+  left: 0px;
+  overflow: hidden;
+  pointer-events: auto;
+  background: ${props => props.theme.base2}
+`
+
 const PopName = styled.div`
   top: 5px;
   right: 5px;
@@ -25,6 +72,16 @@ const PopName = styled.div`
     box-shadow: 0px 3px 5px 2px ${props => props.theme.base0};
     background: ${props => props.theme.base2};
     z-index: 2000;
+
+    ${PopAvatarImg} {
+      background: ${props => props.theme.base3};
+      color: ${props => props.theme.base4};
+    }
+
+    ${PopNameVerifed} {
+      background: ${props => props.theme.base3};
+      color: ${props => props.theme.base4};
+    }
   }
 
   &:active {
@@ -35,24 +92,7 @@ const PopName = styled.div`
   }
 `
 
-const PopNameVerifed  = styled.div`
-  text-align: center;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 4px;
-  width: 26px;
-  height: 26px;
-  position: absolute;
-  right: 10px;
-  overflow: hidden;
-  pointer-events: auto;
-  transition: 200ms cubic-bezier(.82,0,.12,1) all;
-  background: ${props => props.theme.base0}
-`
+
 
 const PopNameVerifedIcon = styled.div`
   position: absolute;
@@ -62,35 +102,24 @@ const PopNameVerifedIcon = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 26px;
-  height: 26px;
+  width: 48px;
+  height: 48px;
   pointer-events: none;
   svg {
     height: 16px;
   }
 `
-
-const PopAvatarImg = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  width: 48px;
-  height: 48px;
-  border-radius: 6px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
-  background: ${props => props.theme.base2};
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 6px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px
-  }
+const PopNameText = styled.div`
+  // position: absolute;
+  // top: 0;
+  // left: 40px;
+  // bottom: 1px;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+  // font-size: 16px;
 `
+
 
 // const PopNameVerifedMessage = styled.div`
 //   position: absolute;
@@ -107,17 +136,17 @@ const PopAvatarImg = styled.div`
 // `
 
 const PopLogo = styled.div`
-position: absolute;
-left: 11px;
-display: flex;
-justify-content: center;
-align-items: center;
-border-radius: 5px;
+  position: absolute;
+  left: 11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
 
-svg {
-  height: 22px;
-  fill: ${props => props.theme.top0};
-}
+  svg {
+    height: 22px;
+    fill: ${props => props.theme.top0};
+  }
 
 `
 
@@ -127,6 +156,30 @@ class User extends React.Component {
     this.state = {
       hovered: false
     }
+  }
+  badge (size) {
+    const theme = this.store('theme')
+    const { ensName } = this.props
+    const user = ensName ? this.store('users', ensName) : ''
+
+    let color, background
+    if (user && user.verified.name) {
+      color = theme.badge.verified.color
+      background = theme.badge.verified.background
+    } else if (user) {
+      color = theme.badge.unverified.color
+      background = theme.badge.unverified.background
+    } else {
+      color = theme.badge.default.color
+      background = theme.badge.default.background
+    }
+
+    return (
+      <svg style={{ height: `${size}px`, width: `${size}px` }}  viewBox='0 0 84 84'>
+        <path fill={background} d='M84,44a16.1,16.1,0,0,0-8.59-14.4,16.63,16.63,0,0,0,1-5.6c0-8.84-6.84-16-15.27-16a14.2,14.2,0,0,0-5.34,1A15,15,0,0,0,28.26,9a14.45,14.45,0,0,0-5.35-1C14.47,8,7.64,15.16,7.64,24a16.63,16.63,0,0,0,1,5.6,16.38,16.38,0,0,0-.82,28.34A17.53,17.53,0,0,0,7.64,60c0,8.84,6.83,16,15.27,16a14.4,14.4,0,0,0,5.34-1,15,15,0,0,0,27.5,0,14.6,14.6,0,0,0,5.34,1c8.44,0,15.27-7.16,15.27-16a15.57,15.57,0,0,0-.13-2.05A16.16,16.16,0,0,0,84,44Z'/>
+        <path fill={color} d='M60.08,39.1,43,16.13a1,1,0,0,0-1.77,0l-17.08,23a1,1,0,0,0,.35,1.4l17.08,8.69a1,1,0,0,0,1.08,0L59.74,40.5A1,1,0,0,0,60.08,39.1Zm-1.4,8.25L42.74,56.47a1.18,1.18,0,0,1-1.25,0L25.55,47.35A.41.41,0,0,0,25,48L41.14,68a1.19,1.19,0,0,0,2,0L59.21,48A.41.41,0,0,0,58.68,47.35Z'/>
+      </svg>
+    )
   }
   render () {
     const theme = this.store('theme')
@@ -145,31 +198,27 @@ class User extends React.Component {
         }}
       >
         {/* <PopLogo>
-          <svg viewBox="0 0 245 247">
-            <path d="M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z"/>
+          <svg viewBox='0 0 245 247'>
+            <path d='M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z'/>
           </svg>
         </PopLogo> */}
         <PopAvatarImg>
-          <img src={user.avatar} />
+          {user.avatar  ? (
+            <img src={user.avatar} />
+          ) : (
+            <svg viewBox='0 0 245 247'>
+              <path fill='currentColor' d='M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z'/>
+            </svg>
+          )}
         </PopAvatarImg>
-        {user.name}
-        {user.verified.name ? (
-          <PopNameVerifed style={{ color: theme.good }}>
-            <PopNameVerifedIcon>
-              <svg viewBox="0 0 512 512">
-                <path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z" />
-              </svg>
-            </PopNameVerifedIcon>
-          </PopNameVerifed>    
-        ) : (
-          <PopNameVerifed style={{ color: theme.bad }}>
-            <PopNameVerifedIcon>
-              <svg viewBox="0 0 640 512">
-                <path fill="currentColor" d="M594.53 508.63L6.18 53.9c-6.97-5.42-8.23-15.47-2.81-22.45L23.01 6.18C28.43-.8 38.49-2.06 45.47 3.37L633.82 458.1c6.97 5.42 8.23 15.47 2.81 22.45l-19.64 25.27c-5.42 6.98-15.48 8.23-22.46 2.81z" />
-              </svg>
-            </PopNameVerifedIcon>
-          </PopNameVerifed>   
-        )}
+        <PopNameText>
+          {user.name}
+        </PopNameText>
+        <PopNameVerifed>
+          <PopNameVerifedIcon>
+            {this.badge(24)}
+          </PopNameVerifedIcon>
+        </PopNameVerifed>    
       </PopName>
     )
   }

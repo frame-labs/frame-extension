@@ -74,7 +74,7 @@ const ItemScroll = styled.div`
   right: -15px;
   bottom: 0;
   left: 0;
-  padding: 6px 15px 0px 0px;
+  padding: 0px 15px 0px 0px;
   overflow-y: scroll;
   overflow-x: hidden;
   overscroll-behavior: contain;
@@ -86,7 +86,7 @@ const PopCollectionsWrapper = styled.div`
   flex-wrap: wrap;
   align-content: flex-start;
   border-radius: 7px;
-  padding: 0px 5px 5px 5px;
+  padding: 6px 5px 6px 5px;
   min-height: 154px;
 `
 
@@ -117,7 +117,6 @@ class Inventory extends React.Component {
                   {Object.keys(user.inventory).sort((key1, key2) => {
                     const c1 = user.inventory[key1]
                     const c2 = user.inventory[key2]
-                    console.log(c1, c2)
                     if (c1.meta.priority === c2.meta.priority) return 0
                     if (c1.meta.priority > c2.meta.priority) return -1
                     if (c1.meta.priority < c2.meta.priority) return 1

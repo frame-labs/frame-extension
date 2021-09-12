@@ -21,7 +21,12 @@ const initialState = {
 }
 
 // Grab persisted state from local storage
+const persist = JSON.parse(window.localStorage.getItem('__frameLayer__') || '{}')
 
-const store = Restore.create(initialState, actions)
+const store = Restore.create({...initialState, ...persist}, actions)
+
+store.observer(() => {
+  window.localStorage.setItem('__frameLayer__', JSON.stringify(store()))
+})
 
 export default store
