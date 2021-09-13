@@ -2,15 +2,22 @@ import React from 'react'
 import Restore from 'react-restore'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
+import n from 'nebula'
 
+import ethProvider from 'eth-provider'
+import provider from './provider'
 import inventory from './inventory'
 import store from './store'
 import themes from './themes'
-import n from 'nebula'
+import nft from './nft'
 
 import './layer'
 
-const nebula = n()
+const fallbackProvider = provider(ethProvider())
+const nebula = n('https://ipfs.nebula.land', fallbackProvider)
+
+// TODO
+const { getNft } = nft(fallbackProvider)
 
 const firstChild = (element, count, i = 0) => {
   element = element.children[0]
