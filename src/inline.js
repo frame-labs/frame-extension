@@ -5,7 +5,12 @@ const ncp = require('ncp')
 const inject = `
   var frame = unescape('${escape(fs.readFileSync(path.join(__dirname, '../dist/frame.js')).toString())}')
   try {
-    chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => window.postMessage({type: 'eth:payload', payload: payload}, window.location.origin))
+    chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
+      if (payload.type === 'eth:payload') {
+        delete payload.type
+        window.postMessage({type: 'eth:payload', payload: payload}, window.location.origin)
+      }
+    })
     window.addEventListener('message', event => {
       if (event.source === window && event.data && event.data.type === 'eth:send') chrome.runtime.sendMessage(event.data.payload)
     })

@@ -24,21 +24,8 @@ export const clearRightPanel = (u) => {
   u('rightPanel', () => ({}))
 }
 
-export const setUser = (u, name, user) => {
-  u('users', name, () => {
-    Object.keys(user.inventory).forEach(c => {
-      const collection = user.inventory[c]
-      collection.meta.priority = collection.meta.img ? 1 : 0
-      collection.meta.img = collection.meta.img ? collection.meta.img : collection.assets[Object.keys(collection.assets).filter((k) => {
-        return collection.assets[k].img
-      }).sort((a, b) => {
-        if (collection.assets[a].tokenId < collection.assets[b].tokenId) return -1
-        if (collection.assets[a].tokenId > collection.assets[b].tokenId) return 1
-        return 0
-      })[0]]?.img
-    })
-    return user
-  })
+export const setUser = (u, userId, user) => {
+  u('users', userId, () => user)
 }
 
 export const setTheme = (u, theme) => {
@@ -51,4 +38,8 @@ export const setCurrentCollection = (u, collection) => {
 
 export const setCurrentAsset = (u, asset) => {
   u('inventory.selectedAsset', () => asset)
+}
+
+export const setBlob = (u, blob, location) => {
+  u('blobMap', location, () => blob)
 }

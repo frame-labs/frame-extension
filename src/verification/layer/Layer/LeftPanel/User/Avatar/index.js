@@ -160,9 +160,9 @@ class Avatar extends React.Component {
     }
   }
   render () {
-    const { ensName } = this.store('layerPop')
+    const { userId } = this.store('layerPop')
     const theme = this.store('theme')
-    const user = this.store('users', ensName)
+    const user = this.store('users', userId)
     const selectedCollection = this.store('inventory.selectedCollection')
 
     // if (selectedCollection) console.log(user.inventory[selectedCollection])

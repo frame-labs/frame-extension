@@ -98,8 +98,8 @@ class Inventory extends React.Component {
     }
   }
   render () {
-    const { ensName } = this.store('layerPop')
-    const user = this.store('users', ensName)
+    const { userId } = this.store('layerPop')
+    const user = this.store('users', userId)
     const selectedCollection = this.store('inventory.selectedCollection')
 
     // if (selectedCollection) console.log(user.inventory[selectedCollection])

@@ -49,9 +49,8 @@ class Badge extends React.Component {
   }
   badge (size) {
     const theme = store('theme')
-    const { ensName } = this.props
-    const user = ensName ? this.store('users', ensName) : ''
-
+    const { userId  } = this.props
+    const user = userId ? this.store('users', userId) : ''
     let color, background
     if (user && user.verified.name) {
       color = theme.badge.verified.color
@@ -96,7 +95,7 @@ class Badge extends React.Component {
             e.stopPropagation()
             const pos = e.target.getBoundingClientRect()
             const position = { x: pos.x, y: pos.y }
-            this.store.setLayerPop({ position, active: true, ensName: this.props.ensName, created: Date.now() })
+            this.store.setLayerPop({ position, active: true, userId: this.props.userId, created: Date.now() })
           }
         }>
           {this.badge(16)}
@@ -109,15 +108,12 @@ const insertAfter = (newNode, referenceNode) => {
   return referenceNode.parentNode.insertBefore(newNode, referenceNode)
 }
 
-const namesChecked = []
+const usersChecked = []
 
 const callback = function (mutationsList, observer) {
   const composeTweet = document.querySelectorAll('[data-testid=SideNav_NewTweet_Button]')[0]
   const { backgroundColor } = window.getComputedStyle(document.body)
   let color = 'rgb(255, 255, 255)'
-  let badgeColor = 'rgb(255, 255, 255)'
-  // let boxShadow = '0px 6px 6px rgba(255, 255, 255, 1)'
-  let boxShadow = 'rgb(136 153 166 / 20%) 0px 0px 15px, rgb(136 153 166 / 15%) 0px 0px 3px 1px'
   if (backgroundColor === color) {
     if (composeTweet) {
       color = window.getComputedStyle(composeTweet).backgroundColor
@@ -172,13 +168,14 @@ const callback = function (mutationsList, observer) {
 
             if (handleIndex > 0) {
               const ensNameSpan = nameSpans.slice(0, handleIndex).reverse().find(block => (block.textContent || '').includes('.eth'))
-              const ensName = (((ensNameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0]
+              const ensName = ((((ensNameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
 
               return { nameSection: link, ensName, handle }
             }
           }, false)
 
           if (ensName) {
+            const userId = ensName.replace(/\./g,'-')
             if (nameSection.querySelector('.__frameMount__')) return
             const mount  = document.createElement('div')
             mount.className = '__frameMount__'
@@ -195,9 +192,14 @@ const callback = function (mutationsList, observer) {
             insertAfter(mount, firstChild(nameSection, 3))
 
             const ConnectedBadge = Restore.connect(Badge, store)
-            ReactDOM.render(<ConnectedBadge ensName={ensName} />, mount)
+            ReactDOM.render(<ConnectedBadge userId={userId} />, mount)
 
             mouseBlocker(tweet)
+
+            // If user has been scanned already
+            if (usersChecked.includes(userId)) return
+            usersChecked.push(userId)
+
             const { record } = await nebula.resolve(ensName)
             if (!record) return
 
@@ -224,7 +226,29 @@ const callback = function (mutationsList, observer) {
             }
 
             user.inventory = await inventory(user.address)
-            store.setUser(ensName, user)
+
+            // Map and type media
+            Object.keys(user.inventory).forEach(collection => {
+              const { meta, assets } = user.inventory[collection]
+              meta.priority = meta.img ? 1 : 0
+              const img = meta.img ? meta.img : assets[Object.keys(assets).filter(k => assets[k].img).sort((a, b) => {
+                if (assets[a].tokenId < assets[b].tokenId) return -1
+                if (assets[a].tokenId > assets[b].tokenId) return 1
+                return 0
+              })[0]]?.img
+              meta.img = { src: img || '' }
+              meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
+
+              Object.keys(assets).forEach(asset => {
+                const { img, animation, thumbnail } = assets[asset]
+                assets[asset].img = { src: animation || img || '' }
+                assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
+                assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
+                assets[asset].thumbnail.type = assets[asset].thumbnail.src.endsWith('.mp4') || assets[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
+              })
+            })
+
+            store.setUser(userId, user)
   
             // if (avatar.querySelector('.__frameMount2__')) return
             // const mount2  = document.createElement('div')
@@ -254,90 +278,3 @@ const observer = new MutationObserver(callback)
 observer.observe(root, config)
 
 // observer.disconnect()
-
-const PFPContainer = styled.div`
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  pointer-events: none;
-`
-
-const VerifyBadge = styled.div`
-  position: absolute;
-  width: 16px;
-  height: 14px;
-  left: -6px;
-  top: 2px;
-  cursor: pointer;
-  justify-content: center;
-  align-items: center;
-  pointer-events: none;
-  // background: red;
-`
-
-class PFP extends React.Component {
-  constructor () {
-    super()
-    this.state = {
-      showEthPanel: false
-    }
-  }
-  badge (size, badgeColor = 'currentColor', ethColor = 'currentColor') {
-    return (
-      <svg style={{ height: `${size}px`, width: `${size}px` }}  viewBox='0 0 84 84'>
-        <path fill={badgeColor} d='M84,44a16.1,16.1,0,0,0-8.59-14.4,16.63,16.63,0,0,0,1-5.6c0-8.84-6.84-16-15.27-16a14.2,14.2,0,0,0-5.34,1A15,15,0,0,0,28.26,9a14.45,14.45,0,0,0-5.35-1C14.47,8,7.64,15.16,7.64,24a16.63,16.63,0,0,0,1,5.6,16.38,16.38,0,0,0-.82,28.34A17.53,17.53,0,0,0,7.64,60c0,8.84,6.83,16,15.27,16a14.4,14.4,0,0,0,5.34-1,15,15,0,0,0,27.5,0,14.6,14.6,0,0,0,5.34,1c8.44,0,15.27-7.16,15.27-16a15.57,15.57,0,0,0-.13-2.05A16.16,16.16,0,0,0,84,44Z'/>
-        <path fill={ethColor} d='M60.08,39.1,43,16.13a1,1,0,0,0-1.77,0l-17.08,23a1,1,0,0,0,.35,1.4l17.08,8.69a1,1,0,0,0,1.08,0L59.74,40.5A1,1,0,0,0,60.08,39.1Zm-1.4,8.25L42.74,56.47a1.18,1.18,0,0,1-1.25,0L25.55,47.35A.41.41,0,0,0,25,48L41.14,68a1.19,1.19,0,0,0,2,0L59.21,48A.41.41,0,0,0,58.68,47.35Z'/>
-      </svg>
-    )
-  }
-  render () {
-    return (
-      <PFPContainer onClick={e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-      onMouseOver={e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-      onMouseEnter={e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-      onMouseLeave={e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}>
-        <VerifyBadge
-          onClick={e => {
-            e.preventDefault()
-            e.stopPropagation()
-            const xPosition = e.clientX
-            const yPosition = e.clientY
-            const layer = document.createElement('div')
-            layer.className = '__frameLayer__'
-            document.body.appendChild(layer)
-            layer.style.cssText = `
-              position: fixed;
-              background: green;
-              top: 0px;
-              right: 0px;
-              bottom: 0px;
-              left: 0px;
-              pointer-events: none;
-              opacity: 0.5;
-              z-index: 2000;
-            `
-            ReactDOM.render(<Panel />, layer)
-          }
-        }>
-          {this.bagde(16)}
-        </VerifyBadge>
-      </PFPContainer>
-  )}
-}

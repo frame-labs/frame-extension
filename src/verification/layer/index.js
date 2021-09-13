@@ -20,9 +20,9 @@ layer.style.cssText = `
 ReactDOM.render(<Layer  />, layer)
 
 // Only in dev env
-// const name = 'liquiddensity.eth'
+// const name = 'liquiddensity-eth'
 // const user = require('./dev/user.json')
 // store.setUser(name, user)
 // const position = { x: 100, y: 50}
-// store.setLayerPop({ position, active: true, ensName: name, created: Date.now() })
+// store.setLayerPop({ position, active: true, userId: name, created: Date.now() })
 
