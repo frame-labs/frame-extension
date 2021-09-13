@@ -144,10 +144,10 @@ const callback = function (mutationsList, observer) {
           const nameBlocks = [...nameSection.querySelectorAll('span')]
           
           const handleHref = (nameSection || {}).href || ''
-          const handle = handleHref.split('/').reverse()[0].toLowerCase()
+          const handle = (handleHref.split('/').reverse()[0] || '').toLowerCase()
 
           const ensNameBlock = nameBlocks.find(block => (block.textContent || '').includes('.eth'))
-          const ensName = ((((ensNameBlock || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0]).toLowerCase()
+          const ensName = ((((ensNameBlock || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
 
           if (ensName) {
             const userId = ensName.replace(/\./g,'-')
