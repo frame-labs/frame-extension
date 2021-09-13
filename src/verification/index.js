@@ -2,20 +2,31 @@ import React from 'react'
 import Restore from 'react-restore'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
+import n from 'nebula'
 
+import ethProvider from 'eth-provider'
+import provider from './provider'
 import inventory from './inventory'
 import store from './store'
 import themes from './themes'
-import n from 'nebula'
+import nft from './nft'
 
 import './layer'
 
-const nebula = n()
+const fallbackProvider = provider(ethProvider())
+const nebula = n('https://ipfs.nebula.land', fallbackProvider)
+
+// TODO
+const { getNft } = nft(fallbackProvider)
 
 const firstChild = (element, count, i = 0) => {
   element = element.children[0]
   if (++i === count) return element
   return firstChild(element, count, i)
+}
+
+function equalsIgnoreCase (s1, s2) {
+  return s1.toLowerCase() === s2.toLowerCase()
 }
 
 const root = document.getElementById('react-root')
@@ -139,15 +150,29 @@ const callback = function (mutationsList, observer) {
         const tweet = addedNode.querySelector('[data-testid=tweet]')
 
         if (tweet) {
-          const [avatar, nameSection] = tweet.querySelectorAll('a[role=link]')
+          const tweetLinks = [...tweet.querySelectorAll('a[role=link]')]
           
-          const nameBlocks = [...nameSection.querySelectorAll('span')]
-          
-          const handleHref = (nameSection || {}).href || ''
-          const handle = (handleHref.split('/').reverse()[0] || '').toLowerCase()
+          const { nameSection, ensName, handle } = tweetLinks.reduce((data, link) => {
+            if (data) return data
 
-          const ensNameBlock = nameBlocks.find(block => (block.textContent || '').includes('.eth'))
-          const ensName = ((((ensNameBlock || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
+            const href = (link || {}).href
+            const handle = href.split('/').reverse()[0].toLowerCase()
+
+            const nameSpans = [...link.querySelectorAll('span')]
+
+            // the name section will be one with a span that displays the same handle as the one in the link href
+            const handleIndex = nameSpans.findIndex(span => {
+              const text = span.textContent || ''
+              return text.startsWith('@') && equalsIgnoreCase(text.substring(1), handle)
+            })
+
+            if (handleIndex > 0) {
+              const ensNameSpan = nameSpans.slice(0, handleIndex).reverse().find(block => (block.textContent || '').includes('.eth'))
+              const ensName = ((((ensNameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
+
+              return { nameSection: link, ensName, handle }
+            }
+          }, false)
 
           if (ensName) {
             const userId = ensName.replace(/\./g,'-')
@@ -188,7 +213,7 @@ const callback = function (mutationsList, observer) {
             }
 
             user.verified = {
-              name: handle.toLowerCase() === user.twitter.toLowerCase(),
+              name: equalsIgnoreCase(handle, user.twitter),
               avatar: false
             }
             const compatible = 'eip155:1/erc721:'

@@ -1,5 +1,4 @@
 const { FetchWrapper } = require('use-nft')
-const ethProvider = require('eth-provider')
 const { ethers } = require('ethers')
 
 const CRYPTOKITTIES = "0x06012c8cf97BEaD5deAe237070F9587f8E7A266d"
@@ -31,9 +30,8 @@ function cryptoPunksContract (eth) {
   ])
 }
 
-async function getNft (address, tokenId) {
-  const eth = ethProvider()
-  const fetcher = new FetchWrapper(['ethereum', { ethereum: ethProvider() }])
+async function getNft (eth, address, tokenId) {
+  const fetcher = new FetchWrapper(['ethereum', { ethereum: eth }])
   const nft = await fetcher.fetchNft(address, tokenId)
 
   let collectionName
@@ -63,4 +61,8 @@ async function getNft (address, tokenId) {
   }
 }
 
-module.exports = { getNft }
+module.exports = function (provider) {
+  return {
+    getNft: (address, tokenId) => getNft(provider, address, tokenId)
+  }
+}
