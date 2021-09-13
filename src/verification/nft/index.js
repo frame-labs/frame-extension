@@ -61,7 +61,7 @@ async function getNft (eth, address, tokenId) {
   }
 }
 
-module.exports = function (provider) {
+export default function (provider) {
   return {
     getNft: (address, tokenId) => getNft(provider, address, tokenId)
   }
