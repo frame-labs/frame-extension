@@ -33,7 +33,7 @@ provider.connection.on('payload', payload => {
         const params = payload.params ? [].concat(payload.params) : []
         params.forEach(sub => delete subs[sub])
       }
-      chrome.tabs.sendMessage(tabId, Object.assign({}, payload, { id: payloadId }))
+      chrome.tabs.sendMessage(tabId, Object.assign({}, payload, { id: payloadId, type: 'eth:payload' }))
       delete pending[payload.id]
     }
   } else if (payload.method && payload.method.indexOf('_subscription') > -1 && subs[payload.params.subscription]) { // Emit subscription result to tab
@@ -41,7 +41,16 @@ provider.connection.on('payload', payload => {
   }
 })
 
-chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
+  if (payload.method === 'media_blob') {
+    const location = payload.location
+    fetch(payload.src).then(res => res.blob()).then(blob => {
+      const blobURL = URL.createObjectURL(blob)
+      chrome.tabs.executeScript(sender.tab.id, {
+        code: `window.__setMediaBlob__("${blobURL}", "${location}");`
+      })
+    }).catch(console.error)
+  } 
   if (payload.method === 'frame_summon') return provider.connection.send(payload)
   const id = provider.nextId++
   pending[id] = { tabId: sender.tab.id, payloadId: payload.id, method: payload.method }
@@ -51,7 +60,8 @@ chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   if (changeInfo.status !== 'complete') return
-  if (tab.url.indexOf('twitter.com') !== -1) {
+  var url = new URL(tab.url)
+  if (url.hostname === 'twitter.com') {
     chrome.tabs.executeScript(tabId, {
       file: 'verification.js'
     })

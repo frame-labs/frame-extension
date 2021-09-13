@@ -79,8 +79,8 @@ class Layer extends React.Component {
     e.stopPropagation()
   }
   render () {
-    const { active, position, ensName, created } = this.store('layerPop')
-    const user = this.store('users', ensName)
+    const { active, position, userId, created } = this.store('layerPop')
+    const user = this.store('users', userId)
     const theme = this.store('theme')
     if (active) {
       if (user) {

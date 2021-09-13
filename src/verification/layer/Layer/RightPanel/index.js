@@ -4,6 +4,8 @@ import styled, { keyframes, ThemeProvider } from 'styled-components'
 
 import { cardShowl, float, shake } from '../style'
 
+import { Video, Image } from '../media'
+
 import svg from '../../../svg'
 
 const PopRight = styled.div`
@@ -216,8 +218,8 @@ class RightPanel extends React.Component {
     )
   }
   renderContent () {
-    const { ensName } = this.store('layerPop')
-    const user = this.store('users', ensName)
+    const { userId  } = this.store('layerPop')
+    const user = this.store('users', userId)
     const { currentCollection, currentAsset } = this.store('rightPanel') // Currently hovered
     const { selectedCollection, selectedAsset } = this.store('inventory') // Currently selected
 
@@ -267,19 +269,15 @@ class RightPanel extends React.Component {
       const assetData = user.inventory[collection].assets[asset]
       // console.log('Asset', asset, assetData)
       const tokenId = '#' + (assetData.tokenId.length > 9 ? assetData.tokenId.substr(0, 3) + '...' + assetData.tokenId.substr(-3) : assetData.tokenId)
-      const img = assetData?.animation || assetData?.img
+      const img = assetData.img
       return (
         <PopRight key={assetData.name}>
           <AssetSummaryWrap>
             <AssetSummaryImage>
-              {img?.endsWith('.mp4') || img?.endsWith('.mov') ? (
-                <video autoPlay loop>
-                  <source src={img} type={'video/mp4'} />
-                </video> 
-              ) : img ? (
-                <img style={{
-                  objectFit: 'cover'
-                }} src={img} /> 
+              {img.type === 'video' ? (
+                <Video src={img.src} />
+              ) : img.type === 'img' ? (
+                <Image src={img.src} />
               ) : asset.name}
             </AssetSummaryImage>
             <AssetSummaryName>
@@ -309,14 +307,10 @@ class RightPanel extends React.Component {
             {collectionData.meta.name === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collectionData.meta.name}
           </CollectionSummaryTitle>
           <CollectionSummaryImage>
-            {img?.endsWith('.mp4') || img?.endsWith('.mov') ? (
-              <video autoPlay loop>
-                <source src={img} type={'video/mp4'} />
-              </video> 
-            ) : img ? (
-              <img style={{
-                objectFit: 'cover'
-              }} src={img} /> 
+            {img.type === 'video' ? (
+              <Video src={img.src} />
+            ) : img.type === 'img' ? (
+              <Image src={img.src} />
             ) : collectionData.meta.name}
           </CollectionSummaryImage>
           <CollectionItemCount>

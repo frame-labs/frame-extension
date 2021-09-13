@@ -159,8 +159,8 @@ class User extends React.Component {
   }
   badge (size) {
     const theme = this.store('theme')
-    const { ensName } = this.props
-    const user = ensName ? this.store('users', ensName) : ''
+    const { userId } = this.props
+    const user = userId ? this.store('users', userId) : ''
 
     let color, background
     if (user && user.verified.name) {
@@ -183,8 +183,8 @@ class User extends React.Component {
   }
   render () {
     const theme = this.store('theme')
-    const { ensName } = this.store('layerPop')
-    const user = this.store('users', ensName)
+    const { userId } = this.store('layerPop')
+    const user = this.store('users', userId)
     return (
       <PopName 
         onMouseEnter={(e)=>{

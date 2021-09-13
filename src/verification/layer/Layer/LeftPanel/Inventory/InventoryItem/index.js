@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 import styled, { keyframes, ThemeProvider } from 'styled-components'
 
 import { float, shake } from '../../../style'
+import { Video, Image } from '../../../media'
 
 const PopCollection = styled.div`
   width: 48px;
@@ -86,13 +87,12 @@ class InventoryItem extends React.Component {
     this.store.setCurrentAsset()
   }
   render () {
-    const { ensName } = this.store('layerPop')
-    const user = this.store('users', ensName)
+    const { userId } = this.store('layerPop')
+    const user = this.store('users', userId)
 
     if (this.props.asset) {
       const asset = user.inventory[this.props.collection].assets[this.props.asset]
-      // console.log('asset in ', asset)
-      const img = asset.thumbnail || asset.animation || asset.img
+      const img = asset.thumbnail
       return (
         <PopCollection 
           onClick={() => {
@@ -116,14 +116,10 @@ class InventoryItem extends React.Component {
             this.store.setRightPanelAsset(false)
           }}
         >
-          {img?.endsWith('.mp4') || img?.endsWith('.mov') ? (
-            <video autoPlay loop>
-              <source src={img} type={'video/mp4'} />
-            </video> 
-          ) : img ? (
-            <img style={{
-              objectFit: 'cover'
-            }} src={asset.img} /> 
+          {img.type === 'video' ? (
+            <Video src={img.src} />
+          ) : img.type === 'img' ? (
+            <Image src={img.src} />
           ) : asset.name}
         </PopCollection>
       )
@@ -149,14 +145,10 @@ class InventoryItem extends React.Component {
             this.store.clearRightPanel()
           }}
         >
-          {img?.endsWith('.mp4') || img?.endsWith('.mov') ? (
-            <video autoPlay loop>
-              <source src={img} type={'video/mp4'} />
-            </video> 
-          ) : img ? (
-            <img style={{
-              objectFit: 'cover'
-            }} src={img} /> 
+          {img.type === 'video' ? (
+            <Video src={img.src} />
+          ) : img.type === 'img' ? (
+            <Image src={img.src} />
           ) : collection.meta.name}
         </PopCollection>
        )
