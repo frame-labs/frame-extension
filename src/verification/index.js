@@ -87,7 +87,110 @@ function findNameSectionInTweet (tweet) {
   }, false)
 }
 
-const root = document.getElementsByTagName('main')[0]
+function mouseBlocker (mount) {
+  const blocker  = document.createElement('div')
+  blocker.className = '__frameMountBlock__'
+  blocker.style.cssText = `
+    width: 4px;
+    height: 20px;
+    position: absolute;
+    top: 0;
+    left: 75px;
+    pointer-events: auto;
+  `
+  mount.appendChild(blocker)
+}
+
+function updateHeaderBadge (root) {
+  const nav = root.querySelector('[data-testid=primaryColumn] nav')
+  if (nav) {
+    const profileHeader = nav.previousElementSibling
+
+    if (profileHeader && !profileHeader.querySelector('.__frameMount__')) {
+      const { ensName, handle, nameSection } = findNameSectionInHeader(profileHeader)
+
+      insertBadge(nameSection, ensName, handle)
+    }
+  }
+}
+
+async function insertBadge (element, ensName, handle) {
+  const userId = ensName.replace(/\./g,'-')
+  const mount = document.createElement('div')
+  mount.className = '__frameMount__'
+  mount.style.cssText = `
+    width: 16px;
+    height: 20px;
+    pointer-events: auto;
+    display: inline-block;
+    position: relative;
+    vertical-align: -20%;
+    margin-right: 4px;
+    margin-left: -2px;
+  `
+  insertAfter(mount, element)
+
+  const ConnectedBadge = Restore.connect(Badge, store)
+  ReactDOM.render(<ConnectedBadge userId={userId} />, mount)
+
+  mouseBlocker(element)
+
+  // If user has been scanned already
+  if (usersChecked.includes(userId)) return
+  usersChecked.push(userId)
+
+  const { record } = await nebula.resolve(ensName)
+  if (!record) return
+
+  // Need to verify eth
+
+  const user = {
+    name: record.name || '',
+    avatar: record.text && record.text.avatar ? record.text.avatar : '',
+    address: record.addresses && record.addresses.eth ? record.addresses.eth.toLowerCase() : '',
+    twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
+  }
+
+  user.verified = {
+    name: equalsIgnoreCase(handle, user.twitter),
+    avatar: false
+  }
+  const compatible = 'eip155:1/erc721:'
+  const index = user.avatar.indexOf(compatible)
+  const nftAvatar = index > -1
+  if (nftAvatar) {
+    const location = user.avatar.subsrt(index + compatible.length)
+    const [contract, tokenId] = location.split('/')
+    console.log('We have an NFT avatar', contract, tokenId)
+  }
+
+  user.inventory = await inventory(user.address)
+
+  // Map and type media
+  Object.keys(user.inventory).forEach(collection => {
+    const { meta, assets } = user.inventory[collection]
+    meta.priority = meta.img ? 1 : 0
+    const img = meta.img ? meta.img : assets[Object.keys(assets).filter(k => assets[k].img).sort((a, b) => {
+      if (assets[a].tokenId < assets[b].tokenId) return -1
+      if (assets[a].tokenId > assets[b].tokenId) return 1
+      return 0
+    })[0]]?.img
+    meta.img = { src: img || '' }
+    meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
+
+    Object.keys(assets).forEach(asset => {
+      const { img, animation, thumbnail } = assets[asset]
+      assets[asset].img = { src: animation || img || '' }
+      assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
+      assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
+      assets[asset].thumbnail.type = assets[asset].thumbnail.src.endsWith('.mp4') || assets[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
+    })
+  })
+
+  store.setUser(userId, user)
+}
+
+const root = document.getElementById('react-root')
 
 const config = { childList: true, subtree: true }
 
@@ -168,7 +271,7 @@ const insertAfter = (newNode, referenceNode) => {
 
 const usersChecked = []
 
-const callback = function (mutationsList, observer) {
+const callback = function (mutationsList) {
   const composeTweet = document.querySelectorAll('[data-testid=SideNav_NewTweet_Button]')[0]
   const { backgroundColor } = window.getComputedStyle(document.body)
   let color = 'rgb(255, 255, 255)'
@@ -187,141 +290,29 @@ const callback = function (mutationsList, observer) {
   // setTheme in store
   store.setTheme(themes(backgroundColor))
 
-  const mouseBlocker = (mount) => {
-    const blocker  = document.createElement('div')
-    blocker.className = '__frameMountBlock__'
-    blocker.style.cssText = `
-      width: 4px;
-      height: 20px;
-      position: absolute;
-      top: 0;
-      left: 75px;
-      pointer-events: auto;
-    `
-    mount.appendChild(blocker)
-  }
-
   mutationsList.forEach(async mutation => {
     if (mutation.type === 'childList') {
       if (mutation.addedNodes.length > 0) {
-        let elementToBadge, ensName, handle, nameSection
-
         const addedNode = mutation.addedNodes[0]
-        const profileNav = addedNode.querySelector('[data-testid=primaryColumn] nav')
 
-        if (profileNav) {
-          const profileHeader = profileNav.previousElementSibling
-          elementToBadge = profileHeader;
-          ({ ensName, handle, nameSection} = findNameSectionInHeader(profileHeader))
-        }
-        else {
-          const tweet = addedNode.querySelector('[data-testid=primaryColumn] [data-testid=tweet]')
-          if (tweet) {
-            elementToBadge = tweet;
-            ({ ensName, handle, nameSection} = findNameSectionInTweet(tweet))
+        updateHeaderBadge(addedNode)
+
+        const tweet = addedNode.querySelector('[data-testid=primaryColumn] [data-testid=tweet]')
+        if (tweet) {
+          const { ensName, handle, nameSection } = findNameSectionInTweet(tweet)
+
+          if (ensName && !tweet.querySelector('.__frameMount__')) {
+            insertBadge(nameSection, ensName, handle)
           }
-        }
-
-        if (ensName) {
-          const userId = ensName.replace(/\./g,'-')
-          if (nameSection.querySelector('.__frameMount__')) return
-          const mount  = document.createElement('div')
-          mount.className = '__frameMount__'
-          mount.style.cssText = `
-            width: 16px;
-            height: 20px;
-            pointer-events: auto;
-            display: inline-block;
-            position: relative;
-            vertical-align: -20%;
-            margin-right: 4px;
-            margin-left: -2px;
-          `
-          insertAfter(mount, firstChild(nameSection, 3))
-
-          const ConnectedBadge = Restore.connect(Badge, store)
-          ReactDOM.render(<ConnectedBadge userId={userId} />, mount)
-
-          mouseBlocker(elementToBadge)
-
-          // If user has been scanned already
-          if (usersChecked.includes(userId)) return
-          usersChecked.push(userId)
-
-          const { record } = await nebula.resolve(ensName)
-          if (!record) return
-
-          // Need to verify eth
-
-          const user = {
-            name: record.name || '',
-            avatar: record.text && record.text.avatar ? record.text.avatar : '',
-            address: record.addresses && record.addresses.eth ? record.addresses.eth.toLowerCase() : '',
-            twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
-          }
-
-          user.verified = {
-            name: equalsIgnoreCase(handle, user.twitter),
-            avatar: false
-          }
-          const compatible = 'eip155:1/erc721:'
-          const index = user.avatar.indexOf(compatible)
-          const nftAvatar = index > -1
-          if (nftAvatar) {
-            const location = user.avatar.subsrt(index + compatible.length)
-            const [contract, tokenId] = location.split('/')
-            console.log('We have an NFT avatar', contract, tokenId)
-          }
-
-          user.inventory = await inventory(user.address)
-
-          // Map and type media
-          Object.keys(user.inventory).forEach(collection => {
-            const { meta, assets } = user.inventory[collection]
-            meta.priority = meta.img ? 1 : 0
-            const img = meta.img ? meta.img : assets[Object.keys(assets).filter(k => assets[k].img).sort((a, b) => {
-              if (assets[a].tokenId < assets[b].tokenId) return -1
-              if (assets[a].tokenId > assets[b].tokenId) return 1
-              return 0
-            })[0]]?.img
-            meta.img = { src: img || '' }
-            meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
-
-            Object.keys(assets).forEach(asset => {
-              const { img, animation, thumbnail } = assets[asset]
-              assets[asset].img = { src: animation || img || '' }
-              assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
-              assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
-              assets[asset].thumbnail.type = assets[asset].thumbnail.src.endsWith('.mp4') || assets[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
-            })
-          })
-
-          store.setUser(userId, user)
-
-          // if (avatar.querySelector('.__frameMount2__')) return
-          // const mount2  = document.createElement('div')
-          // mount2.className = '__frameMount2__'
-          // mount2.style.cssText = `
-          //   position: absolute;
-          //   top: 0px;
-          //   left: 0;
-          //   height: 48px;
-          //   width: 48px;
-          //   border-radius: 24px;
-          //   pointer-events: auto;
-          //   z-index: 2000;
-          // `
-          // avatar.appendChild(mount2)
-          // ReactDOM.render(<PFP />, mount2)
-
         }
       }
     }
   })
 }
 
-const observer = new MutationObserver(callback)
+updateHeaderBadge(root)
 
+const observer = new MutationObserver(callback)
 observer.observe(root, config)
 
 // observer.disconnect()

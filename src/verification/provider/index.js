@@ -27,6 +27,8 @@ export default function (wrappedProvider) {
     wrappedProvider.on('chainChanged', chain => {
       currentChain = parseInt(chain)
     })
+
+    provider.emit('connect')
   })
   
   return provider
