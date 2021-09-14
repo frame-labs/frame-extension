@@ -29,7 +29,65 @@ function equalsIgnoreCase (s1, s2) {
   return s1.toLowerCase() === s2.toLowerCase()
 }
 
-const root = document.getElementById('react-root')
+function parseEnsName (nameSpan) {
+  return ((((nameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
+}
+
+function findNameSectionInHeader (profileHeader) {
+  let handle, ensName, nameSection
+
+  const headerPhoto = profileHeader.getElementsByTagName('a')[0]
+  const headerHref = (headerPhoto || {}).href
+  const match = headerHref.match(/^.*twitter\.com\/(?<handle>\w+)/)
+
+  if (match) {
+    handle = match.groups.handle.toLowerCase()
+
+    const infoSection = profileHeader.children[1]
+
+    nameSection = [...infoSection.children].find(block => {
+      const spans = [...block.getElementsByTagName('span')]
+
+      return spans.some(span => {
+        const text = span.textContent || ''
+        return text.startsWith('@') && equalsIgnoreCase(text.substring(1), handle)
+      })
+    })
+
+    const ensNameSpan = nameSection.querySelector('span > span')
+    ensName = parseEnsName(ensNameSpan)
+  }
+
+  return { nameSection, ensName, handle }
+}
+
+function findNameSectionInTweet (tweet) {
+  const tweetLinks = [...tweet.querySelectorAll('a[role=link]')];
+
+  return tweetLinks.reduce((data, link) => {
+    if (data) return data
+
+    const href = (link || {}).href
+    const handle = href.split('/').reverse()[0].toLowerCase()
+
+    const nameSpans = [...link.querySelectorAll('span')]
+
+    // the name section will be one with a span that displays the same handle as the one in the link href
+    const handleIndex = nameSpans.findIndex(span => {
+      const text = span.textContent || ''
+      return text.startsWith('@') && equalsIgnoreCase(text.substring(1), handle)
+    })
+
+    if (handleIndex > 0) {
+      const ensNameSpan = nameSpans.slice(0, handleIndex).reverse().find(block => (block.textContent || '').includes('.eth'))
+      const ensName = parseEnsName(ensNameSpan)
+
+      return { nameSection: link, ensName, handle }
+    }
+  }, false)
+}
+
+const root = document.getElementsByTagName('main')[0]
 
 const config = { childList: true, subtree: true }
 
@@ -146,127 +204,116 @@ const callback = function (mutationsList, observer) {
   mutationsList.forEach(async mutation => {
     if (mutation.type === 'childList') {
       if (mutation.addedNodes.length > 0) {
+        let elementToBadge, ensName, handle, nameSection
+
         const addedNode = mutation.addedNodes[0]
-        const tweet = addedNode.querySelector('[data-testid=tweet]')
+        const profileNav = addedNode.querySelector('[data-testid=primaryColumn] nav')
 
-        if (tweet) {
-          const tweetLinks = [...tweet.querySelectorAll('a[role=link]')]
-          
-          const { nameSection, ensName, handle } = tweetLinks.reduce((data, link) => {
-            if (data) return data
-
-            const href = (link || {}).href
-            const handle = href.split('/').reverse()[0].toLowerCase()
-
-            const nameSpans = [...link.querySelectorAll('span')]
-
-            // the name section will be one with a span that displays the same handle as the one in the link href
-            const handleIndex = nameSpans.findIndex(span => {
-              const text = span.textContent || ''
-              return text.startsWith('@') && equalsIgnoreCase(text.substring(1), handle)
-            })
-
-            if (handleIndex > 0) {
-              const ensNameSpan = nameSpans.slice(0, handleIndex).reverse().find(block => (block.textContent || '').includes('.eth'))
-              const ensName = ((((ensNameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
-
-              return { nameSection: link, ensName, handle }
-            }
-          }, false)
-
-          if (ensName) {
-            const userId = ensName.replace(/\./g,'-')
-            if (nameSection.querySelector('.__frameMount__')) return
-            const mount  = document.createElement('div')
-            mount.className = '__frameMount__'
-            mount.style.cssText = `
-              width: 16px;
-              height: 20px;
-              pointer-events: auto;
-              display: inline-block;
-              position: relative;
-              vertical-align: -20%;
-              margin-right: 4px;
-              margin-left: -2px;
-            `
-            insertAfter(mount, firstChild(nameSection, 3))
-
-            const ConnectedBadge = Restore.connect(Badge, store)
-            ReactDOM.render(<ConnectedBadge userId={userId} />, mount)
-
-            mouseBlocker(tweet)
-
-            // If user has been scanned already
-            if (usersChecked.includes(userId)) return
-            usersChecked.push(userId)
-
-            const { record } = await nebula.resolve(ensName)
-            if (!record) return
-
-            // Need to verify eth
-
-            const user = {
-              name: record.name || '',
-              avatar: record.text && record.text.avatar ? record.text.avatar : '',
-              address: record.addresses && record.addresses.eth ? record.addresses.eth.toLowerCase() : '',
-              twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
-            }
-
-            user.verified = {
-              name: equalsIgnoreCase(handle, user.twitter),
-              avatar: false
-            }
-            const compatible = 'eip155:1/erc721:'
-            const index = user.avatar.indexOf(compatible)
-            const nftAvatar = index > -1
-            if (nftAvatar) {
-              const location = user.avatar.subsrt(index + compatible.length)
-              const [contract, tokenId] = location.split('/')
-              console.log('We have an NFT avatar', contract, tokenId)
-            }
-
-            user.inventory = await inventory(user.address)
-
-            // Map and type media
-            Object.keys(user.inventory).forEach(collection => {
-              const { meta, assets } = user.inventory[collection]
-              meta.priority = meta.img ? 1 : 0
-              const img = meta.img ? meta.img : assets[Object.keys(assets).filter(k => assets[k].img).sort((a, b) => {
-                if (assets[a].tokenId < assets[b].tokenId) return -1
-                if (assets[a].tokenId > assets[b].tokenId) return 1
-                return 0
-              })[0]]?.img
-              meta.img = { src: img || '' }
-              meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
-
-              Object.keys(assets).forEach(asset => {
-                const { img, animation, thumbnail } = assets[asset]
-                assets[asset].img = { src: animation || img || '' }
-                assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
-                assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
-                assets[asset].thumbnail.type = assets[asset].thumbnail.src.endsWith('.mp4') || assets[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
-              })
-            })
-
-            store.setUser(userId, user)
-  
-            // if (avatar.querySelector('.__frameMount2__')) return
-            // const mount2  = document.createElement('div')
-            // mount2.className = '__frameMount2__'
-            // mount2.style.cssText = `
-            //   position: absolute;
-            //   top: 0px;
-            //   left: 0;
-            //   height: 48px;
-            //   width: 48px;
-            //   border-radius: 24px;
-            //   pointer-events: auto;
-            //   z-index: 2000;
-            // `
-            // avatar.appendChild(mount2)
-            // ReactDOM.render(<PFP />, mount2)
-
+        if (profileNav) {
+          const profileHeader = profileNav.previousElementSibling
+          elementToBadge = profileHeader;
+          ({ ensName, handle, nameSection} = findNameSectionInHeader(profileHeader))
+        }
+        else {
+          const tweet = addedNode.querySelector('[data-testid=primaryColumn] [data-testid=tweet]')
+          if (tweet) {
+            elementToBadge = tweet;
+            ({ ensName, handle, nameSection} = findNameSectionInTweet(tweet))
           }
+        }
+
+        if (ensName) {
+          const userId = ensName.replace(/\./g,'-')
+          if (nameSection.querySelector('.__frameMount__')) return
+          const mount  = document.createElement('div')
+          mount.className = '__frameMount__'
+          mount.style.cssText = `
+            width: 16px;
+            height: 20px;
+            pointer-events: auto;
+            display: inline-block;
+            position: relative;
+            vertical-align: -20%;
+            margin-right: 4px;
+            margin-left: -2px;
+          `
+          insertAfter(mount, firstChild(nameSection, 3))
+
+          const ConnectedBadge = Restore.connect(Badge, store)
+          ReactDOM.render(<ConnectedBadge userId={userId} />, mount)
+
+          mouseBlocker(elementToBadge)
+
+          // If user has been scanned already
+          if (usersChecked.includes(userId)) return
+          usersChecked.push(userId)
+
+          const { record } = await nebula.resolve(ensName)
+          if (!record) return
+
+          // Need to verify eth
+
+          const user = {
+            name: record.name || '',
+            avatar: record.text && record.text.avatar ? record.text.avatar : '',
+            address: record.addresses && record.addresses.eth ? record.addresses.eth.toLowerCase() : '',
+            twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
+          }
+
+          user.verified = {
+            name: equalsIgnoreCase(handle, user.twitter),
+            avatar: false
+          }
+          const compatible = 'eip155:1/erc721:'
+          const index = user.avatar.indexOf(compatible)
+          const nftAvatar = index > -1
+          if (nftAvatar) {
+            const location = user.avatar.subsrt(index + compatible.length)
+            const [contract, tokenId] = location.split('/')
+            console.log('We have an NFT avatar', contract, tokenId)
+          }
+
+          user.inventory = await inventory(user.address)
+
+          // Map and type media
+          Object.keys(user.inventory).forEach(collection => {
+            const { meta, assets } = user.inventory[collection]
+            meta.priority = meta.img ? 1 : 0
+            const img = meta.img ? meta.img : assets[Object.keys(assets).filter(k => assets[k].img).sort((a, b) => {
+              if (assets[a].tokenId < assets[b].tokenId) return -1
+              if (assets[a].tokenId > assets[b].tokenId) return 1
+              return 0
+            })[0]]?.img
+            meta.img = { src: img || '' }
+            meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
+
+            Object.keys(assets).forEach(asset => {
+              const { img, animation, thumbnail } = assets[asset]
+              assets[asset].img = { src: animation || img || '' }
+              assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
+              assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
+              assets[asset].thumbnail.type = assets[asset].thumbnail.src.endsWith('.mp4') || assets[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
+            })
+          })
+
+          store.setUser(userId, user)
+
+          // if (avatar.querySelector('.__frameMount2__')) return
+          // const mount2  = document.createElement('div')
+          // mount2.className = '__frameMount2__'
+          // mount2.style.cssText = `
+          //   position: absolute;
+          //   top: 0px;
+          //   left: 0;
+          //   height: 48px;
+          //   width: 48px;
+          //   border-radius: 24px;
+          //   pointer-events: auto;
+          //   z-index: 2000;
+          // `
+          // avatar.appendChild(mount2)
+          // ReactDOM.render(<PFP />, mount2)
+
         }
       }
     }
