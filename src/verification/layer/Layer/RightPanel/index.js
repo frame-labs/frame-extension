@@ -354,7 +354,6 @@ class RightPanel extends React.Component {
     )
   }
   renderAsset (user, collection, asset) {
-    console.log('renderAsset', user, collection, asset)
     const collectionName = user.inventory[collection].meta.name
     const assetData = user.inventory[collection].assets[asset]
     const tokenId = assetData?.tokenId ? '#' + (assetData.tokenId.length > 9 ? assetData.tokenId.substr(0, 3) + '...' + assetData.tokenId.substr(-3) : assetData.tokenId) : '?'

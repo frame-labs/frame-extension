@@ -1,11 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import store from '../store'
 import Layer from './Layer'
 
 const layer = document.createElement('div')
-layer.className = '__frameLayer__'
+layer.id = '__frameLayer__'
 document.body.appendChild(layer)
 layer.style.cssText = `
   position: fixed;

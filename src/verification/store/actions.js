@@ -44,6 +44,10 @@ export const setCurrentAsset = (u, asset) => {
   u('inventory.selectedAsset', () => asset)
 }
 
-export const setBlob = (u, blob, location) => {
-  u('blobMap', location, () => blob)
+export const setBlob = (u, blob, location, error) => {
+  if (error) {
+    console.error(error)
+  } else {
+    u('blobMap', location, () => blob)
+  }
 }

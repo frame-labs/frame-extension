@@ -77,34 +77,23 @@ const LoadingSpinner = styled.div`
   }
 `
 
-const resetLayer = () => {
-  store.setLayerPop({ position: { x: 0 , y: 0 }, active: false, user: {} })
-  store.setSelect(false)
-  store.setHover(false)
-}
-
-document.addEventListener('scroll', () => {
-  if (store('layerPop.active')) resetLayer()
-})
-
 class Layer extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {}
-
-    // store.observer(() => {
-    //   const { active } = store('layerPop')
-    //   if (active) {
-    //     document.body.style.overflow = 'hidden'
-    //   } else {
-    //     document.body.style.overflow = 'unset'
-    //   }
-    // })
-
+  }
+  componentDidMount () {
+    document.addEventListener('scroll', () => {
+      this.resetLayer()
+    })
   }
   resetLayer () {
-    const { created } = store('layerPop')
-    if (Date.now() - created > 500) resetLayer()
+    const { active, created } = this.store('layerPop')
+    if (active && Date.now() - created > 500) {
+      this.store.setLayerPop({ position: { x: 0 , y: 0 }, active: false, user: {} })
+      this.store.setSelect(false)
+      this.store.setHover(false)
+    }
   }
   block (e) {
     e.preventDefault()
@@ -146,14 +135,20 @@ class Layer extends React.Component {
                   pointerEvents: 'auto'
                 }}
               >
-                <Loading>
-                  <LoadingSpinner>
+                {user?.error ? (
+                  <Loading>
+                    <div>{'error resolving ens name'}</div>
+                  </Loading>
+                ) : (
+                  <Loading>
+                    <LoadingSpinner>
                       <svg viewBox='0 0 50 50'>
                         <circle cx='25' cy='25' r='20' fill='none' strokeWidth='5' />
                       </svg>
-                  </LoadingSpinner>
-                  <div>{'loading'}</div>
-                </Loading>
+                    </LoadingSpinner>
+                    <div>{'loading'}</div>
+                  </Loading>
+                )}
               </Pop>
             </PopWrap>
           </ThemeProvider>
