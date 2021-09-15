@@ -106,10 +106,24 @@ function updateHeaderBadge (root) {
   if (nav) {
     const profileHeader = nav.previousElementSibling
 
-    if (profileHeader && !profileHeader.querySelector('.__frameMount__')) {
+    if (profileHeader) {
       const { ensName, handle, nameSection } = findNameSectionInHeader(profileHeader)
 
-      insertBadge(nameSection, ensName, handle)
+      const existingBadge = profileHeader.querySelector('.__frameMount__')
+
+      if (existingBadge) {
+        if (existingBadge.getAttribute('handle') === handle) {
+          // badge already rendered correctly
+          return
+        }
+
+        // outdated badge
+        existingBadge.remove()
+      }
+
+      if (ensName) {
+        insertBadge(nameSection, ensName, handle)
+      }
     }
   }
 }
@@ -117,6 +131,7 @@ function updateHeaderBadge (root) {
 async function insertBadge (element, ensName, handle) {
   const userId = ensName.replace(/\./g,'-')
   const mount = document.createElement('div')
+  mount.setAttribute('handle', handle)
   mount.className = '__frameMount__'
   mount.style.cssText = `
     width: 16px;
