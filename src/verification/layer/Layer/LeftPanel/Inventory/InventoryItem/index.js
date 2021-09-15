@@ -9,14 +9,15 @@ const PopCollection = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 3px;
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
   padding: 5px 4px 4px 5px;
   // transform: translate3d(180, 180, 180);
   cursor: pointer;
   word-break: break-word;
   user-select: none;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   img {
     width: 48px;
@@ -32,20 +33,6 @@ const PopCollection = styled.div`
     object-fit: cover;
     border-radius: 3px;
     background: ${props => props.theme.base2};
-  }
-
-  div {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 3px;
-    font-size: 8px;
-    padding: 5px;
-    box-sizing: border-box;
-    background: ${props => props.theme.base2};
-    position: relative;
   }
 
   &:hover {
@@ -67,24 +54,37 @@ const PopCollection = styled.div`
   }
 `
 
+const ItemSelected = styled.div`
+  position: absolute;
+  top: 2px;
+  right: 1px; 
+  bottom: 1px;
+  left: 2px;
+  border: 2px solid ${props => props.theme.top0};
+  border-radius: 6px;
+  z-index: 20000;
+`
+
+const TextImg = styled.div`
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  font-size: 8px;
+  padding: 5px;
+  box-sizing: border-box;
+  background: ${props => props.theme.base2};
+  position: relative;
+`
+
 class InventoryItem extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {
       hovered: false
     }
-  }
-  setCollection (collection) {
-    this.store.setCurrentCollection(collection)
-  }
-  unsetCollection () {
-    this.store.setCurrentCollection()
-  }
-  setAsset (asset) {
-    this.store.setCurrentAsset(asset)
-  }
-  unsetAsset () {
-    this.store.setCurrentAsset()
   }
   render () {
     const { userId } = this.store('layerPop')
@@ -93,63 +93,78 @@ class InventoryItem extends React.Component {
     if (this.props.asset) {
       const asset = user.inventory[this.props.collection].assets[this.props.asset]
       const img = asset.thumbnail
+      const select = this.store('select')
+
       return (
         <PopCollection 
           onClick={() => {
-            this.setAsset(this.props.asset)
-            this.store.setRightPanelAsset(this.props.asset)
+            if (select?.asset === this.props.asset) {
+              this.store.setSelect({ 
+                type: 'collection', 
+                collection: this.props.collection 
+              })
+            } else {
+              this.store.setSelect({ 
+                type: 'asset', 
+                asset: this.props.asset,
+                collection: this.props.collection 
+              })
+            }
           }}
           onMouseMove = {() => {
-            this.store.setRightPanelAsset(this.props.asset)
-            // this.popCollectionHover = setTimeout(() => {
-              
-            // }, 100)
+            this.store.setHover({ 
+              type: 'asset', 
+              asset:this.props.asset,
+              collection: this.props.collection 
+            })
           }}
           onMouseEnter={() => {
-            this.store.setRightPanelAsset(this.props.asset)
-            // this.popCollectionHover = setTimeout(() => {
-              
-            // }, 100)
+            this.store.setHover({ 
+              type: 'asset', 
+              asset:this.props.asset,
+              collection: this.props.collection 
+            })
           }}
           onMouseLeave={() => {
-            // clearTimeout(this.popCollectionHover)
-            this.store.setRightPanelAsset(false)
+            this.store.setHover(false)
           }}
         >
-          {img.type === 'video' ? (
-            <Video src={img.src} />
-          ) : img.type === 'img' ? (
+          {select?.asset === this.props.asset ? <ItemSelected /> : null }
+          {img?.src && img.type === 'video' ? (
+            <Video src={img.src} soundOff={true} />
+          ) : img?.src && img.type === 'img' ? (
             <Image src={img.src} />
-          ) : asset.name}
+          ) : <TextImg>{asset.name}</TextImg>}
         </PopCollection>
       )
     } else if (this.props.collection) {
       const collection = user.inventory[this.props.collection]
       const img = collection.meta.img
+      const select = this.store('select')
       return (
         <PopCollection 
           onClick={() => {
-            this.store.setCurrentCollection(this.props.collection)
-            this.store.setRightPanelCollection(this.props.collection)
+            this.store.setSelect({ 
+              type: 'collection', 
+              collection: this.props.collection 
+            })
           }}
           onMouseEnter={() => {
-            // this.setState({ hovered: true })
-            this.store.setRightPanelCollection(this.props.collection)
-            // this.popCollectionHover = setTimeout(() => {
-              
-            // }, 100)
+            this.store.setHover({ 
+              type: 'collection', 
+              collection: this.props.collection 
+            })
           }}
           onMouseLeave={() => {
-            // this.setState({ hovered: false })
-            // clearTimeout(this.popCollectionHover)
-            this.store.clearRightPanel()
+            this.store.setHover(false)
           }}
         >
-          {img.type === 'video' ? (
-            <Video src={img.src} />
-          ) : img.type === 'img' ? (
+          {select?.collection === this.props.collection ? <ItemSelected /> : null }
+          {img?.src && img.type === 'video' ? (
+            <Video src={img.src} soundOff={true} />
+          ) : img?.src && img.type === 'img' ? (
             <Image src={img.src} />
-          ) : collection.meta.name}
+          ) : <TextImg>{collection.meta.name}</TextImg>}
         </PopCollection>
        )
     } else {

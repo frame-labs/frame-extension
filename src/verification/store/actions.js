@@ -6,6 +6,10 @@ export const setHover = (u, hover) => {
   u('hover', () => hover)
 }
 
+export const setSelect = (u, select) => {
+  u('select', () => select)
+}
+
 export const setRightPanelCollection = (u, collection) => {
   u('rightPanel', (rp = {}) => {
     rp.currentCollection = collection

@@ -92,7 +92,9 @@ const PopName = styled.div`
   }
 `
 
-
+const PopNameSelected = styled(PopName)`
+  border: 2px solid ${props => props.theme.top0};
+`
 
 const PopNameVerifedIcon = styled.div`
   position: absolute;
@@ -150,6 +152,17 @@ const PopLogo = styled.div`
 
 `
 
+const NameSelect = styled.div`
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  bottom: -3px;
+  left: -3px;
+  border-radius: 9px;
+  border: 2px solid ${props => props.theme.top0};
+  z-index: 20000;
+`
+
 class User extends React.Component {
   constructor (...args) {
     super(...args)
@@ -185,18 +198,25 @@ class User extends React.Component {
     const theme = this.store('theme')
     const { userId } = this.store('layerPop')
     const user = this.store('users', userId)
+    const select = this.store('select')
+
     return (
-      <PopName 
+      <PopName
         onMouseEnter={(e)=>{
-          this.store.setHover({
-            type: 'name',
-            ensName: 'brantly.eth'
-          })
+          this.store.setHover({ type: 'user', userId })
         }}
-        onMouseLeave={(e)=>{
+        onClick={(e) => {
+          if (this.store('select')?.type === 'user') {
+            this.store.setSelect(false)
+          } else {
+            this.store.setSelect({ type: 'user', userId })
+          }
+        }}
+        onMouseLeave={(e) => {
           this.store.setHover(false)
         }}
       >
+        {select?.type === 'user' ? <NameSelect /> : null}
         {/* <PopLogo>
           <svg viewBox='0 0 245 247'>
             <path d='M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z'/>

@@ -20,9 +20,17 @@ layer.style.cssText = `
 ReactDOM.render(<Layer  />, layer)
 
 // Only in dev env
-// const name = 'liquiddensity-eth'
-// const user = require('./dev/user.json')
-// store.setUser(name, user)
-// const position = { x: 100, y: 50}
-// store.setLayerPop({ position, active: true, userId: name, created: Date.now() })
+// const liquidId = 'liquiddensity-eth'
+// const liquidUser = require('./dev/liquiddensity-eth.json')
+// store.setUser(liquidId, liquidUser)
+// const brantlyId = 'brantly-eth'
+// const brantlyUser = require('./dev/brantly-eth.json')
+// store.setUser(brantlyId, brantlyUser)
+// const validatorId = 'validator-eth'
+// const validatorUser = require('./dev/validator-eth.json')
+// store.setUser(validatorId, validatorUser)
 
+// const position = { x: 100, y: 50}
+// const userId = liquidId
+
+// store.setLayerPop({ position, active: true, userId, created: Date.now() })  

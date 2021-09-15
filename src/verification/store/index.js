@@ -12,7 +12,6 @@ const initialState = {
     },
     name: ''
   },
-  rightPanel: {},
   users: {},
   theme: themes(), // Fill default theme
   inventory: {
@@ -22,6 +21,7 @@ const initialState = {
 }
 
 // Grab persisted state from local storage
+window.localStorage.removeItem('__frameLayer__') 
 const persist = {} // JSON.parse(window.localStorage.getItem('__frameLayer__') || '{}')
 
 const store = Restore.create({...initialState, ...persist}, actions)

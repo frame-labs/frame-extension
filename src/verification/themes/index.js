@@ -3,7 +3,7 @@ const defaultTheme = {
   bad: 'rgb(249, 24, 128)', // 'rgba(235, 90, 140, 1)'
   good: 'rgb(0, 186, 124)', // 'rgb(0, 175, 145)'
   moonOver: 'rgba(60, 20, 20, 1)',
-  badOver: 'rgb(100, 0, 0)',
+  badOver: 'rgb(255, 255, 255)',
   goodOver: 'rgb(255, 255, 255)',
   baseShadow: 'rgba(20, 20, 30, 0.3)',
   base0: 'rgb(40, 40, 50)', // Darkest Base
@@ -67,14 +67,6 @@ themes['rgb(255, 255, 255)'] = {
   top2: 'rgb(35, 35, 55)',
   top3: 'rgb(25, 25, 55)',
   top4: 'rgb(15, 15, 55)', // Darkest Top
-  verifiedBadge: {
-    background: 'rgb(0, 186, 124)',
-    color: 'rgb(255, 255, 255)'
-  },
-  unverifiedBadge: {
-    background: 'rgb(249, 24, 128)',
-    color: 'rgb(255, 255, 255)'
-  },
   badge: {
     verified: {
       background: 'rgb(0, 186, 124)',

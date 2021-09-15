@@ -14,6 +14,22 @@ const InventoryWrap = styled.div`
   right: 5px;
 `
 
+const InventoryNone = styled.div`
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  margin-left: -2px;
+`
+
 const InventoryHeader = styled.div`
   position: relative;
   font-size: 9px;
@@ -59,6 +75,10 @@ const InventoryHeaderBack = styled.div`
   }
 `
 
+const InventoryHeaderText = styled.span`
+  margin-left: 20px;
+`
+
 const ItemWrap = styled.div`
   position: absolute;
   top: 24px;
@@ -99,14 +119,18 @@ class Inventory extends React.Component {
   }
   render () {
     const { userId } = this.store('layerPop')
-    const user = this.store('users', userId)
-    const selectedCollection = this.store('inventory.selectedCollection')
+    const user = this.store('users', userId) || {}
+    const select = this.store('select')
+    const collection = select?.collection
 
+    let name = collection ? user?.inventory?.[collection]?.meta?.name : '' || ''
+    if (name === 'ENS: Ethereum Name Service') name = 'Ethereum Name Service'
+    if (name.length > 26) name = name.substr(0, 23) + '...'
     // if (selectedCollection) console.log(user.inventory[selectedCollection])
 
     return (
       <InventoryWrap>
-        {!selectedCollection ? (
+        {!collection ? (
           <>
             <InventoryHeader>   
               Inventory
@@ -123,6 +147,7 @@ class Inventory extends React.Component {
                   }).map(key => {
                     return <InventoryItem key={key} collection={key} />
                   })}
+                  {Object.keys(user.inventory).length === 0 ? <InventoryNone>{'no items'}</InventoryNone> : null}
                 </PopCollectionsWrapper>
               </ItemScroll>
             </ItemWrap>
@@ -132,22 +157,23 @@ class Inventory extends React.Component {
             <InventoryHeader>
               <InventoryHeaderBack
                 onClick={() => {
-                  this.store.setCurrentCollection()
-                  this.store.setCurrentAsset()
-                  this.store.clearRightPanel()
+                  this.store.setSelect(false)
+                  this.store.setHover(false)
                 }}
               >
                 <svg viewBox="0 0 448 512">
                   <path fill="currentColor" d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" />
                 </svg>
               </InventoryHeaderBack>
-              {user.inventory[selectedCollection].meta.name === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : user.inventory[selectedCollection].meta.name}
+              <InventoryHeaderText>
+                {name}
+              </InventoryHeaderText>
             </InventoryHeader>
             <ItemWrap>
               <ItemScroll>
                 <PopCollectionsWrapper>
-                  {Object.keys(user.inventory[selectedCollection].assets).map(key => {
-                    return <InventoryItem key={key} collection={selectedCollection} asset={key} />
+                  {Object.keys(user.inventory[collection].assets).map(key => {
+                    return <InventoryItem key={key} collection={collection} asset={key} />
                   })}
                 </PopCollectionsWrapper>
               </ItemScroll>

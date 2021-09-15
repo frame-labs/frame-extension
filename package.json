@@ -1,6 +1,6 @@
 {
   "name": "frame-extension",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/floating/frame-extension.git"
@@ -18,20 +18,20 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.15.0",
     "@babel/preset-react": "7.14.5",
-    "html-webpack-plugin": "^5.3.2",
+    "html-webpack-plugin": "5.3.2",
     "ncp": "2.0.0",
-    "node-polyfill-webpack-plugin": "^1.1.4",
+    "node-polyfill-webpack-plugin": "1.1.4",
     "nodemon": "2.0.12",
-    "react-hot-loader": "^4.13.0",
+    "react-hot-loader": "4.13.0",
     "rimraf": "3.0.2",
     "standard": "16.0.3",
-    "terser-webpack-plugin": "5.2.3",
-    "webpack": "5.52.0",
+    "terser-webpack-plugin": "5.2.4",
+    "webpack": "5.52.1",
     "webpack-cli": "4.8.0",
-    "webpack-dev-server": "^4.1.1"
+    "webpack-dev-server": "4.2.1"
   },
   "dependencies": {
-    "@babel/preset-env": "7.15.4",
+    "@babel/preset-env": "7.15.6",
     "@babel/runtime": "7.15.4",
     "@ensdomains/address-encoder": "0.2.8",
     "@ensdomains/content-hash": "2.5.7",
@@ -43,10 +43,11 @@
     "eth-provider": "0.9.4",
     "ethereum-provider": "0.4.4",
     "ethers": "5.4.6",
+    "nebula": "0.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-restore": "0.5.0",
     "styled-components": "5.3.1",
-    "use-nft": "^0.10.1"
+    "use-nft": "0.10.1"
   }
 }

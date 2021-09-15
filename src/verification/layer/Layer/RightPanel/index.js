@@ -40,7 +40,7 @@ const AssetSummaryWrap = styled.div`
 const PopRightLogo = styled(PopRight)`
   svg {
     height: 80px;
-    fill: ${props => props.theme.base2};
+    fill: ${props => props.theme.base3};
     opacity: 0.2;
   }
 `
@@ -74,6 +74,7 @@ const CollectionSummaryImage = styled.div`
   background: ${props => props.theme.base1};
   text-align: center;
   margin: 8px;
+  position: relative;
 
   img, video {
     width: 112px;
@@ -83,6 +84,13 @@ const CollectionSummaryImage = styled.div`
   }
 
   span {
+    width: 112px;
+    height: 112px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 16px;
   }
 `
@@ -126,17 +134,25 @@ const AssetSummaryImage = styled.div`
   width: 185x;
   height: 185px;
   margin-top: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-weight: 600;
   text-align: center;
+  position: relative;
 
   img, video {
-    width: 185px;
-    height: 185px;
-    object-fit: contain;
+    max-width: 185px;
+    max-height: 185px;
+    // object-fit: contain;
     border-radius: 6px;
+  }
+
+  span, div {
+    width: 185px;
+    min-height: 185px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    position: relative;
   }
 `
 
@@ -203,10 +219,201 @@ const AssetLink = styled.div`
   }
 `
 
+const PopUser = styled.div`
+  position: absolute;
+  top: 5px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  // justify-content: center;
+  align-items: center;
+  // animation: ${float} 200ms linear both;
+  overscroll-behavior: contain;
+  color: ${props => props.theme.top0};
+`
+
+const Verified = styled.div`
+  font-size: 10px;
+  text-transform: lowercase;
+  font-weight: 600;
+  border-radius: 6px;
+  width: calc(100% - 10px);
+  margin-bottom: 10px;
+  padding: 1px 0px;
+`
+
+const PopUserVerified = styled(Verified)`
+  background: ${props => props.theme.base1};
+  color: ${props => props.theme.goodOver};
+`
+
+const PopUserUnverified = styled(Verified)`
+  background: ${props => props.theme.bad};
+  color: ${props => props.theme.badOver};
+`
+
+const PopUserLine = styled.div`
+  width: calc(100% - 6px);
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0px 3px;
+`
+
+const PopUserLineCenter = styled(PopUserLine)`
+  background: ${props => props.theme.good};
+  font-size: 10px;
+  height: 34px;
+  display: flex;
+  // flex-direction: column;
+  text-transform: uppercase;
+  svg {
+    margin: 8px 5px 5px 0px;
+  }
+`
+
+const PopUserBadge = styled.div`
+  background: ${props => props.theme.good};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  font-size: 12px;
+  width: calc(100% - 10px);
+  margin-bottom: 5px;
+`
+
+const ProfileImage = styled.div`
+  width: 185px;
+  height: 185px;
+  // border-radius: 93px;
+  font-weight: 600;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: ${props => props.theme.base2};
+  border-radius: 6px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  margin-left: -2px;
+`
+
 class RightPanel extends React.Component {
   constructor (...args) {
     super(...args)
     this.state = {}
+  }
+  renderUser (user) {
+    const theme = this.store('theme')
+    const img = ''
+    return (
+      <PopRight key='hover:user'>
+        <PopUser>
+          <ProfileImage>
+              {img?.src && img?.type === 'video' ? (
+                <Video src={img.src} />
+              ) : img?.src && img?.type === 'img' ? (
+                <Image src={img.src} />
+              ) : <div>{'no nft pfp'}</div>}
+            </ProfileImage>
+          {user.verified.name || true ? (
+            <>
+              <PopUserVerified>
+                <PopUserLine>{'@ffloat'}</PopUserLine>
+                <PopUserLineCenter>
+                  <div>{svg.badge(21, theme.top0, theme.good)}</div>
+                  <div>{'ens name verified'}</div>
+                </PopUserLineCenter>
+                <PopUserLine>{user.name}</PopUserLine>
+              </PopUserVerified>
+            </>
+          ) : (
+            <>
+              <PopUserBadge>{svg.badge(48, theme.top0, theme.bad)}</PopUserBadge>
+              <PopUserUnverified>
+                <PopUserLine>{'@ffloat'}</PopUserLine>
+                <PopUserLineCenter>{'ens name unverified'}</PopUserLineCenter>
+                <PopUserLine>{user.name}</PopUserLine>
+              </PopUserUnverified>
+            </>
+          )}
+        </PopUser>
+      </PopRight>
+    )
+  }
+  renderAsset (user, collection, asset) {
+    console.log('renderAsset', user, collection, asset)
+    const collectionName = user.inventory[collection].meta.name
+    const assetData = user.inventory[collection].assets[asset]
+    const tokenId = assetData?.tokenId ? '#' + (assetData.tokenId.length > 9 ? assetData.tokenId.substr(0, 3) + '...' + assetData.tokenId.substr(-3) : assetData.tokenId) : '?'
+    const img = assetData.img
+    return (
+      <PopRight key={assetData.name}>
+        <AssetSummaryWrap>
+          <AssetSummaryImage>
+            {img?.src && img?.type === 'video' ? (
+              <Video src={img.src} />
+            ) : img?.src && img?.type === 'img' ? (
+              <Image src={img.src} />
+            ) : <span>{asset.name}</span>}
+          </AssetSummaryImage>
+          <AssetSummaryName>
+            {assetData.name}
+          </AssetSummaryName>
+          <AssetSummaryCollection>
+            <div>{collectionName === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collectionName}</div>
+            <div>{tokenId}</div>
+          </AssetSummaryCollection>
+          <AssetLink onClick={()=>{
+            window.open(assetData.openSeaLink, '_blank')
+          }}>
+            View on OpenSea
+          </AssetLink>
+        </AssetSummaryWrap>
+      </PopRight>
+    )
+  }
+  renderCollection (user, collection) {
+    const collectionData = user.inventory[collection]
+    const count = Object.keys(collectionData.assets).length || 0
+
+    const img = collectionData.meta.img
+
+    return (
+      <PopRight key={collectionData.meta.name}>
+        <CollectionSummaryTitle>
+          {collectionData.meta.name === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collectionData.meta.name}
+        </CollectionSummaryTitle>
+        <CollectionSummaryImage>
+          {img?.src && img?.type === 'video' ? (
+              <Video src={img.src} />
+            ) : img?.src && img?.type === 'img' ? (
+              <Image src={img.src} />
+            ) : <span>{collectionData.meta.name}</span>
+          }
+        </CollectionSummaryImage>
+        <CollectionItemCount>
+          <CollectionItemCountNumber>
+            {count}
+          </CollectionItemCountNumber>
+          <CollectionItemCountLabel>
+            {count === 1 ? 'item' : 'items'}
+          </CollectionItemCountLabel>
+        </CollectionItemCount>
+      </PopRight>
+    )
   }
   renderDefault () {
     return (
@@ -217,122 +424,28 @@ class RightPanel extends React.Component {
       </PopRightLogo>
     )
   }
-  renderContent () {
+  render () {
     const { userId  } = this.store('layerPop')
     const user = this.store('users', userId)
-    const { currentCollection, currentAsset } = this.store('rightPanel') // Currently hovered
-    const { selectedCollection, selectedAsset } = this.store('inventory') // Currently selected
-
-    // console.log('currentCollection', currentCollection)
-    // console.log('selectedCollection', selectedCollection)
-
-    // console.log('currentAsset', currentAsset)
-    // console.log('selectedAsset', selectedAsset)
-
-    // const { hoverNameVerification } = this.store('rightPanel') 
-    // const { selectedNameVerification } = this.store('nav') 
-
-    const collection = currentCollection || selectedCollection
-    const asset = currentAsset || selectedAsset
 
     const hover = this.store('hover')
-    const selected = false
+    const select = this.store('select')
 
-    const theme = this.store('theme')
-
-    if (hover) {
-      if (hover.type === 'name') {
-        return (
-          <PopRight key='hover:name'>
-            <div>{'ens name'}</div>
-            <div>{svg.badge(48, theme.top0, theme.good)}</div>
-            <div>{hover.name}</div>
-            <div>{'verified'}</div>
-          </PopRight>
-        )
-      } else if (hover.type === 'avatar') {
-        return (
-          <PopRight key='hover:avatar'>
-            <div>{'nft pfp/avatar'}</div>
-            <div>{svg.badge(48, theme.top0, theme.bad)}</div>
-            <div>{hover.name}</div>
-            <div>{'verified'}</div>
-          </PopRight>
-        )
-      } else {
-        return this.renderDefault()
-      }
-    } else if (selected) {
-      return this.renderDefault()
-    } else if (asset) {
-      const collectionName = user.inventory[collection].meta.name
-      const assetData = user.inventory[collection].assets[asset]
-      // console.log('Asset', asset, assetData)
-      const tokenId = '#' + (assetData.tokenId.length > 9 ? assetData.tokenId.substr(0, 3) + '...' + assetData.tokenId.substr(-3) : assetData.tokenId)
-      const img = assetData.img
-      return (
-        <PopRight key={assetData.name}>
-          <AssetSummaryWrap>
-            <AssetSummaryImage>
-              {img.type === 'video' ? (
-                <Video src={img.src} />
-              ) : img.type === 'img' ? (
-                <Image src={img.src} />
-              ) : asset.name}
-            </AssetSummaryImage>
-            <AssetSummaryName>
-              {assetData.name}
-            </AssetSummaryName>
-            <AssetSummaryCollection>
-              <div>{collectionName === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collectionName}</div>
-              <div>{tokenId}</div>
-            </AssetSummaryCollection>
-            <AssetLink onClick={()=>{
-              window.open(assetData.openSeaLink, '_blank')
-            }}>
-              View on OpenSea
-            </AssetLink>
-          </AssetSummaryWrap>
-        </PopRight>
-      )
-    } else if (collection) {
-      const collectionData = user.inventory[collection]
-      const count = Object.keys(collectionData.assets).length || 0
-
-      const img = collectionData.meta.img
-
-      return (
-        <PopRight key={collectionData.meta.name}>
-          <CollectionSummaryTitle>
-            {collectionData.meta.name === 'ENS: Ethereum Name Service' ? 'Ethereum Name Service' : collectionData.meta.name}
-          </CollectionSummaryTitle>
-          <CollectionSummaryImage>
-            {img.type === 'video' ? (
-              <Video src={img.src} />
-            ) : img.type === 'img' ? (
-              <Image src={img.src} />
-            ) : collectionData.meta.name}
-          </CollectionSummaryImage>
-          <CollectionItemCount>
-            <CollectionItemCountNumber>
-              {count}
-            </CollectionItemCountNumber>
-            <CollectionItemCountLabel>
-              {count === 1 ? 'item' : 'items'}
-            </CollectionItemCountLabel>
-          </CollectionItemCount>
-        </PopRight>
-      )
+    if (select?.type === 'user') {
+      return this.renderUser(user)
+    } else if (select?.type === 'asset') {
+      return this.renderAsset(user, select?.collection, select?.asset) 
+    } else if (hover?.type === 'user') {
+      return this.renderUser(user)
+    } else if (hover?.type === 'asset') {
+      return this.renderAsset(user, hover?.collection, hover?.asset)
+    } else if (select?.type === 'collection') {
+      return this.renderCollection(user, select?.collection) 
+    } else if (hover?.type === 'collection') {
+      return this.renderCollection(user, hover?.collection) 
     } else {
       return this.renderDefault()
     }
-  }
-  render () {
-    return (
-      <>
-        {this.renderContent()}
-      </>
-    )
   }
 }
 

@@ -3,14 +3,15 @@ import Restore from 'react-restore'
 import styled, { keyframes, ThemeProvider } from 'styled-components'
 
 import store from '../../store'
+import svg from '../../svg'
 
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
 
-import { cardShow } from './style'
+import { cardShow, dash, rotate } from './style'
 
 const PopWrap = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   bottom: 0px;
@@ -19,7 +20,7 @@ const PopWrap = styled.div`
 `
 
 const Pop = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   width: 440px;
@@ -29,9 +30,10 @@ const Pop = styled.div`
   font-family: sans-serif;
   animation: ${cardShow} 400ms linear both;
   overscroll-behavior: contain;
+  overflow: hidden;
   color: ${props => props.theme.top0};
   background: ${props => props.theme.base0};
-  overflow: hidden;
+  font-size: 15px;
 `
 
 const Loading = styled.div`
@@ -47,9 +49,39 @@ const Loading = styled.div`
   font-size: 12px;
   letter-spacing: 2px;
   margin-left: 2px;
+  color: ${props => props.theme.top0};
+  display: flex;
+  flex-direction: column;
 `
 
-const resetLayer = () => store.setLayerPop({ position: { x: 0 , y: 0 }, active: false, user: {} })
+const LoadingSpinner = styled.div`
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+  svg {
+    animation: ${rotate} 2s linear infinite;
+    z-index: 2;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -25px 0 0 -25px;
+    width: 50px;
+    height: 50px;
+    
+    & circle {
+      stroke: ${props => props.theme.top0};
+      stroke-linecap: round;
+      animation: ${dash} 1.5s ease-in-out infinite;
+    }
+  }
+`
+
+const resetLayer = () => {
+  store.setLayerPop({ position: { x: 0 , y: 0 }, active: false, user: {} })
+  store.setSelect(false)
+  store.setHover(false)
+}
 
 document.addEventListener('scroll', () => {
   if (store('layerPop.active')) resetLayer()
@@ -88,17 +120,13 @@ class Layer extends React.Component {
           <ThemeProvider theme={theme}>
             <PopWrap onClick={(e) => this.resetLayer()}>
               <Pop
-                onMouseDown={this.block} 
-                onMouseOver={this.block} 
-                onMouseMove={this.block}
-                onScroll={this.block}
                 onClick={this.block} 
                 style={{
                   left: `${position.x - 65}px`, 
                   top: `${position.y - 5}px`,
                   pointerEvents: 'auto'
                 }}
-              >
+              > 
                 <LeftPanel />
                 <RightPanel />
               </Pop>
@@ -108,7 +136,7 @@ class Layer extends React.Component {
       } else {
         return (
           <ThemeProvider theme={theme}>
-            <PopWrap onMouseOver={(e) => this.resetLayer()}>
+            <PopWrap onClick={(e) => this.resetLayer()}>
               <Pop
                 onMouseDown={(e) => e.stopPropagation()} 
                 onMouseOver={(e) => e.stopPropagation()} 
@@ -119,7 +147,12 @@ class Layer extends React.Component {
                 }}
               >
                 <Loading>
-                  {'loading'}
+                  <LoadingSpinner>
+                      <svg viewBox='0 0 50 50'>
+                        <circle cx='25' cy='25' r='20' fill='none' strokeWidth='5' />
+                      </svg>
+                  </LoadingSpinner>
+                  <div>{'loading'}</div>
                 </Loading>
               </Pop>
             </PopWrap>

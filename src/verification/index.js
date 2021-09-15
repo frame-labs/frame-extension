@@ -139,15 +139,13 @@ async function insertBadge (element, ensName, handle) {
   if (usersChecked.includes(userId)) return
   usersChecked.push(userId)
 
-  const { record } = await nebula.resolve(ensName)
+  const { record, address } = await nebula.resolve(ensName)
   if (!record) return
-
-  // Need to verify eth
 
   const user = {
     name: record.name || '',
     avatar: record.text && record.text.avatar ? record.text.avatar : '',
-    address: record.addresses && record.addresses.eth ? record.addresses.eth.toLowerCase() : '',
+    address: address ? address.toLowerCase() : '',
     twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
   }
 
