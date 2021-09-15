@@ -150,7 +150,9 @@ function updateHeaderBadge (root) {
         existingBadge.remove()
       }
 
-      if (ensName) {
+      const target = firstChild(nameSection, 3)
+
+      if (ensName && target) {
         insertBadge(nameSection, ensName, handle)
       }
     }
@@ -177,8 +179,6 @@ async function insertBadge (element, ensName, handle) {
   const ConnectedBadge = Restore.connect(Badge, store)
   ReactDOM.render(<ConnectedBadge userId={userId} />, mount)
 
-  mouseBlocker(element)
-
   // If user has been scanned already
   if (usersChecked.includes(userId)) return
   usersChecked.push(userId)
@@ -186,7 +186,6 @@ async function insertBadge (element, ensName, handle) {
   try {
     const { record, address } = await nebula.resolve(ensName)
     if (!record) return
-
     const user = {
       name: record.name || '',
       avatar: '',
@@ -349,9 +348,10 @@ const callback = function (mutationsList) {
         const tweet = addedNode.querySelector('[data-testid=primaryColumn] [data-testid=tweet]')
         if (tweet) {
           const { ensName, handle, nameSection } = findNameSectionInTweet(tweet)
+          const target = firstChild(nameSection, 3)
 
-          if (ensName && !tweet.querySelector('.__frameMount__')) {
-            insertBadge(nameSection, ensName, handle)
+          if (ensName && !tweet.querySelector('.__frameMount__') && target) {
+            insertBadge(target, ensName, handle)
           }
         }
       }
