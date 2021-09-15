@@ -6,12 +6,14 @@ import n from 'nebula'
 
 import ethProvider from 'eth-provider'
 import provider from './provider'
-import inventory from './inventory'
+import * as inventory from './inventory'
 import store from './store'
 import themes from './themes'
 import nft from './nft'
 
 import './layer'
+
+const nftSpec = /erc(?:721|1155):(?<address>0x\w+)\/(?<tokenId>\d+)/
 
 const fallbackProvider = provider(ethProvider())
 const nebula = n('https://ipfs.nebula.land', fallbackProvider)
@@ -31,6 +33,34 @@ function equalsIgnoreCase (s1, s2) {
 
 function parseEnsName (nameSpan) {
   return ((((nameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
+}
+
+function parseAvatarNft (avatar = '') {
+  const nftFields = avatar.match(nftSpec)
+
+  return {
+    avatarAddress: nftFields ? nftFields.groups.address : '',
+    avatarTokenId: nftFields ? nftFields.groups.tokenId : ''
+  }
+}
+
+function getMediaType (src) {
+  return ['.mp4', '.mov'].some(suffix => src.endsWith(suffix)) ? 'video' : 'img'
+}
+
+function convertAssetToMedia (asset) {
+  const { img, animation, thumbnail } = asset
+
+  const image = { src: animation || img || '' }
+  image.type = getMediaType(image.src)
+
+  const thumb = { src: thumbnail || animation || img || ''}
+  thumb.type = getMediaType(thumb.src)
+
+  return {
+    img: image,
+    thumbnail: thumb
+  }
 }
 
 function findNameSectionInHeader (profileHeader) {
@@ -160,7 +190,7 @@ async function insertBadge (element, ensName, handle) {
 
     const user = {
       name: record.name || '',
-      avatar: record.text && record.text.avatar ? record.text.avatar : '',
+      avatar: '',
       address: address ? address.toLowerCase() : '',
       twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
     }
@@ -169,17 +199,18 @@ async function insertBadge (element, ensName, handle) {
       name: address && equalsIgnoreCase(handle, user.twitter),
       avatar: false
     }
-    const compatible = 'eip155:1/erc721:'
-    const index = user.avatar.indexOf(compatible)
-    const nftAvatar = index > -1
-    if (nftAvatar) {
-      const location = user.avatar.subsrt(index + compatible.length)
-      const [contract, tokenId] = location.split('/')
-      console.log('We have an NFT avatar', contract, tokenId)
-    }
 
     if (record.addresses.eth) {
-      user.inventory = await inventory(record.addresses.eth)
+      user.inventory = await inventory.forAddress(record.addresses.eth)
+    }
+
+    const { avatarAddress, avatarTokenId } = parseAvatarNft(record.text.avatar)
+    if (avatarAddress && avatarTokenId) {
+      // TODO: verify nft owner
+      //const avatarNft = await getNft(avatarAddress, avatarTokenId)
+
+      const avatarAsset = await inventory.get(avatarAddress, avatarTokenId)
+      user.avatar = convertAssetToMedia(avatarAsset)
     }
 
     // Map and type media
@@ -196,6 +227,14 @@ async function insertBadge (element, ensName, handle) {
 
       Object.keys(assets).forEach(asset => {
         const { img, animation, thumbnail } = assets[asset]
+
+        const media = convertAssetToMedia(assets[asset])
+
+        assets[asset] = {
+          ...assets[asset],
+          ...media
+        }
+
         assets[asset].img = { src: animation || img || '' }
         assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
         assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
