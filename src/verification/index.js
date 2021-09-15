@@ -139,53 +139,60 @@ async function insertBadge (element, ensName, handle) {
   if (usersChecked.includes(userId)) return
   usersChecked.push(userId)
 
-  const { record, address } = await nebula.resolve(ensName)
-  if (!record) return
+  try {
+    const { record, address } = await nebula.resolve(ensName)
+    if (!record) return
 
-  const user = {
-    name: record.name || '',
-    avatar: record.text && record.text.avatar ? record.text.avatar : '',
-    address: address ? address.toLowerCase() : '',
-    twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
-  }
+    const user = {
+      name: record.name || '',
+      avatar: record.text && record.text.avatar ? record.text.avatar : '',
+      address: address ? address.toLowerCase() : '',
+      twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
+    }
 
-  user.verified = {
-    name: equalsIgnoreCase(handle, user.twitter),
-    avatar: false
-  }
-  const compatible = 'eip155:1/erc721:'
-  const index = user.avatar.indexOf(compatible)
-  const nftAvatar = index > -1
-  if (nftAvatar) {
-    const location = user.avatar.subsrt(index + compatible.length)
-    const [contract, tokenId] = location.split('/')
-    console.log('We have an NFT avatar', contract, tokenId)
-  }
+    user.verified = {
+      name: address && equalsIgnoreCase(handle, user.twitter),
+      avatar: false
+    }
+    const compatible = 'eip155:1/erc721:'
+    const index = user.avatar.indexOf(compatible)
+    const nftAvatar = index > -1
+    if (nftAvatar) {
+      const location = user.avatar.subsrt(index + compatible.length)
+      const [contract, tokenId] = location.split('/')
+      console.log('We have an NFT avatar', contract, tokenId)
+    }
 
-  user.inventory = await inventory(user.address)
+    if (record.addresses.eth) {
+      user.inventory = await inventory(record.addresses.eth)
+    }
 
-  // Map and type media
-  Object.keys(user.inventory).forEach(collection => {
-    const { meta, assets } = user.inventory[collection]
-    meta.priority = meta.img ? 1 : 0
-    const img = meta.img ? meta.img : assets[Object.keys(assets).filter(k => assets[k].img).sort((a, b) => {
-      if (assets[a].tokenId < assets[b].tokenId) return -1
-      if (assets[a].tokenId > assets[b].tokenId) return 1
-      return 0
-    })[0]]?.img
-    meta.img = { src: img || '' }
-    meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
+    // Map and type media
+    Object.keys(user.inventory).forEach(collection => {
+      const { meta, assets } = user.inventory[collection]
+      meta.priority = meta.img ? 1 : 0
+      const img = meta.img ? meta.img : assets[Object.keys(assets).filter(k => assets[k].img).sort((a, b) => {
+        if (assets[a].tokenId < assets[b].tokenId) return -1
+        if (assets[a].tokenId > assets[b].tokenId) return 1
+        return 0
+      })[0]]?.img
+      meta.img = { src: img || '' }
+      meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
 
-    Object.keys(assets).forEach(asset => {
-      const { img, animation, thumbnail } = assets[asset]
-      assets[asset].img = { src: animation || img || '' }
-      assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
-      assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
-      assets[asset].thumbnail.type = assets[asset].thumbnail.src.endsWith('.mp4') || assets[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
+      Object.keys(assets).forEach(asset => {
+        const { img, animation, thumbnail } = assets[asset]
+        assets[asset].img = { src: animation || img || '' }
+        assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
+        assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
+        assets[asset].thumbnail.type = assets[asset].thumbnail.src.endsWith('.mp4') || assets[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
+      })
     })
-  })
 
-  store.setUser(userId, user)
+    store.setUser(userId, user)
+  } catch (e) {
+    console.error('could not show verification badge', e)
+    store.setUser(userId, { error: e.message })
+  }
 }
 
 const root = document.getElementById('react-root')
@@ -211,10 +218,10 @@ class Badge extends React.Component {
     const { userId  } = this.props
     const user = userId ? this.store('users', userId) : ''
     let color, background
-    if (user && user.verified.name) {
+    if (user && !user.error && user.verified.name) {
       color = theme.badge.verified.color
       background = theme.badge.verified.background
-    } else if (user) {
+    } else if (user && user.error) {
       color = theme.badge.unverified.color
       background = theme.badge.unverified.background
     } else {

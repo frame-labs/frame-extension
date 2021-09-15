@@ -115,7 +115,7 @@ class Layer extends React.Component {
     const user = this.store('users', userId)
     const theme = this.store('theme')
     if (active) {
-      if (user) {
+      if (user && !user.error) {
         return (
           <ThemeProvider theme={theme}>
             <PopWrap onClick={(e) => this.resetLayer()}>
