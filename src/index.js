@@ -49,7 +49,11 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
       chrome.tabs.executeScript(sender.tab.id, {
         code: `window.__setMediaBlob__("${blobURL}", "${location}");`
       })
-    }).catch(console.error)
+    }).catch(e => {
+      chrome.tabs.executeScript(sender.tab.id, {
+        code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
+      })
+    })
   } 
   if (payload.method === 'frame_summon') return provider.connection.send(payload)
   const id = provider.nextId++
@@ -58,15 +62,6 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
   provider.connection.send(load)
 })
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  if (changeInfo.status !== 'complete') return
-  var url = new URL(tab.url)
-  if (url.hostname === 'twitter.com') {
-    chrome.tabs.executeScript(tabId, {
-      file: 'verification.js'
-    })
-  }
-})
 
 // chrome.browserAction.onClicked.addListener(tab => {
 //   if (provider.connected) {

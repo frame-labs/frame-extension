@@ -1,14 +1,14 @@
 async function scan (address) {
   const inventory = {}
-
+  if (!address) return inventory
   const getSet = async (address, offset) => {
     const url = `https://api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=${offset}&limit=50`
     const options = { method: 'GET' }
     const set = await (await fetch(url, options)).json()
-    set.assets.forEach(a => {
+    set?.assets?.forEach(a => {
       inventory[a.id] = a
     })
-    if (set.assets.length === 50) await getSet(address, offset + 50)
+    if (set?.assets?.length === 50) await getSet(address, offset + 50)
   }
   
   await getSet(address, 0)

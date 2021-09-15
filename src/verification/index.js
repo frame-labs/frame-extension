@@ -10,7 +10,6 @@ import * as inventory from './inventory'
 import store from './store'
 import themes from './themes'
 import nft from './nft'
-
 import './layer'
 
 const nftSpec = /erc(?:721|1155):(?<address>0x\w+)\/(?<tokenId>\d+)/
@@ -330,24 +329,15 @@ const insertAfter = (newNode, referenceNode) => {
 
 const usersChecked = []
 
+let currentTheme = ''
+
 const callback = function (mutationsList) {
   const composeTweet = document.querySelectorAll('[data-testid=SideNav_NewTweet_Button]')[0]
   const { backgroundColor } = window.getComputedStyle(document.body)
-  let color = 'rgb(255, 255, 255)'
-  if (backgroundColor === color) {
-    if (composeTweet) {
-      color = window.getComputedStyle(composeTweet).backgroundColor
-      badgeColor = color
-    } else {
-      color = 'rgb(45, 45, 45)'
-      badgeColor = 'rgb(45, 45, 45)'
-      boxShadow = 'rgb(136 153 166 / 20%) 0px 0px 15px, rgb(136 153 166 / 15%) 0px 0px 3px 1px'
-    }
-  } 
-
-  // TODO: Only update current style if something has changed
-  // setTheme in store
-  store.setTheme(themes(backgroundColor))
+  if (currentTheme !== backgroundColor) {
+    store.setTheme(themes(backgroundColor))
+    currentTheme = backgroundColor
+  }
 
   mutationsList.forEach(async mutation => {
     if (mutation.type === 'childList') {

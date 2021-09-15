@@ -31,14 +31,14 @@ const LoadingSpinner = styled.div`
 
 class _Video extends React.Component {
   componentDidMount () {
-    const location = this.props.src.replace(/\./g,'-')
+    const location = this.props.src.replace(/\./g,'-').replace('://','-').replace(/\//g, '-')
     const storeBlob = this.store('blobMap', location)
     if (!storeBlob) {
       chrome?.runtime?.sendMessage({ method: 'media_blob', src: this.props.src, location })
     }
   }
   render () {
-    const location = this.props.src.replace(/\./g,'-')
+    const location = this.props.src.replace(/\./g,'-').replace('://','-').replace(/\//g, '-')
     const storeBlob = this.store('blobMap', location)
     if (!storeBlob) {
       return (

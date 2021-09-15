@@ -20,6 +20,12 @@
     "js": ["inject.js"],
     "run_at": "document_start",
     "all_frames": true
+  },
+  {
+    "matches": ["http://twitter.com/*", "https://twitter.com/*"],
+    "js": ["verification.js"],
+    "run_at": "document_idle",
+    "all_frames": true
   }],
   "permissions": [
     "activeTab",

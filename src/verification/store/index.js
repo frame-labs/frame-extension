@@ -30,7 +30,8 @@ store.observer(() => {
   window.localStorage.setItem('__frameLayer__', JSON.stringify(store()))
 })
 
-window.__setMediaBlob__ = (blobURL, location) => {
+window.__setMediaBlob__ = (blobURL, location, error) => {
+  if (error) return store.setBlob(blobURL, location, error)
   fetch(blobURL)
     .then(res => res.blob())
     .then(blob => {
