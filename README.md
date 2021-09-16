@@ -10,7 +10,7 @@
 ### Build
 ```bash
 # Clone
-› git clone https://github.com/floating/frame-extension
+› git clone https://github.com/floating/frame-extension-layers
 
 # Install
 › npm install
