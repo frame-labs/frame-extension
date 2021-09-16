@@ -14,7 +14,7 @@
     "serve": "webpack serve --config webpack.dev.layer.config.js"
   },
   "author": "Jordan Muir",
-  "license": "GPL-3.0",
+  "license": "",
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.15.0",
     "@babel/preset-react": "7.14.5",

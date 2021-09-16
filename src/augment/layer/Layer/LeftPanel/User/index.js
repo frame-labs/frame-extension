@@ -14,11 +14,10 @@ const PopAvatarImg = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 6px;
-  background: ${props => props.theme.base2};
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${props => props.theme.base3};
+  color: ${props => props.theme.base0};
 
   img {
     width: 30px;
@@ -49,7 +48,6 @@ const PopNameVerifed = styled.div`
   left: 0px;
   overflow: hidden;
   pointer-events: auto;
-  background: ${props => props.theme.base2}
 `
 
 const PopName = styled.div`
@@ -70,24 +68,12 @@ const PopName = styled.div`
 
   &:hover {
     animation: 5s ${float} ease-in-out infinite alternate;
-    box-shadow: 0px 3px 5px 2px ${props => props.theme.base0};
     background: ${props => props.theme.base2};
     z-index: 2000;
-
-    ${PopAvatarImg} {
-      background: ${props => props.theme.base3};
-      color: ${props => props.theme.base4};
-    }
-
-    ${PopNameVerifed} {
-      background: ${props => props.theme.base3};
-      color: ${props => props.theme.base4};
-    }
   }
 
   &:active {
     animation: ${shake} 2s ease-in-out infinite;
-    box-shadow: 0px 2px 3px 2px ${props => props.theme.base0};
     background: ${props => props.theme.base2};
     z-index: 2000;
   }

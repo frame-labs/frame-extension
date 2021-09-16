@@ -24,7 +24,7 @@ const PopCollection = styled.div`
     height: 48px;
     object-fit: cover;
     border-radius: 3px;
-    background: ${props => props.theme.base2};
+    background: ${props => props.theme.base0};
   }
 
   video {
@@ -32,7 +32,7 @@ const PopCollection = styled.div`
     height: 48px;
     object-fit: cover;
     border-radius: 3px;
-    background: ${props => props.theme.base2};
+    background: ${props => props.theme.base0};
   }
 
   &:hover {
@@ -75,7 +75,7 @@ const TextImg = styled.div`
   font-size: 8px;
   padding: 5px;
   box-sizing: border-box;
-  background: ${props => props.theme.base2};
+  background: ${props => props.theme.base0};
   position: relative;
 `
 

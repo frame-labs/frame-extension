@@ -40,8 +40,8 @@ const AssetSummaryWrap = styled.div`
 const PopRightLogo = styled(PopRight)`
   svg {
     height: 80px;
-    fill: ${props => props.theme.base3};
-    opacity: 0.2;
+    fill: ${props => props.theme.base1};
+    opacity: 1;
   }
 `
 
@@ -199,15 +199,13 @@ const AssetLink = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: ${props => props.theme.top1};
-  color: ${props => props.theme.base0};
+  background: ${props => props.theme.good};
+  color: ${props => props.theme.goodOver};
   cursor: pointer;
   user-select: none;
 
   &:hover {
     animation: 5s ${float} ease-in-out infinite alternate;
-    box-shadow: 0px 3px 5px 2px ${props => props.theme.base0};
-    background: ${props => props.theme.top0};
     z-index: 2000;
   }
 
@@ -241,7 +239,7 @@ const Verified = styled.div`
   font-weight: 600;
   border-radius: 6px;
   width: calc(100% - 10px);
-  height: 30px;
+  margin-bottom: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -250,19 +248,21 @@ const Verified = styled.div`
 const PopUserVerified = styled(Verified)`
   div {
     background: ${props => props.theme.good};
+    color: ${props => props.theme.goodOver};
   }
 `
 
 const PopUserUnverified = styled(Verified)`
   div {
     background: ${props => props.theme.bad};
+    color: ${props => props.theme.badOver};
   }
 `
 
 const PopUserLine = styled.div`
   width: calc(100% - 6px);
   height: 24px;
-  border-radius: 6px;
+  border-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -272,15 +272,14 @@ const PopUserLine = styled.div`
 const PopUserLabel = styled.div`
   background: ${props => props.theme.base1};
   font-size: 10px;
-  height: 21px;
-  border-radius: 4px;
-  margin: 3px;
+  height: 22px;
+  border-radius: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
   // flex-direction: column;
   text-transform: uppercase;
-  width: 185px;
+  width: 100%;
 `
 
 const PopUserBadge = styled.div`
@@ -297,18 +296,19 @@ const PopUserBadge = styled.div`
 `
 
 const ProfileMatch = styled.div`
-  height: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 10px;
-  margin-bottom: 36px;
+  height: 20px;
   font-weight: 600;
+  margin: 3px 0px 5px 0px;
+  width: 100%;
 `
 
 const ProfileImage = styled.div`
   width: 185px;
-  height: 215px;
+  height: 185px;
   // border-radius: 93px;
   font-weight: 600;
   text-align: center;
@@ -316,20 +316,31 @@ const ProfileImage = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
-  // background: ${props => props.theme.base2};
+  background: ${props => props.theme.base2};
   border-radius: 6px;
-  margin-bottom: 5px;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 2px;
-  margin-left: -2px;
 
   img, video {
     max-width: 185px;
     max-height: 185px;
     // object-fit: contain;
     border-radius: 6px;
+  }
+`
+
+const ProfileLinkIcon = styled.div`
+  height: 40px;
+  width: 100%;
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${props => props.theme.top0};
+  svg {
+    max-height: 26px;
   }
 `
 
@@ -344,6 +355,17 @@ class RightPanel extends React.Component {
     return (
       <PopRight key='hover:user'>
         <PopUser>
+          <ProfileLinkIcon style={{
+            color: user.verified.name ? theme.good : theme.bad
+          }}>
+          <svg viewBox='0 0 24 24'>
+            <path fill='currentColor' d='M14.78 3.653a3.936 3.936 0 115.567 5.567l-3.627 3.627a3.936 3.936 0 01-5.88-.353.75.75 0 00-1.18.928 5.436 5.436 0 008.12.486l3.628-3.628a5.436 5.436 0 10-7.688-7.688l-3 3a.75.75 0 001.06 1.061l3-3z' />
+            <path fill='currentColor' d='M7.28 11.153a3.936 3.936 0 015.88.353.75.75 0 001.18-.928 5.436 5.436 0 00-8.12-.486L2.592 13.72a5.436 5.436 0 107.688 7.688l3-3a.75.75 0 10-1.06-1.06l-3 3a3.936 3.936 0 01-5.567-5.568l3.627-3.627z' />
+          </svg>
+          </ProfileLinkIcon> 
+          <ProfileMatch>
+            {`@${user.twitter}  -  ${user.name}`}
+          </ProfileMatch>
           {user.verified.name ? (
             <>
               <PopUserVerified>
@@ -361,9 +383,6 @@ class RightPanel extends React.Component {
               </PopUserUnverified>
             </>
           )}
-          <ProfileMatch>
-            {`@${user.twitter} / ${user.name}`}
-          </ProfileMatch>
           <ProfileImage>
             {img?.src && img?.type === 'video' ? (
               <Video src={img.src} />
@@ -398,7 +417,7 @@ class RightPanel extends React.Component {
             <div>{tokenId}</div>
           </AssetSummaryCollection>
           <AssetLink onClick={()=>{
-            window.open(assetData.openSeaLink, '_blank')
+            window.open(assetData.openSeaLink + '?ref=0xB813BE9096C52307AE0e46932E33D1D68a21bba1', '_blank')
           }}>
             View on OpenSea
           </AssetLink>
@@ -439,8 +458,8 @@ class RightPanel extends React.Component {
   renderDefault () {
     return (
       <PopRightLogo key='logo'>
-        <svg viewBox="0 0 245 247">
-          <path d="M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z"/>
+        <svg viewBox='0 0 245 247'>
+          <path d='M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z'/>
         </svg>
       </PopRightLogo>
     )

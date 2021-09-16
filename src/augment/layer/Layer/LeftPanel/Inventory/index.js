@@ -19,20 +19,24 @@ const InventoryNone = styled.div`
   top: 0px;
   left: 0px;
   bottom: 0px;
-  right: 15px;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 400;
-  letter-spacing: 2px;
-  margin-left: -2px;
+  span {
+    letter-spacing: 2px;
+    margin-left: 2px;
+  }
+  
 `
 
 const InventoryHeader = styled.div`
   position: relative;
-  font-size: 9px;
+  font-size: 10px;
   text-align: center;
   width; 100%;
   text-transform: uppercase;
@@ -54,8 +58,8 @@ const InventoryHeaderBack = styled.div`
   width: 26px;
   height: 14px;
   border-radius: 7px;
-  background: ${props => props.theme.top0};
-  color: ${props => props.theme.base0};
+  background: ${props => props.theme.good};
+  color: ${props => props.theme.goodOver};
   cursor: pointer;
 
   svg {
@@ -107,7 +111,8 @@ const PopCollectionsWrapper = styled.div`
   align-content: flex-start;
   border-radius: 7px;
   padding: 6px 5px 6px 5px;
-  min-height: 154px;
+  box-sizing: border-box;
+  min-height: calc(100% + 1px);
 `
 
 class Inventory extends React.Component {
@@ -146,7 +151,7 @@ class Inventory extends React.Component {
                   }).map(key => {
                     return <InventoryItem key={key} collection={key} />
                   })}
-                  {Object.keys(user.inventory).length === 0 ? <InventoryNone>{'no items'}</InventoryNone> : null}
+                  {Object.keys(user.inventory).length === 0 ? <InventoryNone><span>{'no items'}</span></InventoryNone> : null}
                 </PopCollectionsWrapper>
               </ItemScroll>
             </ItemWrap>

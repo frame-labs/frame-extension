@@ -23,7 +23,7 @@
   },
   {
     "matches": ["http://twitter.com/*", "https://twitter.com/*"],
-    "js": ["verification.js"],
+    "js": ["augment.js"],
     "run_at": "document_idle",
     "all_frames": true
   }],

@@ -24,7 +24,7 @@ module.exports = [
   },
   {
     mode: 'production',
-    entry: './src/verification/index.js',
+    entry: './src/augment/index.js',
     module: {
       rules: [
         {
@@ -46,7 +46,7 @@ module.exports = [
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'verification.js'
+      filename: 'augment.js'
     },
     performance: {
       hints: false

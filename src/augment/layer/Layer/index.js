@@ -35,6 +35,10 @@ const Pop = styled.div`
   background: ${props => props.theme.base0};
   font-size: 15px;
   box-shadow: 0px 5px 10px ${props => props.theme.baseShadow};
+  transform: translate3d(0, 0, 0) rotate(0.01deg);
+  * {
+    transform: translate3d(0, 0, 0) rotate(0.01deg);
+  }
 `
 
 const Loading = styled.div`
