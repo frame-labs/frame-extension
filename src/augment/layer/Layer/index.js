@@ -142,7 +142,7 @@ class Layer extends React.Component {
               >
                 {user?.error ? (
                   <Loading>
-                    <div>{'error resolving ens name'}</div>
+                    <div>{'could not resolve ens name'}</div>
                   </Loading>
                 ) : (
                   <Loading>
