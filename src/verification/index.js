@@ -130,8 +130,8 @@ function mouseBlocker (mount) {
   mount.appendChild(blocker)
 }
 
-function updateHeaderBadge (root) {
-  const nav = root.querySelector('[data-testid=primaryColumn] nav')
+function updateHeaderBadge (root = document.querySelector('main')) {
+  const nav = root && root.querySelector('[data-testid=primaryColumn] nav')
   if (nav) {
     const profileHeader = nav.previousElementSibling
 
@@ -343,7 +343,7 @@ const callback = function (mutationsList) {
       if (mutation.addedNodes.length > 0) {
         const addedNode = mutation.addedNodes[0]
 
-        updateHeaderBadge(addedNode)
+        updateHeaderBadge()
 
         const tweet = addedNode.querySelector('[data-testid=primaryColumn] [data-testid=tweet]')
         if (tweet) {
