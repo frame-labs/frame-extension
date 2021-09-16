@@ -33,7 +33,7 @@ provider.connection.on('payload', payload => {
         const params = payload.params ? [].concat(payload.params) : []
         params.forEach(sub => delete subs[sub])
       }
-      chrome.tabs.sendMessage(tabId, Object.assign({}, payload, { id: payloadId }))
+      chrome.tabs.sendMessage(tabId, Object.assign({}, payload, { id: payloadId, type: 'eth:payload' }))
       delete pending[payload.id]
     }
   } else if (payload.method && payload.method.indexOf('_subscription') > -1 && subs[payload.params.subscription]) { // Emit subscription result to tab
@@ -41,13 +41,27 @@ provider.connection.on('payload', payload => {
   }
 })
 
-chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
+  if (payload.method === 'media_blob') {
+    const location = payload.location
+    fetch(payload.src).then(res => res.blob()).then(blob => {
+      const blobURL = URL.createObjectURL(blob)
+      chrome.tabs.executeScript(sender.tab.id, {
+        code: `window.__setMediaBlob__("${blobURL}", "${location}");`
+      })
+    }).catch(e => {
+      chrome.tabs.executeScript(sender.tab.id, {
+        code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
+      })
+    })
+  } 
   if (payload.method === 'frame_summon') return provider.connection.send(payload)
   const id = provider.nextId++
   pending[id] = { tabId: sender.tab.id, payloadId: payload.id, method: payload.method }
   const load = Object.assign({}, payload, { id, __frameOrigin: getOrigin(sender.url) })
   provider.connection.send(load)
 })
+
 
 // chrome.browserAction.onClicked.addListener(tab => {
 //   if (provider.connected) {

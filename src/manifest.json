@@ -1,6 +1,6 @@
 {
   "name": "Frame",
-  "version": "0.5.2",
+  "version": "0.7.0",
   "manifest_version": 2,
   "description": "Frame",
   "homepage_url": "https://github.com/floating/frame",
@@ -19,6 +19,12 @@
     "matches": ["file://*/*", "http://*/*", "https://*/*"],
     "js": ["inject.js"],
     "run_at": "document_start",
+    "all_frames": true
+  },
+  {
+    "matches": ["http://twitter.com/*", "https://twitter.com/*"],
+    "js": ["augment.js"],
+    "run_at": "document_idle",
     "all_frames": true
   }],
   "permissions": [
