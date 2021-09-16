@@ -51,3 +51,7 @@ export const setBlob = (u, blob, location, error) => {
     u('blobMap', location, () => blob)
   }
 }
+
+export const setScrollBarWidth = (u, width) => {
+  u('scrollBarWidth', () => width)
+}

@@ -91,10 +91,10 @@ const ItemWrap = styled.div`
 const ItemScroll = styled.div`
   position: absolute;
   top: 0;
-  right: -15px;
+  right: -50px;
   bottom: 0;
   left: 0;
-  padding: 0px 15px 0px 0px;
+  padding-right: 50px;
   overflow-y: scroll;
   overflow-x: hidden;
   overscroll-behavior: contain;
@@ -125,9 +125,8 @@ class Inventory extends React.Component {
 
     let name = collection ? user?.inventory?.[collection]?.meta?.name : '' || ''
     if (name === 'ENS: Ethereum Name Service') name = 'Ethereum Name Service'
-    if (name.length > 26) name = name.substr(0, 23) + '...'
-    // if (selectedCollection) console.log(user.inventory[selectedCollection])
-
+    if (name.length > 26) name = name.substr(0, 23) + '...' 
+    const paddingRight = (50 - this.store('scrollBarWidth')) + 'px'
     return (
       <InventoryWrap>
         {!collection ? (
@@ -136,7 +135,7 @@ class Inventory extends React.Component {
               Inventory
             </InventoryHeader>
             <ItemWrap>
-              <ItemScroll>
+              <ItemScroll style={{ paddingRight }}>
                 <PopCollectionsWrapper>
                   {Object.keys(user.inventory).sort((key1, key2) => {
                     const c1 = user.inventory[key1]
