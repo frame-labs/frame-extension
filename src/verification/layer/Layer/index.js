@@ -34,6 +34,7 @@ const Pop = styled.div`
   color: ${props => props.theme.top0};
   background: ${props => props.theme.base0};
   font-size: 15px;
+  box-shadow: 0px 5px 10px ${props => props.theme.baseShadow};
 `
 
 const Loading = styled.div`
