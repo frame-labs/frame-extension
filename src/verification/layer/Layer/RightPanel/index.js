@@ -159,7 +159,7 @@ const AssetSummaryImage = styled.div`
 const AssetSummaryName = styled.div`
   font-size: 12px;
   height: 21px;
-  margin: 19px 5px 0px 5px;
+  margin: 14px 5px 0px 5px;
   padding: 4px 7px 4px 7px;
   border-radius: 12px;
   text-align: center;
@@ -191,7 +191,7 @@ const AssetLink = styled.div`
   bottom: 5px;
   left: 5px;
   right: 5px;
-  height: 20px;
+  height: 30px;
   text-transform: uppercase;
   font-size: 9px;
   font-weight: 600;
@@ -241,18 +241,22 @@ const Verified = styled.div`
   font-weight: 600;
   border-radius: 6px;
   width: calc(100% - 10px);
-  margin-bottom: 10px;
-  padding: 1px 0px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 const PopUserVerified = styled(Verified)`
-  background: ${props => props.theme.base1};
-  color: ${props => props.theme.goodOver};
+  div {
+    background: ${props => props.theme.good};
+  }
 `
 
 const PopUserUnverified = styled(Verified)`
-  background: ${props => props.theme.bad};
-  color: ${props => props.theme.badOver};
+  div {
+    background: ${props => props.theme.bad};
+  }
 `
 
 const PopUserLine = styled.div`
@@ -265,16 +269,18 @@ const PopUserLine = styled.div`
   margin: 0px 3px;
 `
 
-const PopUserLineCenter = styled(PopUserLine)`
-  background: ${props => props.theme.good};
+const PopUserLabel = styled.div`
+  background: ${props => props.theme.base1};
   font-size: 10px;
-  height: 34px;
+  height: 21px;
+  border-radius: 4px;
+  margin: 3px;
   display: flex;
+  justify-content: center;
+  align-items: center;
   // flex-direction: column;
   text-transform: uppercase;
-  svg {
-    margin: 8px 5px 5px 0px;
-  }
+  width: 185px;
 `
 
 const PopUserBadge = styled.div`
@@ -290,9 +296,19 @@ const PopUserBadge = styled.div`
   margin-bottom: 5px;
 `
 
+const ProfileMatch = styled.div`
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  margin-bottom: 36px;
+  font-weight: 600;
+`
+
 const ProfileImage = styled.div`
   width: 185px;
-  height: 185px;
+  height: 215px;
   // border-radius: 93px;
   font-weight: 600;
   text-align: center;
@@ -300,7 +316,7 @@ const ProfileImage = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
-  background: ${props => props.theme.base2};
+  // background: ${props => props.theme.base2};
   border-radius: 6px;
   margin-bottom: 5px;
   text-transform: uppercase;
@@ -308,6 +324,13 @@ const ProfileImage = styled.div`
   font-weight: 400;
   letter-spacing: 2px;
   margin-left: -2px;
+
+  img, video {
+    max-width: 185px;
+    max-height: 185px;
+    // object-fit: contain;
+    border-radius: 6px;
+  }
 `
 
 class RightPanel extends React.Component {
@@ -317,38 +340,37 @@ class RightPanel extends React.Component {
   }
   renderUser (user) {
     const theme = this.store('theme')
-    const img = ''
+    const img = user.avatar.img
     return (
       <PopRight key='hover:user'>
         <PopUser>
-          <ProfileImage>
-              {img?.src && img?.type === 'video' ? (
-                <Video src={img.src} />
-              ) : img?.src && img?.type === 'img' ? (
-                <Image src={img.src} />
-              ) : <div>{'no nft pfp'}</div>}
-            </ProfileImage>
-          {user.verified.name || true ? (
+          {user.verified.name ? (
             <>
               <PopUserVerified>
-                <PopUserLine>{'@ffloat'}</PopUserLine>
-                <PopUserLineCenter>
-                  <div>{svg.badge(21, theme.top0, theme.good)}</div>
-                  <div>{'ens name verified'}</div>
-                </PopUserLineCenter>
-                <PopUserLine>{user.name}</PopUserLine>
+                <PopUserLabel>
+                  {'ens name verified'}
+                </PopUserLabel>
               </PopUserVerified>
             </>
           ) : (
             <>
-              <PopUserBadge>{svg.badge(48, theme.top0, theme.bad)}</PopUserBadge>
               <PopUserUnverified>
-                <PopUserLine>{'@ffloat'}</PopUserLine>
-                <PopUserLineCenter>{'ens name unverified'}</PopUserLineCenter>
-                <PopUserLine>{user.name}</PopUserLine>
+                <PopUserLabel>
+                  {'ens name unverified'}
+                </PopUserLabel>
               </PopUserUnverified>
             </>
           )}
+          <ProfileMatch>
+            {`@${user.twitter} / ${user.name}`}
+          </ProfileMatch>
+          <ProfileImage>
+            {img?.src && img?.type === 'video' ? (
+              <Video src={img.src} />
+            ) : img?.src && img?.type === 'img' ? (
+              <Image src={img.src} />
+            ) : <div>{'no nft pfp'}</div>}
+          </ProfileImage>
         </PopUser>
       </PopRight>
     )

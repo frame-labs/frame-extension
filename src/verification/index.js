@@ -186,15 +186,18 @@ async function insertBadge (element, ensName, handle) {
   try {
     const { record, address } = await nebula.resolve(ensName)
     if (!record) return
+
+    const twitter = record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
+    
     const user = {
       name: record.name || '',
       avatar: '',
       address: address ? address.toLowerCase() : '',
-      twitter: record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
+      twitter: handle
     }
 
     user.verified = {
-      name: address && equalsIgnoreCase(handle, user.twitter),
+      name: address && equalsIgnoreCase(handle, twitter),
       avatar: false
     }
 
@@ -204,8 +207,9 @@ async function insertBadge (element, ensName, handle) {
 
     const { avatarAddress, avatarTokenId } = parseAvatarNft(record.text.avatar)
     if (avatarAddress && avatarTokenId) {
-      // TODO: verify nft owner
-      //const avatarNft = await getNft(avatarAddress, avatarTokenId)
+      // try {
+      //   user.verified.avatar = await getNft(avatarAddress, avatarTokenId)
+      // } catch (e) {}
 
       const avatarAsset = await inventory.get(avatarAddress, avatarTokenId)
       user.avatar = convertAssetToMedia(avatarAsset)
@@ -273,7 +277,7 @@ class Badge extends React.Component {
     if (user && !user.error && user.verified.name) {
       color = theme.badge.verified.color
       background = theme.badge.verified.background
-    } else if (user && user.error) {
+    } else if (user) {
       color = theme.badge.unverified.color
       background = theme.badge.unverified.background
     } else {

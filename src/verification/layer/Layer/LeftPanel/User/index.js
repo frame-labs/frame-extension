@@ -3,6 +3,7 @@ import Restore from 'react-restore'
 import styled, { keyframes, ThemeProvider } from 'styled-components'
 
 import { float, shake } from '../../style'
+import { Video, Image } from '../../media'
 
 
 const PopAvatarImg = styled.div`
@@ -172,11 +173,11 @@ class User extends React.Component {
   }
   badge (size) {
     const theme = this.store('theme')
-    const { userId } = this.props
-    const user = userId ? this.store('users', userId) : ''
+    const { userId } = this.store('layerPop')
+    const user = this.store('users', userId)
 
     let color, background
-    if (user && user.verified.name) {
+    if (user && !user.error && user.verified.name) {
       color = theme.badge.verified.color
       background = theme.badge.verified.background
     } else if (user) {
@@ -199,6 +200,7 @@ class User extends React.Component {
     const { userId } = this.store('layerPop')
     const user = this.store('users', userId)
     const select = this.store('select')
+    const img = user.avatar.thumbnail
 
     return (
       <PopName
@@ -223,8 +225,10 @@ class User extends React.Component {
           </svg>
         </PopLogo> */}
         <PopAvatarImg>
-          {user.avatar  ? (
-            <img src={user.avatar} />
+          {img?.src && img.type === 'video' ? (
+            <Video src={img.src} soundOff={true} />
+          ) : img?.src && img.type === 'img' ? (
+            <Image src={img.src} />
           ) : (
             <svg viewBox='0 0 245 247'>
               <path fill='currentColor' d='M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z'/>
