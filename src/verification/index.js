@@ -63,7 +63,7 @@ function convertAssetToMedia (asset) {
 }
 
 function findNameSectionInHeader (profileHeader) {
-  let handle, ensName, nameSection
+  let handle, ensName, targetElement
 
   const headerPhoto = profileHeader.getElementsByTagName('a')[0]
   const headerHref = (headerPhoto || {}).href
@@ -74,7 +74,7 @@ function findNameSectionInHeader (profileHeader) {
 
     const infoSection = profileHeader.children[1]
 
-    nameSection = [...infoSection.children].find(block => {
+    const nameSection = [...infoSection.children].find(block => {
       const spans = [...block.getElementsByTagName('span')]
 
       return spans.some(span => {
@@ -85,9 +85,13 @@ function findNameSectionInHeader (profileHeader) {
 
     const ensNameSpan = nameSection.querySelector('span > span')
     ensName = parseEnsName(ensNameSpan)
+
+    if (ensName) {
+      targetElement = ensNameSpan.parentElement.parentElement
+    }
   }
 
-  return { nameSection, ensName, handle }
+  return { targetElement, ensName, handle }
 }
 
 function findNameSectionInTweet (tweet) {
@@ -111,23 +115,9 @@ function findNameSectionInTweet (tweet) {
       const ensNameSpan = nameSpans.slice(0, handleIndex).reverse().find(block => (block.textContent || '').includes('.eth'))
       const ensName = parseEnsName(ensNameSpan)
 
-      return { nameSection: link, ensName, handle }
+      return { targetElement: link, ensName, handle }
     }
   }, false)
-}
-
-function mouseBlocker (mount) {
-  const blocker  = document.createElement('div')
-  blocker.className = '__frameMountBlock__'
-  blocker.style.cssText = `
-    width: 4px;
-    height: 20px;
-    position: absolute;
-    top: 0;
-    left: 75px;
-    pointer-events: auto;
-  `
-  mount.appendChild(blocker)
 }
 
 function updateHeaderBadge (root = document.querySelector('main')) {
@@ -136,7 +126,7 @@ function updateHeaderBadge (root = document.querySelector('main')) {
     const profileHeader = nav.previousElementSibling
 
     if (profileHeader) {
-      const { ensName, handle, nameSection } = findNameSectionInHeader(profileHeader)
+      const { ensName, handle, targetElement } = findNameSectionInHeader(profileHeader)
 
       const existingBadge = profileHeader.querySelector('.__frameMount__')
 
@@ -150,16 +140,14 @@ function updateHeaderBadge (root = document.querySelector('main')) {
         existingBadge.remove()
       }
 
-      const target = firstChild(nameSection, 3)
-
-      if (ensName && target) {
-        insertBadge(nameSection, ensName, handle)
+      if (ensName && targetElement) {
+        insertBadge(targetElement, ensName, handle)
       }
     }
   }
 }
 
-async function insertBadge (element, ensName, handle) {
+async function insertBadge (targetElement, ensName, handle) {
   const userId = ensName.replace(/\./g,'-')
   const mount = document.createElement('div')
   mount.setAttribute('handle', handle)
@@ -174,7 +162,8 @@ async function insertBadge (element, ensName, handle) {
     margin-right: 4px;
     margin-left: -2px;
   `
-  insertAfter(mount, element)
+
+  insertAfter(mount, targetElement)
 
   const ConnectedBadge = Restore.connect(Badge, store)
   ReactDOM.render(<ConnectedBadge userId={userId} />, mount)
@@ -351,8 +340,8 @@ const callback = function (mutationsList) {
 
         const tweet = addedNode.querySelector('[data-testid=primaryColumn] [data-testid=tweet]')
         if (tweet) {
-          const { ensName, handle, nameSection } = findNameSectionInTweet(tweet)
-          const target = firstChild(nameSection, 3)
+          const { ensName, handle, targetElement } = findNameSectionInTweet(tweet)
+          const target = firstChild(targetElement, 3)
 
           if (ensName && !tweet.querySelector('.__frameMount__') && target) {
             insertBadge(target, ensName, handle)
