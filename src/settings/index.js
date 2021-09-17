@@ -106,6 +106,7 @@ const FrameConnected = styled.div`
   font-size: 13px;
   text-transform: uppercase;
   font-weight: 600;
+  user-select: none;
 `
 
 const SummonFrameFrameWrap = styled.div`

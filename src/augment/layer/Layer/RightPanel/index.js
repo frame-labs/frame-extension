@@ -211,8 +211,6 @@ const AssetLink = styled.div`
 
   &:active {
     animation: ${shake} 2s ease-in-out infinite;
-    box-shadow: 0px 2px 3px 2px ${props => props.theme.base0};
-    background: ${props => props.theme.top0};
     z-index: 2000;
   }
 `
