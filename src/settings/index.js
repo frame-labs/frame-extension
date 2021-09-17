@@ -221,16 +221,16 @@ const AppearToggle = styled.div`
 
 
 const NotConnected = styled.div`
-  padding: 0px 50px;
+  padding: 0px 25px;
   font-size: 18px;
 `
 
 const Download = styled.a`
-  background: var(--goodUp);
+  background: var(--good);
   color: var(--goodOver);
-  height: 42px;
+  height: 50px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -239,9 +239,12 @@ const Download = styled.a`
   cursor: pointer;
   font-size: 15px;
   border: 1px solid var(--ghostZ);
+  letter-spacing: 1px;
+  padding-right: 1px;
+  box-sizing: border-box;
 
   &:hover {
-    background: rgb(0, 255, 235);
+    background: var(--goodUp);
     color: var(--goodOver);
   }
 
@@ -298,7 +301,7 @@ class _Settings extends React.Component {
       return (
         <>
           <NotConnected>Frame is not currently running on your machine</NotConnected>
-          <Download href='https://frame.sh' target='_newtab'>Click here to download Frame</Download>
+          <Download href='https://frame.sh' target='_newtab'>Download Frame</Download>
         </>
       )
     }
