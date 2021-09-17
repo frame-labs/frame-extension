@@ -11,17 +11,15 @@ const getOrigin = url => {
   return path[0] + '//' + path[2]
 }
 
-const pop = show => {
-  if (show) {
-    chrome.browserAction.setPopup({ popup: 'pop.html' })
-  } else {
-    chrome.browserAction.setPopup({ popup: 'settings.html' })
-  }
-}
+chrome.browserAction.setPopup({ popup: 'settings.html' })
 
-pop(true)
-provider.on('connect', () => pop(false))
-provider.on('disconnect', () => pop(true))
+let frameConnected = false
+provider.on('connect', () => { frameConnected = true })
+provider.on('disconnect', () => { frameConnected = false })
+
+chrome.extension.onConnect.addListener(port => {
+  if (port.name === 'frame_connect') port.onMessage.addListener(() => port.postMessage(frameConnected))
+})
 
 provider.connection.on('payload', payload => {
   if (typeof payload.id !== 'undefined') {

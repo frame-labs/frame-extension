@@ -352,9 +352,19 @@ const callback = function (mutationsList) {
   })
 }
 
-updateHeaderBadge(root)
 
-const observer = new MutationObserver(callback)
-observer.observe(root, config)
+let augmentOff = false
+
+try {
+  augmentOff = JSON.parse(window.localStorage.getItem('__frameAugmentOff__'))
+} catch (e) {
+  augmentOff = false
+}
+
+if (!augmentOff) {
+  updateHeaderBadge(root)
+  const observer = new MutationObserver(callback)
+  observer.observe(root, config)
+}
 
 // observer.disconnect()
