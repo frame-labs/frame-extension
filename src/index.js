@@ -17,7 +17,7 @@ let frameConnected = false
 provider.on('connect', () => { frameConnected = true })
 provider.on('disconnect', () => { frameConnected = false })
 
-chrome.extension.onConnect.addListener(port => {
+chrome.runtime.onConnect.addListener(port => {
   if (port.name === 'frame_connect') port.onMessage.addListener(() => port.postMessage(frameConnected))
 })
 
@@ -52,7 +52,7 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
         code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
       })
     })
-  } 
+  }
   if (payload.method === 'frame_summon') return provider.connection.send(payload)
   const id = provider.nextId++
   pending[id] = { tabId: sender.tab.id, payloadId: payload.id, method: payload.method }

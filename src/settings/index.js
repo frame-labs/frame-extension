@@ -326,7 +326,7 @@ class _Settings extends React.Component {
 
 const Settings = Restore.connect(_Settings, store)
 
-const frameConnect = chrome.extension.connect({ name: 'frame_connect' })
+const frameConnect = chrome.runtime.connect({ name: 'frame_connect' })
 
 setInterval(() => {
   frameConnect.postMessage('frame_connected')
