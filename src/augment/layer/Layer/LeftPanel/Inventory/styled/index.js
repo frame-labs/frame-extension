@@ -10,12 +10,11 @@ export const InventoryWrap = styled.div`
 `
 
 export const InventoryNone = styled.div`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
+  text-align: center;
+  border-radius: 7px;
+  box-sizing: border-box;
+  height: 200px;
   width: 100%;
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
