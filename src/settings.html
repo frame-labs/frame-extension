@@ -4,7 +4,7 @@
     <title>Frame</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700">
     <style>
       html {
         --ghostX09: rgba(20, 20, 19, 0.9);
@@ -26,6 +26,8 @@
         --goodUp: rgb(0, 250, 225);
         --good: rgb(0, 210, 190);
         --goodOver: rgba(0, 90, 100, 1);
+        --badOver: rgb(140, 00, 50);
+        --bad: rgb(255, 110, 155);
       }
 
       body {
@@ -35,7 +37,7 @@
         font-family: 'Open Sans', sans-serif;
         font-weight: 300;
         font-size: 14px;
-        margin: 20px;
+        margin: 16px;
       }
 
       a, a:hover, a:visited {

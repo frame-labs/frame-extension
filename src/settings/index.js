@@ -76,10 +76,45 @@ const SettingsWrap = styled.div`
   }
 `
 
+const AugmentValue = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const AugmentState = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 75px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  background: var(--ghostB);
+`
+
+const AugmentStateOn = styled(AugmentState)`
+  // background: var(--good);
+  color: var(--good);
+`
+
+const AugmentStateOff = styled(AugmentState)`
+  // background: var(--bad);
+  color: var(--bad);
+`
+
 const Augment = styled.div`
+  position: relative;
   background: var(--ghostA);
   // color: var(--good);
-  height: 32px;
+  height: 24px;
   border-radius: 8px;
   font-weight: 600;
   display: flex;
@@ -89,11 +124,15 @@ const Augment = styled.div`
   margin: 16px;
   cursor: pointer;
   font-size: 11px;
-  border: 1px solid var(--ghostZ);
+  border: 2px solid var(--ghostZ);
   padding-bottom: 1px;
+  overflow: hidden;
 
   &:hover {
     background: var(--ghostB);
+    ${AugmentState} {
+      background: var(--ghostC);
+    }
   }
 
   * {
@@ -102,8 +141,8 @@ const Augment = styled.div`
 `
 
 const FrameConnected = styled.div`
-  padding: 0px 20px 0px 30px;
-  font-size: 13px;
+  padding: 0px 16px 0px 0px;
+  font-size: 12px;
   text-transform: uppercase;
   font-weight: 600;
   user-select: none;
@@ -115,18 +154,34 @@ const SummonFrameFrameWrap = styled.div`
   align-items: center;
 `
 
+const FrameCheck = styled.div`
+  // width: 42px;
+  height: 33px;
+  // background: var(--ghostC);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--good);
+  padding: 0px 10px;
+
+  svg {
+    height: 23px;
+  }
+`
+
 const SummonFrameButton = styled.div`
-  width: 56px;
-  height: 32px;
+  width: 50px;
+  height: 33px;
   background: var(--ghostC);
   display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  padding-right: 3px;
+  // padding-right: 1px;
 
   svg {
-    height: 24px;
+    height: 22px;
   }
 `
 
@@ -134,27 +189,31 @@ const SummonFrame = styled.div`
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  border-radius: 16px;
-  height: 32px;
+  border-radius: 8px;
+  height: 33px;
   background: var(--ghostB);
-  box-shadow: 0px 6px 12px -6px var(--ghostX);
+  // box-shadow: 0px 6px 12px -6px var(--ghostX);
   flex-shrink: 1;
   overflow: hidden;
   cursor: pointer;
+  border: 2px solid var(--ghostZ);
 
   * {
     pointer-events: none;
   }
 
   &:hover {
-    background: var(--ghostC);
+    // background: var(--ghostC);
     ${SummonFrameButton} {
-      background: var(--good);
-      color: var(--goodOver);
-    }
-    ${FrameConnected} {
       color: var(--good);
     }
+    // ${FrameConnected} {
+    //   color: var(--good);
+    // }
+    // ${FrameCheck} {
+    //   background: var(--ghostD);
+    //   color: var(--good);
+    // }
   }
 
 `
@@ -168,11 +227,11 @@ const TabOrigin = styled.div`
   align-items: center;
   flex-direction: column;
   background: var(--ghostZ);
-  height: 32px;
+  height: 33px;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-sizing: border-box;
+  padding-bottom: 1px;
 `
 
 const Appear = styled.div`
@@ -180,7 +239,7 @@ const Appear = styled.div`
   background: var(--ghostZ);
   margin: 16px;
   border-radius: 10px;
-  padding: 1px;
+  padding: 2px;
 `
 
 const AppearDescription = styled.div`
@@ -238,7 +297,7 @@ const Download = styled.a`
   margin: 16px;
   cursor: pointer;
   font-size: 15px;
-  border: 1px solid var(--ghostZ);
+  border: 2px solid var(--ghostZ);
   letter-spacing: 1px;
   padding-right: 1px;
   box-sizing: border-box;
@@ -257,6 +316,7 @@ const Download = styled.a`
   }
 
 `
+const isFirefox = Boolean(window?.browser && browser?.runtime)
 
 class _Settings extends React.Component {
   frameConnected () {
@@ -268,6 +328,11 @@ class _Settings extends React.Component {
             <SummonFrame onClick={() => {
                 chrome.runtime.sendMessage({ jsonrpc: '2.0', id: 1, method: 'frame_summon', params: [] })
               }}>
+              <FrameCheck>
+                <svg viewBox='0 0 24 24'>
+                  <path fill='currentColor' d='M21.03 5.72a.75.75 0 010 1.06l-11.5 11.5a.75.75 0 01-1.072-.012l-5.5-5.75a.75.75 0 111.084-1.036l4.97 5.195L19.97 5.72a.75.75 0 011.06 0z' />
+                </svg>
+              </FrameCheck>
               <FrameConnected>Connected to Frame</FrameConnected>
               <SummonFrameButton>
                 <svg viewBox='0 0 24 24' width='24' height='24'>
@@ -311,14 +376,16 @@ class _Settings extends React.Component {
       <SettingsWrap>
         <img src='FrameLogo.png' />
         {this.frameConnected()}
-        {this.props.origin === 'https://twitter.com' ? (
+        {this.props.origin === 'https://twitter.com' && !isFirefox ? (
           this.props.augmentOff ? (
             <Augment onClick={() => augmentOffToggle()}>
-              <div>Twitter Badge: Off</div>
+              <AugmentValue>Twitter Badges</AugmentValue>
+              <AugmentStateOff>OFF</AugmentStateOff>
             </Augment>
           ) : (
             <Augment onClick={() => augmentOffToggle()}>
-              <div>Twitter Badge: On</div>
+              <AugmentValue>Twitter Badges</AugmentValue>
+              <AugmentStateOn>ON</AugmentStateOn>
             </Augment>
           )
         ) : null}
