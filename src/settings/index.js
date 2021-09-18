@@ -74,6 +74,10 @@ const SettingsWrap = styled.div`
     height: 30px;
     width: 30px;
   }
+  
+  * {
+    user-select: none;
+  }
 `
 
 const AugmentValue = styled.div`
@@ -101,12 +105,10 @@ const AugmentState = styled.div`
 `
 
 const AugmentStateOn = styled(AugmentState)`
-  // background: var(--good);
   color: var(--good);
 `
 
 const AugmentStateOff = styled(AugmentState)`
-  // background: var(--bad);
   color: var(--bad);
 `
 
@@ -145,7 +147,6 @@ const FrameConnected = styled.div`
   font-size: 12px;
   text-transform: uppercase;
   font-weight: 600;
-  user-select: none;
 `
 
 const SummonFrameFrameWrap = styled.div`
@@ -155,9 +156,7 @@ const SummonFrameFrameWrap = styled.div`
 `
 
 const FrameCheck = styled.div`
-  // width: 42px;
   height: 33px;
-  // background: var(--ghostC);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -178,7 +177,6 @@ const SummonFrameButton = styled.div`
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  // padding-right: 1px;
 
   svg {
     height: 22px;
@@ -192,7 +190,6 @@ const SummonFrame = styled.div`
   border-radius: 8px;
   height: 33px;
   background: var(--ghostB);
-  // box-shadow: 0px 6px 12px -6px var(--ghostX);
   flex-shrink: 1;
   overflow: hidden;
   cursor: pointer;
@@ -203,17 +200,9 @@ const SummonFrame = styled.div`
   }
 
   &:hover {
-    // background: var(--ghostC);
     ${SummonFrameButton} {
       color: var(--good);
     }
-    // ${FrameConnected} {
-    //   color: var(--good);
-    // }
-    // ${FrameCheck} {
-    //   background: var(--ghostD);
-    //   color: var(--good);
-    // }
   }
 
 `
@@ -379,12 +368,12 @@ class _Settings extends React.Component {
         {this.props.origin === 'https://twitter.com' && !isFirefox ? (
           this.props.augmentOff ? (
             <Augment onClick={() => augmentOffToggle()}>
-              <AugmentValue>Twitter Badges</AugmentValue>
+              <AugmentValue>Verify ENS Names</AugmentValue>
               <AugmentStateOff>OFF</AugmentStateOff>
             </Augment>
           ) : (
             <Augment onClick={() => augmentOffToggle()}>
-              <AugmentValue>Twitter Badges</AugmentValue>
+              <AugmentValue>Verify ENS Names</AugmentValue>
               <AugmentStateOn>ON</AugmentStateOn>
             </Augment>
           )
