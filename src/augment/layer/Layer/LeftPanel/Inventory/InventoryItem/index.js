@@ -1,83 +1,13 @@
 import React from 'react'
 import Restore from 'react-restore'
-import styled, { keyframes, ThemeProvider } from 'styled-components'
 
-import { float, shake } from '../../../style'
 import { Video, Image } from '../../../media'
 
-const PopCollection = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 3px;
-  padding: 5px 4px 4px 5px;
-  // transform: translate3d(180, 180, 180);
-  cursor: pointer;
-  word-break: break-word;
-  user-select: none;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  img {
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-    border-radius: 3px;
-    background: ${props => props.theme.base0};
-  }
-
-  video {
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-    border-radius: 3px;
-    background: ${props => props.theme.base0};
-  }
-
-  &:hover {
-    transform: scale(1.2);
-    z-index: 2000;
-    img, div {
-      animation: 5s ${float} ease-in-out infinite alternate;
-      box-shadow: 0px 8px 6px -2px ${props => props.theme.baseShadow};
-    }
-  }
-
-  &:active {
-    // transform: scale(1);
-    z-index: 2000;
-    img, div {
-      animation: ${shake} 2s ease-in-out infinite;
-      box-shadow: 0px 1px 1px -2px ${props => props.theme.baseShadow};
-    }
-  }
-`
-
-const ItemSelected = styled.div`
-  position: absolute;
-  top: 2px;
-  right: 1px; 
-  bottom: 1px;
-  left: 2px;
-  border: 2px solid ${props => props.theme.top0};
-  border-radius: 6px;
-  z-index: 20000;
-`
-
-const TextImg = styled.div`
-  width: 48px;
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 3px;
-  font-size: 8px;
-  padding: 5px;
-  box-sizing: border-box;
-  background: ${props => props.theme.base0};
-  position: relative;
-`
+import {
+  PopCollection,
+  ItemSelected,
+  TextImg
+} from './styled'
 
 class InventoryItem extends React.Component {
   constructor (...args) {

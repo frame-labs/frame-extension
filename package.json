@@ -9,7 +9,7 @@
   "main": "src",
   "scripts": {
     "test": "standard",
-    "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js && cp ./src/pop.html ./dist/pop.html",
+    "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js",
     "watch": "webpack --config webpack.dev.config.js",
     "serve": "webpack serve --config webpack.dev.layer.config.js"
   },
@@ -22,7 +22,6 @@
     "html-webpack-plugin": "5.3.2",
     "ncp": "2.0.0",
     "node-polyfill-webpack-plugin": "1.1.4",
-    "nodemon": "2.0.12",
     "react-hot-loader": "4.13.0",
     "rimraf": "3.0.2",
     "standard": "16.0.3",
@@ -37,7 +36,6 @@
     "@ensdomains/address-encoder": "0.2.8",
     "@ensdomains/content-hash": "2.5.7",
     "@ensdomains/resolver": "0.3.1",
-    "abi-codec": "0.0.9",
     "babel-loader": "8.2.2",
     "content-hash": "2.5.2",
     "eth-ens-namehash": "2.0.8",

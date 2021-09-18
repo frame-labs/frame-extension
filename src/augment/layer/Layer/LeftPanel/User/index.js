@@ -1,154 +1,16 @@
 import React from 'react'
 import Restore from 'react-restore'
-import styled, { keyframes, ThemeProvider } from 'styled-components'
 
-import { float, shake } from '../../style'
 import { Video, Image } from '../../media'
 
-
-const PopAvatarImg = styled.div`
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  width: 48px;
-  height: 48px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: ${props => props.theme.base0};
-
-  img {
-    width: 30px;
-    height: 30px;
-    object-fit: cover;
-    border-radius: 3px;
-    margin: 4px;
-  }
-
-  svg {
-    height: 22px;
-    width: 22px;
-  }
-`
-
-const PopNameVerifed = styled.div`
-  text-align: center;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 6px;
-  width: 48px;
-  height: 48px;
-  position: absolute;
-  left: 0px;
-  overflow: hidden;
-  pointer-events: auto;
-`
-
-const PopName = styled.div`
-  top: 5px;
-  right: 5px;
-  bottom: 0;
-  left: 5px;
-  position: absolute;
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 20000;
-  font-weight: 400;
-  border-radius: 6px;
-  background: ${props => props.theme.base1};
-  cursor: pointer;
-
-  &:hover {
-    animation: 5s ${float} ease-in-out infinite alternate;
-    background: ${props => props.theme.base2};
-    z-index: 2000;
-  }
-
-  &:active {
-    animation: ${shake} 2s ease-in-out infinite;
-    background: ${props => props.theme.base2};
-    z-index: 2000;
-  }
-`
-
-const PopNameSelected = styled(PopName)`
-  border: 2px solid ${props => props.theme.top0};
-`
-
-const PopNameVerifedIcon = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 48px;
-  height: 48px;
-  pointer-events: none;
-  svg {
-    height: 16px;
-  }
-`
-const PopNameText = styled.div`
-  // position: absolute;
-  // top: 0;
-  // left: 40px;
-  // bottom: 1px;
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
-  // font-size: 16px;
-`
-
-
-// const PopNameVerifedMessage = styled.div`
-//   position: absolute;
-//   top: 0;
-//   right: 24px;
-//   bottom: 0;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   height: 24px;
-//   padding: 0px 1px 0px 5px;
-//   pointer-events: none;
-//   min-width: 130px;
-// `
-
-const PopLogo = styled.div`
-  position: absolute;
-  left: 11px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-
-  svg {
-    height: 22px;
-    fill: ${props => props.theme.top0};
-  }
-
-`
-
-const NameSelect = styled.div`
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  bottom: -3px;
-  left: -3px;
-  border-radius: 9px;
-  border: 2px solid ${props => props.theme.top0};
-  z-index: 20000;
-`
+import {
+  PopAvatarImg,
+  PopNameVerifed,
+  PopName,
+  PopNameVerifedIcon,
+  PopNameText,
+  NameSelect
+} from './styled'
 
 class User extends React.Component {
   constructor (...args) {
@@ -182,7 +44,6 @@ class User extends React.Component {
     )
   }
   render () {
-    const theme = this.store('theme')
     const { userId } = this.store('layerPop')
     const user = this.store('users', userId)
     const select = this.store('select')
@@ -205,11 +66,6 @@ class User extends React.Component {
         }}
       >
         {select?.type === 'user' ? <NameSelect /> : null}
-        {/* <PopLogo>
-          <svg viewBox='0 0 245 247'>
-            <path d='M232,124V46.82A33.82,33.82,0,0,0,198.18,13H123L110,0H36.94A36.94,36.94,0,0,0,0,36.94V111l13,13v76.18A33.82,33.82,0,0,0,46.82,234H123l13,13h72.06A36.94,36.94,0,0,0,245,210.06V137Zm-58,29.41A22.6,22.6,0,0,1,151.41,176H93.59A22.6,22.6,0,0,1,71,153.41V93.59A22.6,22.6,0,0,1,93.59,71h57.82A22.6,22.6,0,0,1,174,93.59Z'/>
-          </svg>
-        </PopLogo> */}
         <PopAvatarImg>
           {img?.src && img.type === 'video' ? (
             <Video src={img.src} soundOff={true} />
