@@ -154,13 +154,14 @@ async function insertBadge (targetElement, ensName, handle) {
   mount.className = '__frameMount__'
   mount.style.cssText = `
     width: 16px;
-    height: 20px;
+    height: 22px;
     pointer-events: auto;
     display: inline-block;
     position: relative;
     vertical-align: -20%;
     margin-right: 4px;
     margin-left: -2px;
+    top: 3px;
   `
 
   insertAfter(mount, targetElement)
@@ -300,7 +301,7 @@ class Badge extends React.Component {
         e.stopPropagation()
       }}>
         <div 
-          style={{ pointerEvents: 'auto', paddingTop: '2px' }}
+          style={{ pointerEvents: 'auto' }}
           onMouseOver={e => {
             e.preventDefault()
             e.stopPropagation()
