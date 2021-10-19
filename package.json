@@ -26,8 +26,8 @@
     "rimraf": "3.0.2",
     "standard": "16.0.4",
     "terser-webpack-plugin": "5.2.4",
-    "webpack": "5.58.2",
-    "webpack-cli": "4.9.0",
+    "webpack": "5.59.0",
+    "webpack-cli": "4.9.1",
     "webpack-dev-server": "4.3.1"
   },
   "dependencies": {
@@ -39,14 +39,14 @@
     "babel-loader": "8.2.2",
     "content-hash": "2.5.2",
     "eth-ens-namehash": "2.0.8",
-    "eth-provider": "0.9.6",
+    "eth-provider": "0.9.7",
     "ethereum-provider": "0.4.6",
     "ethers": "5.4.7",
     "nebula": "0.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-restore": "0.5.0",
-    "styled-components": "5.3.1",
+    "styled-components": "5.3.3",
     "use-nft": "0.10.1"
   }
 }
