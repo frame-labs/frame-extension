@@ -1,6 +1,6 @@
 {
   "name": "frame-extension",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "repository": {
     "type": "git",
     "url": "git://github.com/floating/frame-extension.git"
@@ -16,37 +16,37 @@
   "author": "Jordan Muir",
   "license": "",
   "devDependencies": {
-    "@babel/core": "7.15.8",
-    "@babel/plugin-transform-runtime": "7.15.8",
-    "@babel/preset-react": "7.14.5",
+    "@babel/core": "7.16.0",
+    "@babel/plugin-transform-runtime": "7.16.4",
+    "@babel/preset-react": "7.16.0",
     "html-webpack-plugin": "5.5.0",
     "ncp": "2.0.0",
     "node-polyfill-webpack-plugin": "1.1.4",
     "react-hot-loader": "4.13.0",
     "rimraf": "3.0.2",
     "standard": "16.0.4",
-    "terser-webpack-plugin": "5.2.4",
-    "webpack": "5.60.0",
+    "terser-webpack-plugin": "5.2.5",
+    "webpack": "5.64.3",
     "webpack-cli": "4.9.1",
-    "webpack-dev-server": "4.4.0"
+    "webpack-dev-server": "4.5.0"
   },
   "dependencies": {
-    "@babel/preset-env": "7.15.8",
-    "@babel/runtime": "7.15.4",
+    "@babel/preset-env": "7.16.4",
+    "@babel/runtime": "7.16.3",
     "@ensdomains/address-encoder": "0.2.10",
     "@ensdomains/content-hash": "2.5.7",
     "@ensdomains/resolver": "0.3.1",
     "babel-loader": "8.2.3",
     "content-hash": "2.5.2",
     "eth-ens-namehash": "2.0.8",
-    "eth-provider": "0.9.7",
-    "ethereum-provider": "0.4.7",
+    "eth-provider": "0.9.8",
+    "ethereum-provider": "0.4.8",
     "ethers": "5.5.1",
     "nebula": "0.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-restore": "0.5.0",
     "styled-components": "5.3.3",
-    "use-nft": "0.10.1"
+    "use-nft": "0.10.2"
   }
 }
