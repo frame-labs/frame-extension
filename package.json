@@ -1,6 +1,6 @@
 {
   "name": "frame-extension",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "repository": {
     "type": "git",
     "url": "git://github.com/floating/frame-extension.git"
@@ -26,14 +26,14 @@
     "rimraf": "3.0.2",
     "standard": "16.0.4",
     "terser-webpack-plugin": "5.2.5",
-    "webpack": "5.64.3",
+    "webpack": "5.65.0",
     "webpack-cli": "4.9.1",
-    "webpack-dev-server": "4.5.0"
+    "webpack-dev-server": "4.6.0"
   },
   "dependencies": {
     "@babel/preset-env": "7.16.4",
     "@babel/runtime": "7.16.3",
-    "@ensdomains/address-encoder": "0.2.10",
+    "@ensdomains/address-encoder": "0.2.13",
     "@ensdomains/content-hash": "2.5.7",
     "@ensdomains/resolver": "0.3.1",
     "babel-loader": "8.2.3",
@@ -41,7 +41,7 @@
     "eth-ens-namehash": "2.0.8",
     "eth-provider": "0.9.8",
     "ethereum-provider": "0.4.8",
-    "ethers": "5.5.1",
+    "ethers": "5.5.2",
     "nebula": "0.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",

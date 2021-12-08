@@ -35,6 +35,7 @@ provider.connection.on('payload', payload => {
       delete pending[payload.id]
     }
   } else if (payload.method && payload.method.indexOf('_subscription') > -1 && subs[payload.params.subscription]) { // Emit subscription result to tab
+    payload.type = 'eth:payload'
     subs[payload.params.subscription].send(payload)
   }
 })
