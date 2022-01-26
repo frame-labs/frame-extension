@@ -1,14 +1,14 @@
 {
-  "name": "Frame",
+  "name": "Frame Companion",
   "version": "0.7.5",
   "manifest_version": 2,
-  "description": "Frame",
+  "description": "Frame Companion",
   "homepage_url": "https://github.com/floating/frame",
   "background": {
     "scripts": ["index.js"]
   },
   "browser_action": {
-    "default_title": "Frame",
+    "default_title": "Frame Companion",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
