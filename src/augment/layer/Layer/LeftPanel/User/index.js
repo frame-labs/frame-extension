@@ -47,7 +47,7 @@ class User extends React.Component {
     const { userId } = this.store('layerPop')
     const user = this.store('users', userId)
     const select = this.store('select')
-    const img = user.avatar.thumbnail
+    const img = user.avatar.img
 
     return (
       <PopName

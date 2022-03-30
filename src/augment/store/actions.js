@@ -22,6 +22,14 @@ export const setUserInventory = (u, userId, inventory) => {
   })
 }
 
+export const setUserAvatar = (u, userId, avatar) => {
+  if (!userId || !avatar) return
+  u('users', userId, user => {
+    user.avatar = avatar
+    return user
+  })
+}
+
 export const setTheme = (u, theme) => {
   u('theme', () => theme)
 }

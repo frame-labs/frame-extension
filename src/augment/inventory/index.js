@@ -44,8 +44,29 @@ pylon.on('inventories', inventories => {
       })
     })
 
-    store.setUserInventory(idMap[address], inventory)
-  }) 
+    const userId = idMap[address]
+
+    store.setUserInventory(userId, inventory)
+
+    const avatarNft = store('users', userId, 'avatarNft')
+
+    if (avatarNft) {
+      const { avatarAddress, avatarTokenId } = avatarNft
+      Object.keys(inventory).forEach(collection => {
+        const { items } = inventory[collection]
+        Object.keys(items).forEach(asset => {
+          const a = inventory[collection].items[asset]
+          const { contract, tokenId } = a
+          if (
+            contract.address.toLowerCase() === avatarAddress.toLowerCase() &&
+            tokenId.toLowerCase() === avatarTokenId.toLowerCase()
+          ) {
+            store.setUserAvatar(userId, {img: a.img})
+          }
+        })
+      })
+    }
+  })
 })
 
 
