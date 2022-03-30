@@ -1,91 +1,78 @@
-async function scan (address) {
-  const inventory = {}
-  if (!address) return inventory
-  const getSet = async (address, offset) => {
-    const url = `https://api.opensea.io/api/v1/assets?owner=${address}&order_direction=desc&offset=${offset}&limit=50`
-    const options = { method: 'GET' }
-    const set = await (await fetch(url, options)).json()
-    set?.assets?.forEach(a => {
-      inventory[a.id] = a
-    })
-    if (set?.assets?.length === 50) await getSet(address, offset + 50)
-  }
+import store from '../store'
+import Pylon from '@framelabs/pylon-client'
+
+// const Pylon = require('@framelabs/pylon-client').default
+const pylon = new Pylon('wss://data.pylon.link')
+
+const addressSub = []
+const idMap = {}
+
+pylon.on('inventories', inventories => {
+  // Map and type media
+  inventories.forEach(inv => {
+    const address = inv.id
+    const inventory = inv.data.inventory
+
+    Object.keys(inventory).forEach(collection => {
+      const { meta, items } = inventory[collection]
+
+      meta.priority = meta.img ? 1 : 0
+
+      const img = meta.img ? meta.img : items[Object.keys(items).filter(k => items[k].img).sort((a, b) => {
+        if (items[a].tokenId < items[b].tokenId) return -1
+        if (items[a].tokenId > items[b].tokenId) return 1
+        return 0
+      })[0]]?.img
+
+      meta.img = { src: img || '' }
+      meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
   
-  await getSet(address, 0)
-  return inventory
+      Object.keys(items).forEach(asset => {
+        const { img, animation, thumbnail } = items[asset]
+  
+        const media = convertAssetToMedia(items[asset])
+  
+        items[asset] = {
+          ...items[asset],
+          ...media
+        }
+  
+        items[asset].img = { src: animation || img || '' }
+        items[asset].img.type = items[asset].img.src.endsWith('.mp4') || items[asset].img.src.endsWith('.mov') ? 'video' : 'img'
+        items[asset].thumbnail = { src: thumbnail || animation || img || ''}
+        items[asset].thumbnail.type = items[asset].thumbnail.src.endsWith('.mp4') || items[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
+      })
+    })
+
+    store.setUserInventory(idMap[address], inventory)
+  }) 
+})
+
+
+function getMediaType (src) {
+  return ['.mp4', '.mov'].some(suffix => src.endsWith(suffix)) ? 'video' : 'img'
 }
 
-function createAsset (assetData) {
-  const {
-    name,
-    id,
-    token_id,
-    image_url,
-    image_thumbnail_url,
-    animation_url,
-    description,
-    external_link,
-    permalink,
-    traits,
-    asset_contract,
-    display_data
-  } = assetData
+function convertAssetToMedia (asset) {
+  const { img, animation, thumbnail } = asset
+
+  const image = { src: animation || img || '' }
+  image.type = getMediaType(image.src)
+
+  const thumb = { src: thumbnail || animation || img || ''}
+  thumb.type = getMediaType(thumb.src)
 
   return {
-    name,
-    id,
-    tokenId: token_id,
-    thumbnail: image_thumbnail_url || image_url,
-    img: image_url,
-    animation: animation_url,
-    description,
-    link: external_link,
-    display: display_data,
-    openSeaLink: permalink,
-    traits,
-    contract: {
-      address: asset_contract.address,
-      type: asset_contract.asset_contract_type,
-      created: asset_contract.created,
-      name: asset_contract.name,
-      owner: asset_contract.owner,
-      schema: asset_contract.schema_name,
-      description: asset_contract.description,
-      img: asset_contract.image_url,
-      link: asset_contract.external_link
-    }
+    img: image,
+    thumbnail: thumb
   }
 }
 
-async function get (address, tokenId) {
-  const url = `https://api.opensea.io/api/v1/asset/${address}/${tokenId}`
-  const options = { method: 'GET' }
-
-  const assetData = await (await fetch(url, options)).json()
-
-  return createAsset(assetData)
+function addUser (userId, address) {
+  address = address.toLowerCase()
+  if (addressSub.indexOf(address) === -1) addressSub.push(address)
+  idMap[address] = userId
+  pylon.inventories(addressSub)
 }
 
-async function forAddress (address) {
-  let assets = await scan(address)
-
-  return Object.values(assets).reduce((inventory, { collection, ...assetData }) => {
-    if (!inventory[collection.slug]) {
-      inventory[collection.slug] = {
-        meta: {
-          name: collection.name,
-          description: collection.description,
-          img: collection.featured_image_url,
-          imgLarge: collection.large_image_url
-        },
-        assets: {}
-      }
-    }
-
-    inventory[collection.slug].assets[assetData.id] = createAsset(assetData)
-
-    return inventory
-  }, {})
-}
-
-export { forAddress, get }
+export { addUser }

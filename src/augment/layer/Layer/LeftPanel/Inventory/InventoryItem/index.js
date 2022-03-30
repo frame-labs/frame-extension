@@ -21,7 +21,7 @@ class InventoryItem extends React.Component {
     const user = this.store('users', userId)
 
     if (this.props.asset) {
-      const asset = user.inventory[this.props.collection].assets[this.props.asset]
+      const asset = user.inventory[this.props.collection].items[this.props.asset]
       const img = asset.thumbnail
       const select = this.store('select')
 

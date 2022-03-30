@@ -14,6 +14,14 @@ export const setUser = (u, userId, user) => {
   u('users', userId, () => user)
 }
 
+export const setUserInventory = (u, userId, inventory) => {
+  if (!userId || !inventory) return
+  u('users', userId, user => {
+    user.inventory = inventory
+    return user
+  })
+}
+
 export const setTheme = (u, theme) => {
   u('theme', () => theme)
 }

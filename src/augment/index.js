@@ -18,7 +18,7 @@ const fallbackProvider = provider(ethProvider())
 const nebula = n('https://ipfs.nebula.land', fallbackProvider)
 
 // TODO
-const { getNft } = nft(fallbackProvider)
+// const { getNft } = nft(fallbackProvider)
 
 const firstChild = (element, count, i = 0) => {
   element = element.children[0]
@@ -26,12 +26,13 @@ const firstChild = (element, count, i = 0) => {
   return firstChild(element, count, i)
 }
 
-function equalsIgnoreCase (s1, s2) {
-  return s1.toLowerCase() === s2.toLowerCase()
+function trim (string, prefix) {
+  if (string.startsWith(prefix)) string = string.slice(prefix.length)
+  return string
 }
 
-function parseEnsName (nameSpan) {
-  return ((((nameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
+function equalsIgnoreCase (s1, s2) {
+  return s1.toLowerCase() === s2.toLowerCase()
 }
 
 function parseAvatarNft (avatar = '') {
@@ -40,25 +41,6 @@ function parseAvatarNft (avatar = '') {
   return {
     avatarAddress: nftFields ? nftFields.groups.address : '',
     avatarTokenId: nftFields ? nftFields.groups.tokenId : ''
-  }
-}
-
-function getMediaType (src) {
-  return ['.mp4', '.mov'].some(suffix => src.endsWith(suffix)) ? 'video' : 'img'
-}
-
-function convertAssetToMedia (asset) {
-  const { img, animation, thumbnail } = asset
-
-  const image = { src: animation || img || '' }
-  image.type = getMediaType(image.src)
-
-  const thumb = { src: thumbnail || animation || img || ''}
-  thumb.type = getMediaType(thumb.src)
-
-  return {
-    img: image,
-    thumbnail: thumb
   }
 }
 
@@ -94,30 +76,38 @@ function findNameSectionInHeader (profileHeader) {
   return { targetElement, ensName, handle }
 }
 
+function parseEnsName (nameSpan) {
+  return ((((nameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
+}
+
 function findNameSectionInTweet (tweet) {
-  const tweetLinks = [...tweet.querySelectorAll('a[role=link]')];
+  const tweetLinks = [...tweet.querySelectorAll('a[role=link]')]
 
-  return tweetLinks.reduce((data, link) => {
-    if (data) return data
+  const target = {}
+  tweetLinks.some((link, i) => {
+    const spans = [...link.querySelectorAll('span')]
+    return spans.some(span => {
+      const text = span.textContent 
+      if (text.startsWith('@')) {
+        const handle = text.substring(1)
+        if (handle && /^[a-zA-Z0-9_]{1,15}$/.test(handle) && equalsIgnoreCase(link.href, 'https://twitter.com/' + handle)) {
+          target.handleLink = link
+          target.handle = handle
+          target.nameLink = tweetLinks[i - 1]
+          target.name = target.nameLink.textContent
+          const nameSpan = [...target.nameLink.querySelectorAll('span')].find(block => (block.textContent || '').includes('.eth'))
+          target.ensName = parseEnsName(nameSpan)
+          return true
+        }
+      }
+    }) 
+  })
 
-    const href = (link || {}).href
-    const handle = href.split('/').reverse()[0].toLowerCase()
-
-    const nameSpans = [...link.querySelectorAll('span')]
-
-    // the name section will be one with a span that displays the same handle as the one in the link href
-    const handleIndex = nameSpans.findIndex(span => {
-      const text = span.textContent || ''
-      return text.startsWith('@') && equalsIgnoreCase(text.substring(1), handle)
-    })
-
-    if (handleIndex > 0) {
-      const ensNameSpan = nameSpans.slice(0, handleIndex).reverse().find(block => (block.textContent || '').includes('.eth'))
-      const ensName = parseEnsName(ensNameSpan)
-
-      return { targetElement: link, ensName, handle }
-    }
-  }, false)
+  return { 
+    targetElement: target.nameLink, 
+    ensName: target.ensName, 
+    handle: target.handle 
+  }
 }
 
 function updateHeaderBadge (root = document.querySelector('main')) {
@@ -160,7 +150,7 @@ async function insertBadge (targetElement, ensName, handle) {
     position: relative;
     vertical-align: -20%;
     margin-right: 4px;
-    margin-left: -2px;
+    margin-left: 0px;
     top: 3px;
   `
 
@@ -191,48 +181,19 @@ async function insertBadge (targetElement, ensName, handle) {
       avatar: false
     }
 
-    if (record.addresses.eth) {
-      user.inventory = await inventory.forAddress(record.addresses.eth)
-    }
+    user.inventory = {}
 
-    const { avatarAddress, avatarTokenId } = parseAvatarNft(record.text.avatar)
-    if (avatarAddress && avatarTokenId) {
-      // try {
-      //   user.verified.avatar = await getNft(avatarAddress, avatarTokenId)
-      // } catch (e) {}
+    if (record.addresses.eth) inventory.addUser(userId, record.addresses.eth)
 
-      const avatarAsset = await inventory.get(avatarAddress, avatarTokenId)
-      user.avatar = convertAssetToMedia(avatarAsset)
-    }
+    // const { avatarAddress, avatarTokenId } = parseAvatarNft(record.text.avatar)
+    // if (avatarAddress && avatarTokenId) {
+    //   try {
+    //     user.verified.avatar = await getNft(avatarAddress, avatarTokenId)
+    //   } catch (e) {}
 
-    // Map and type media
-    Object.keys(user.inventory).forEach(collection => {
-      const { meta, assets } = user.inventory[collection]
-      meta.priority = meta.img ? 1 : 0
-      const img = meta.img ? meta.img : assets[Object.keys(assets).filter(k => assets[k].img).sort((a, b) => {
-        if (assets[a].tokenId < assets[b].tokenId) return -1
-        if (assets[a].tokenId > assets[b].tokenId) return 1
-        return 0
-      })[0]]?.img
-      meta.img = { src: img || '' }
-      meta.img.type = meta.img.src.endsWith('.mp4') || meta.img.src.endsWith('.mov') ? 'video' : 'img'
-
-      Object.keys(assets).forEach(asset => {
-        const { img, animation, thumbnail } = assets[asset]
-
-        const media = convertAssetToMedia(assets[asset])
-
-        assets[asset] = {
-          ...assets[asset],
-          ...media
-        }
-
-        assets[asset].img = { src: animation || img || '' }
-        assets[asset].img.type = assets[asset].img.src.endsWith('.mp4') || assets[asset].img.src.endsWith('.mov') ? 'video' : 'img'
-        assets[asset].thumbnail = { src: thumbnail || animation || img || ''}
-        assets[asset].thumbnail.type = assets[asset].thumbnail.src.endsWith('.mp4') || assets[asset].thumbnail.src.endsWith('.mov') ? 'video' : 'img'
-      })
-    })
+    //   const avatarAsset = await inventory.get(avatarAddress, avatarTokenId)
+    //   user.avatar = convertAssetToMedia(avatarAsset)
+    // }
 
     store.setUser(userId, user)
   } catch (e) {
@@ -342,10 +303,11 @@ const callback = function (mutationsList) {
         const tweet = addedNode.querySelector('[data-testid=primaryColumn] [data-testid=tweet]')
         if (tweet) {
           const { ensName, handle, targetElement } = findNameSectionInTweet(tweet)
-          const target = firstChild(targetElement, 3)
-
-          if (ensName && !tweet.querySelector('.__frameMount__') && target) {
-            insertBadge(target, ensName, handle)
+          if (targetElement) {
+            const target = firstChild(targetElement, 3)
+            if (ensName && !tweet.querySelector('.__frameMount__') && target) {
+              insertBadge(target, ensName, handle)
+            }
           }
         }
       }

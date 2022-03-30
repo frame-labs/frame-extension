@@ -1,6 +1,6 @@
 {
   "name": "frame-extension",
-  "version": "0.7.5",
+  "version": "0.8.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/floating/frame-extension.git"
@@ -36,6 +36,7 @@
     "@ensdomains/address-encoder": "0.2.13",
     "@ensdomains/content-hash": "2.5.7",
     "@ensdomains/resolver": "0.3.1",
+    "@framelabs/pylon-client": "0.0.5",
     "babel-loader": "8.2.3",
     "content-hash": "2.5.2",
     "eth-ens-namehash": "2.0.8",
