@@ -78,7 +78,7 @@ class RightPanel extends React.Component {
   }
   renderAsset (user, collection, asset) {
     const collectionName = user.inventory[collection].meta.name
-    const assetData = user.inventory[collection].assets[asset]
+    const assetData = user.inventory[collection].items[asset]
     const tokenId = assetData?.tokenId ? '#' + (assetData.tokenId.length > 9 ? assetData.tokenId.substr(0, 3) + '...' + assetData.tokenId.substr(-3) : assetData.tokenId) : '?'
     const img = assetData.img
     return (
@@ -109,7 +109,7 @@ class RightPanel extends React.Component {
   }
   renderCollection (user, collection) {
     const collectionData = user.inventory[collection]
-    const count = Object.keys(collectionData.assets).length || 0
+    const count = Object.keys(collectionData.items).length || 0
 
     const img = collectionData.meta.img
 

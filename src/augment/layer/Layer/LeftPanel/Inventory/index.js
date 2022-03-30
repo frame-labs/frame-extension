@@ -75,7 +75,7 @@ class Inventory extends React.Component {
             <ItemWrap>
               <ItemScroll>
                 <PopCollectionsWrapper>
-                  {Object.keys(user.inventory[collection].assets).map(key => {
+                  {Object.keys(user.inventory[collection].items).map(key => {
                     return <InventoryItem key={key} collection={collection} asset={key} />
                   })}
                 </PopCollectionsWrapper>
