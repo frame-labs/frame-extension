@@ -37,7 +37,7 @@ class Avatar extends React.Component {
         }}
       >
         <PopAvatarImg>
-          <img src={user.avatar} />
+          <img src={user.avatar.img.src} />
         </PopAvatarImg>
         <PopAvatarMeta>
           <PopAvatarMetaName>NFT NAME</PopAvatarMetaName>

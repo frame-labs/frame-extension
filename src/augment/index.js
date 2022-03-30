@@ -185,15 +185,7 @@ async function insertBadge (targetElement, ensName, handle) {
 
     if (record.addresses.eth) inventory.addUser(userId, record.addresses.eth)
 
-    // const { avatarAddress, avatarTokenId } = parseAvatarNft(record.text.avatar)
-    // if (avatarAddress && avatarTokenId) {
-    //   try {
-    //     user.verified.avatar = await getNft(avatarAddress, avatarTokenId)
-    //   } catch (e) {}
-
-    //   const avatarAsset = await inventory.get(avatarAddress, avatarTokenId)
-    //   user.avatar = convertAssetToMedia(avatarAsset)
-    // }
+    user.avatarNft = parseAvatarNft(record.text.avatar)
 
     store.setUser(userId, user)
   } catch (e) {
