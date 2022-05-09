@@ -15,6 +15,7 @@ module.exports = [
       ]
     },
     output: {
+      publicPath: '',
       path: path.resolve(__dirname, 'dist'),
       filename: 'frame.js'
     },
@@ -45,6 +46,7 @@ module.exports = [
       ]
     },
     output: {
+      publicPath: '',
       path: path.resolve(__dirname, 'dist'),
       filename: 'augment.js'
     },
@@ -78,6 +80,7 @@ module.exports = [
       ]
     },
     output: {
+      publicPath: '',
       path: path.resolve(__dirname, 'dist'),
       filename: 'settings.js'
     },
@@ -92,6 +95,7 @@ module.exports = [
     mode: 'production',
     entry: './src/index.js',
     output: {
+      publicPath: '',
       path: path.resolve(__dirname, 'dist'),
       filename: 'index.js'
     },
