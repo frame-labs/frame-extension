@@ -41,7 +41,7 @@ class Inventory extends React.Component {
             <ItemWrap>
               <ItemScroll style={{ paddingRight }}>
                 <PopCollectionsWrapper>
-                  {Object.keys(user.inventory).sort((key1, key2) => {
+                  {user.inventory ? Object.keys(user.inventory).sort((key1, key2) => {
                     const c1 = user.inventory[key1]
                     const c2 = user.inventory[key2]
                     if (c1.meta.priority === c2.meta.priority) return 0
@@ -49,8 +49,8 @@ class Inventory extends React.Component {
                     if (c1.meta.priority < c2.meta.priority) return 1
                   }).map(key => {
                     return <InventoryItem key={key} collection={key} />
-                  })}
-                  {Object.keys(user.inventory).length === 0 ? <InventoryNone><span>{'no items'}</span></InventoryNone> : null}
+                  }): null}
+                  {user.inventory ? Object.keys(user.inventory).length === 0 ? <InventoryNone><span>{'no items'}</span></InventoryNone> : null : <InventoryNone><span>{'loading'}</span></InventoryNone>}
                 </PopCollectionsWrapper>
               </ItemScroll>
             </ItemWrap>

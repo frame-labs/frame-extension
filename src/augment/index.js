@@ -181,8 +181,6 @@ async function insertBadge (targetElement, ensName, handle) {
       avatar: false
     }
 
-    user.inventory = {}
-
     if (record.addresses.eth) inventory.addUser(userId, record.addresses.eth)
 
     user.avatarNft = parseAvatarNft(record.text.avatar)

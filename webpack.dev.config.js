@@ -18,6 +18,7 @@ module.exports = [
       extensions: ['*', '.js', '.jsx']
     },
     output: {
+      publicPath: '',
       path: path.resolve(__dirname, 'dist'),
       filename: 'augment.js'
     },
@@ -45,6 +46,7 @@ module.exports = [
       extensions: ['*', '.js', '.jsx']
     },
     output: {
+      publicPath: '',
       path: path.resolve(__dirname, 'dist'),
       filename: 'settings.js'
     },
