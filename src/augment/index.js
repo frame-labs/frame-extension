@@ -12,7 +12,6 @@ import themes from './themes'
 import './layer'
 
 const nftSpec = /erc(?:721|1155):(?<address>0x\w+)\/(?<tokenId>\d+)/
-console.log('STARTING')
 
 const fallbackProvider = provider(ethProvider())
 const nebula = n('https://ipfs.nebula.land', fallbackProvider)
