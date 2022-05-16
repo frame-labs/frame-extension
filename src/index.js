@@ -59,7 +59,7 @@ provider.connection.on('payload', payload => {
 })
 
 chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
-  const { method, params, tabId } = payload
+  const { method, params, tab } = payload
 
   if (payload.method === 'media_blob') {
     const location = payload.location
@@ -78,8 +78,8 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
   if (payload.method === 'frame_summon') return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })
   
   const id = provider.nextId++
-  pending[id] = { tabId: sender?.tab?.id || tabId, payloadId: payload.id, method }
-  const load = { jsonrpc: '2.0', id, method, params, __frameOrigin: getOrigin(sender.url) }
+  pending[id] = { tabId: sender?.tab?.id || tab.id, payloadId: payload.id, method }
+  const load = { jsonrpc: '2.0', id, method, params, __frameOrigin: getOrigin((tab || {}).url || sender.url) }
 
   provider.connection.send(load)
 })

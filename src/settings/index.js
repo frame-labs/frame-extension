@@ -394,7 +394,7 @@ class _Settings extends React.Component {
             chains.map(chain => {
               return (
                 <button onClick={() => {
-                  chrome.runtime.sendMessage({ tabId: this.props.tab.id, method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + chain.toString(16) }] })
+                  chrome.runtime.sendMessage({ tab: this.props.tab, method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + chain.toString(16) }] })
                   this.setState({ switchingChain: false })
                 }}>{chain}</button>
               )
@@ -409,22 +409,28 @@ class _Settings extends React.Component {
     const isConnected = this.store('frameConnected')
     const origin = getOrigin(this.props.tab.url)
 
+    const mainPanel = isConnected
+      ? (
+          <>
+          <div>test</div>
+            {this.frameConnected()}
+            {this.state.switchingChain
+              ? this.chainSelect()
+              : (
+                  <>
+                    {this.appearAsMMToggle()}
+                    {this.switchChain()}
+                  </>
+                )
+              }
+          </>
+        )
+      : this.notConnected()
+
     return (
       <SettingsWrap>
         <img src='FrameLogo.png' />
-        {
-          isConnected ? this.frameConnected() : this.notConnected()
-        }
-        {
-          this.state.switchingChain
-            ? this.chainSelect()
-            : (
-                <>
-                  {this.appearAsMMToggle()}
-                  {this.switchChain()}
-                </>
-              )
-        }
+        {mainPanel}
         {origin === 'https://twitter.com' && !isFirefox ? (
           this.props.augmentOff ? (
             <Augment onClick={() => augmentOffToggle()}>
