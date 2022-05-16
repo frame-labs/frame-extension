@@ -14,6 +14,14 @@ export const setUser = (u, userId, user) => {
   u('users', userId, () => user)
 }
 
+export function setActiveChain (u, chain) {
+  u('chains.selected', () => chain)
+}
+
+export function setChains (u, chains) {
+  u('chains.available', () => chains)
+}
+
 export const setUserInventory = (u, userId, inventory) => {
   if (!userId || !inventory) return
   u('users', userId, user => {

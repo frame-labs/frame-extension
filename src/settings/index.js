@@ -12,6 +12,9 @@ const initialState = {
 }
 
 const actions = {
+  setChains: (u, chains) => {
+    u('availableChains', () => chains)
+  },
   setFrameConnected: (u, connected) => {
     u('frameConnected', () => connected)
   }
@@ -308,64 +311,121 @@ const Download = styled.a`
 const isFirefox = Boolean(window?.browser && browser?.runtime)
 
 class _Settings extends React.Component {
-  frameConnected () {
-    const frameConnected = this.store('frameConnected')
-    if (frameConnected) {
-      return (
-        <>
-          <SummonFrameFrameWrap>
-            <SummonFrame onClick={() => {
-                chrome.runtime.sendMessage({ jsonrpc: '2.0', id: 1, method: 'frame_summon', params: [] })
-              }}>
-              <FrameCheck>
-                <svg viewBox='0 0 24 24'>
-                  <path fill='currentColor' d='M21.03 5.72a.75.75 0 010 1.06l-11.5 11.5a.75.75 0 01-1.072-.012l-5.5-5.75a.75.75 0 111.084-1.036l4.97 5.195L19.97 5.72a.75.75 0 011.06 0z' />
-                </svg>
-              </FrameCheck>
-              <FrameConnected>Connected to Frame</FrameConnected>
-              <SummonFrameButton>
-                <svg viewBox='0 0 24 24' width='24' height='24'>
-                  <path fill='currentColor' d='M3 3.25c0-.966.784-1.75 1.75-1.75h5.5a.75.75 0 010 1.5h-5.5a.25.25 0 00-.25.25v17.5c0 .138.112.25.25.25h5.5a.75.75 0 010 1.5h-5.5A1.75 1.75 0 013 20.75V3.25zm9.994 9.5l3.3 3.484a.75.75 0 01-1.088 1.032l-4.5-4.75a.75.75 0 010-1.032l4.5-4.75a.75.75 0 011.088 1.032l-3.3 3.484h8.256a.75.75 0 010 1.5h-8.256z' />
-                </svg>
-            </SummonFrameButton>
-            </SummonFrame>
-          </SummonFrameFrameWrap>
-          {this.props.mmAppear ? (
-            <Appear>
-              <AppearDescription>
-                <span>Injecting as <span className='mm'>Metamask</span></span>
-              </AppearDescription>
-              <AppearToggle onClick={() => mmAppearToggle()}>
-                <span>Appear As <span className='frame'>Frame</span> Instead</span>
-              </AppearToggle>
-            </Appear>
-          ) : (
-            <Appear>
-              <AppearDescription>
-                  <span>Injecting as <span className='frame'>Frame</span></span>
-              </AppearDescription>
-              <AppearToggle onClick={() => mmAppearToggle()}>
-                <span>Appear As <span className='mm'>Metamask</span> Instead</span>
-              </AppearToggle>
-            </Appear>
-          )}
-        </>
-      )
-    } else {
-      return (
-        <>
-          <NotConnected>Frame is not currently running on your machine</NotConnected>
-          <Download href='https://frame.sh' target='_newtab'>Download Frame</Download>
-        </>
-      )
+  constructor (...args) {
+    super(...args)
+
+    this.state = {
+      switchingChain: false
     }
   }
+
+  notConnected() {
+    return (
+      <>
+        <NotConnected>Frame is not currently running on your machine</NotConnected>
+        <Download href='https://frame.sh' target='_newtab'>Download Frame</Download>
+      </>
+    )
+  }
+
+  frameConnected () {
+    return (
+      <>
+        <SummonFrameFrameWrap>
+          <SummonFrame onClick={() => {
+              chrome.runtime.sendMessage({ method: 'frame_summon', params: [] })
+            }}>
+            <FrameCheck>
+              <svg viewBox='0 0 24 24'>
+                <path fill='currentColor' d='M21.03 5.72a.75.75 0 010 1.06l-11.5 11.5a.75.75 0 01-1.072-.012l-5.5-5.75a.75.75 0 111.084-1.036l4.97 5.195L19.97 5.72a.75.75 0 011.06 0z' />
+              </svg>
+            </FrameCheck>
+            <FrameConnected>Connected to Frame</FrameConnected>
+            <SummonFrameButton>
+              <svg viewBox='0 0 24 24' width='24' height='24'>
+                <path fill='currentColor' d='M3 3.25c0-.966.784-1.75 1.75-1.75h5.5a.75.75 0 010 1.5h-5.5a.25.25 0 00-.25.25v17.5c0 .138.112.25.25.25h5.5a.75.75 0 010 1.5h-5.5A1.75 1.75 0 013 20.75V3.25zm9.994 9.5l3.3 3.484a.75.75 0 01-1.088 1.032l-4.5-4.75a.75.75 0 010-1.032l4.5-4.75a.75.75 0 011.088 1.032l-3.3 3.484h8.256a.75.75 0 010 1.5h-8.256z' />
+              </svg>
+          </SummonFrameButton>
+          </SummonFrame>
+        </SummonFrameFrameWrap>
+      </>
+    )
+  }
+
+  appearAsMMToggle () {
+    return this.props.mmAppear 
+      ? (
+          <Appear>
+            <AppearDescription>
+              <span>Injecting as <span className='mm'>Metamask</span></span>
+            </AppearDescription>
+            <AppearToggle onClick={() => mmAppearToggle()}>
+              <span>Appear As <span className='frame'>Frame</span> Instead</span>
+            </AppearToggle>
+          </Appear>
+        )
+      : (
+          <Appear>
+            <AppearDescription>
+                <span>Injecting as <span className='frame'>Frame</span></span>
+            </AppearDescription>
+            <AppearToggle onClick={() => mmAppearToggle()}>
+              <span>Appear As <span className='mm'>Metamask</span> Instead</span>
+            </AppearToggle>
+          </Appear>
+        )
+  }
+
+  switchChain () {
+    return (
+      <>
+        <button onClick={() => this.setState({ switchingChain: true })}>switch chain</button>
+      </> 
+    )
+  }
+
+  chainSelect () {
+    const chains = this.store('availableChains') || []
+
+    return (
+      <>
+        <div>
+          {
+            chains.map(chain => {
+              return (
+                <button onClick={() => {
+                  chrome.runtime.sendMessage({ tabId: this.props.tab.id, method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + chain.toString(16) }] })
+                  this.setState({ switchingChain: false })
+                }}>{chain}</button>
+              )
+            })
+          }
+        </div>
+      </>
+    )
+  }
+
   render () {
+    const isConnected = this.store('frameConnected')
+    const origin = getOrigin(this.props.tab.url)
+
     return (
       <SettingsWrap>
         <img src='FrameLogo.png' />
-        {this.frameConnected()}
-        {this.props.origin === 'https://twitter.com' && !isFirefox ? (
+        {
+          isConnected ? this.frameConnected() : this.notConnected()
+        }
+        {
+          this.state.switchingChain
+            ? this.chainSelect()
+            : (
+                <>
+                  {this.appearAsMMToggle()}
+                  {this.switchChain()}
+                </>
+              )
+        }
+        {origin === 'https://twitter.com' && !isFirefox ? (
           this.props.augmentOff ? (
             <Augment onClick={() => augmentOffToggle()}>
               <AugmentValue>Verify ENS Names</AugmentValue>
@@ -378,7 +438,7 @@ class _Settings extends React.Component {
             </Augment>
           )
         ) : null}
-        <TabOrigin>{this.props.origin}</TabOrigin>
+        <TabOrigin>{origin}</TabOrigin>
       </SettingsWrap>
     )
   }
@@ -390,7 +450,11 @@ const frameConnect = chrome.runtime.connect({ name: 'frame_connect' })
 
 setInterval(() => {
   frameConnect.postMessage('frame_connected')
-  frameConnect.onMessage.addListener(store.setFrameConnected)
+
+  frameConnect.onMessage.addListener(state => {
+    store.setFrameConnected(state.connected)
+    store.setChains(state.availableChains)
+  })
 }, 2000)
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -415,13 +479,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         frameConnect.postMessage('frame_connected')
-        frameConnect.onMessage.addListener(connected => {
-          store.setFrameConnected(connected)
+        frameConnect.onMessage.addListener(state => {
+          store.setFrameConnected(state.connected)
+          store.setChains(state.availableChains)
 
           const root = document.getElementById('root')
 
           ReactDOM.render(<Settings 
-            origin={getOrigin(tabs[0].url)}
+            tab={tabs[0]}
             mmAppear={mmAppear}
             augmentOff={augmentOff}
           />, root)

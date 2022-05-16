@@ -14,6 +14,10 @@ const initialState = {
   },
   users: {},
   theme: themes(), // Fill default theme
+  chains: {
+    available: [],
+    selected: ''
+  },
   inventory: {
     selected: ''
   },

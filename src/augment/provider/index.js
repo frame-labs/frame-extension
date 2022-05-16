@@ -1,5 +1,7 @@
-const { EventEmitter } = require('events')
-const ethProvider = require('eth-provider')
+import { EventEmitter } from 'events'
+import ethProvider from 'eth-provider'
+
+import store from '../store'
 
 async function waitUntil (numTimes, check) {
   return new Promise(resolve => {
@@ -12,13 +14,12 @@ async function waitUntil (numTimes, check) {
 }
 
 export default function (wrappedProvider) {
+  console.log('CREATING PROVIDER')
   const mainnetProvider = ethProvider('infura', { infuraId: '786ade30f36244469480aa5c2bf0743b' })
   const request = wrappedProvider.request
   const provider = new EventEmitter()
 
-  let currentChain = 0
-
-  const onMainnet = () => currentChain === 1
+  const onMainnet = () => store('chains.selected') === 1
 
   provider.request = async ({ method, params }) => {
     if (provider.connected && !wrappedProvider.connected || (!onMainnet() && method === 'eth_call')) {
@@ -43,11 +44,26 @@ export default function (wrappedProvider) {
   wrappedProvider.on('connect', async () => {
     provider.connected = true
     wrappedProvider.on('chainChanged', chain => {
-      currentChain = parseInt(chain)
+      console.log({ chain })
+      store.setActiveChain(parseInt(chain))
+    })
+
+    wrappedProvider.on('chainsChanged', chains => {
+      console.log({ chains })
+      store.setChains(chains)
     })
 
     wrappedProvider.request({ method: 'eth_chainId' })
-      .then(chain => currentChain = parseInt(chain))
+      .then(chain => {
+        console.log({ chainId: chain })
+        store.setActiveChain(parseInt(chain))
+      })
+
+    wrappedProvider.request({ method: 'wallet_getChains' })
+    .then(chains => {
+      console.log({ initialChains: chains })
+      store.setChains(chains)
+    })
 
     provider.emit('connect')
   })
