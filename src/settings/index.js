@@ -412,7 +412,6 @@ class _Settings extends React.Component {
     const mainPanel = isConnected
       ? (
           <>
-          <div>test</div>
             {this.frameConnected()}
             {this.state.switchingChain
               ? this.chainSelect()

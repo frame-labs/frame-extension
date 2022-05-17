@@ -31,7 +31,7 @@ provider.on('connect', () => {
 provider.on('disconnect', () => { frameState.connected = false })
 provider.on('chainsChanged', setChains)
 
-chrome.runtime.onConnect.addListener((port, msg) => {
+chrome.runtime.onConnect.addListener(port => {
   if (port.name === 'frame_connect') {
     port.onMessage.addListener(() => {
       port.postMessage(frameState)
