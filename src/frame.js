@@ -1,6 +1,25 @@
 const EventEmitter = require('events')
 const EthereumProvider = require('ethereum-provider')
 
+class ExtensionProvider extends EthereumProvider {
+  // override the send method in order to add a flag that identifies messages
+  // as "connection messages", meaning Frame won't track an origin that sends
+  // these requests
+  _send (method, params, targetChain, waitForConnection) {
+    if (!waitForConnection && (method === 'eth_chainId' || method === 'net_version')) {
+      const payload = { jsonrpc: '2.0', id: this.nextId++, method, params, _extensionConnecting: true }
+      const sendFn = new Promise((resolve, reject) => {
+        this.promises[payload.id] = { resolve, reject, method }
+        this.connection.send(payload)
+      })
+
+      return sendFn
+    }
+
+    return super._send(method, params, targetChain, waitForConnection)
+  }
+}
+
 class Connection extends EventEmitter {
   constructor () {
     super()
@@ -26,7 +45,7 @@ try {
 }
 
 if (mmAppear) {
-  class MetaMaskProvider extends EthereumProvider {}
+  class MetaMaskProvider extends ExtensionProvider {}
 
   try {
     window.ethereum = new MetaMaskProvider(new Connection())
@@ -39,7 +58,7 @@ if (mmAppear) {
     console.error('Frame Error:', e)
   }
 } else {
-  class FrameProvider extends EthereumProvider {}
+  class FrameProvider extends ExtensionProvider {}
 
   try {
     window.ethereum = new FrameProvider(new Connection())
