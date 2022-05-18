@@ -7,7 +7,7 @@ class ExtensionProvider extends EthereumProvider {
   // these requests
   _send (method, params, targetChain, waitForConnection) {
     if (!waitForConnection && (method === 'eth_chainId' || method === 'net_version')) {
-      const payload = { jsonrpc: '2.0', id: this.nextId++, method, params, _extensionConnecting: true }
+      const payload = { jsonrpc: '2.0', id: this.nextId++, method, params, __extensionConnecting: true }
       
       return new Promise((resolve, reject) => {
         this.promises[payload.id] = { resolve, reject, method }
