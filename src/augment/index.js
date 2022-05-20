@@ -9,7 +9,6 @@ import provider from './provider'
 import * as inventory from './inventory'
 import store from './store'
 import themes from './themes'
-import nft from './nft'
 import './layer'
 
 const nftSpec = /erc(?:721|1155):(?<address>0x\w+)\/(?<tokenId>\d+)/
@@ -17,8 +16,6 @@ const nftSpec = /erc(?:721|1155):(?<address>0x\w+)\/(?<tokenId>\d+)/
 const fallbackProvider = provider(ethProvider())
 const nebula = n('https://ipfs.nebula.land', fallbackProvider)
 
-// TODO
-// const { getNft } = nft(fallbackProvider)
 
 const firstChild = (element, count, i = 0) => {
   element = element.children[0]

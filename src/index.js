@@ -13,12 +13,30 @@ const getOrigin = url => {
 
 chrome.browserAction.setPopup({ popup: 'settings.html' })
 
-let frameConnected = false
-provider.on('connect', () => { frameConnected = true })
-provider.on('disconnect', () => { frameConnected = false })
+const frameState = {
+  connected: false,
+  availableChains: []
+}
+
+function setChains (chains) {
+  frameState.availableChains = chains.map(c => parseInt(c))
+}
+
+provider.on('connect', () => {
+  frameState.connected = true
+
+  provider.request({ method: 'wallet_getChains' }).then(setChains)
+})
+
+provider.on('disconnect', () => { frameState.connected = false })
+provider.on('chainsChanged', setChains)
 
 chrome.runtime.onConnect.addListener(port => {
-  if (port.name === 'frame_connect') port.onMessage.addListener(() => port.postMessage(frameConnected))
+  if (port.name === 'frame_connect') {
+    port.onMessage.addListener(() => {
+      port.postMessage(frameState)
+    })
+  }
 })
 
 provider.connection.on('payload', payload => {
@@ -41,6 +59,8 @@ provider.connection.on('payload', payload => {
 })
 
 chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
+  const { method, params, tab } = payload
+
   if (payload.method === 'media_blob') {
     const location = payload.location
     fetch(payload.src).then(res => res.blob()).then(blob => {
@@ -54,10 +74,13 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
       })
     })
   }
-  if (payload.method === 'frame_summon') return provider.connection.send(payload)
+
+  if (payload.method === 'frame_summon') return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })
+  
   const id = provider.nextId++
-  pending[id] = { tabId: sender.tab.id, payloadId: payload.id, method: payload.method }
-  const load = Object.assign({}, payload, { id, __frameOrigin: getOrigin(sender.url) })
+  pending[id] = { tabId: sender?.tab?.id || tab.id, payloadId: payload.id, method }
+  const load = { jsonrpc: '2.0', id, method, params, __frameOrigin: getOrigin((tab || {}).url || sender.url) }
+
   provider.connection.send(load)
 })
 
