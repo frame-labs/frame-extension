@@ -79,7 +79,15 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
   
   const id = provider.nextId++
   pending[id] = { tabId: sender?.tab?.id || tab.id, payloadId: payload.id, method }
-  const load = { jsonrpc: '2.0', id, method, params, __frameOrigin: getOrigin((tab || {}).url || sender.url) }
+
+  const load = {
+    jsonrpc: '2.0',
+    id,
+    method,
+    params,
+    __frameOrigin: getOrigin((tab || {}).url || sender.url),
+    __extensionConnecting: payload.__extensionConnecting
+  }
 
   provider.connection.send(load)
 })
