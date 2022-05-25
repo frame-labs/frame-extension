@@ -1,7 +1,6 @@
 import store from '../store'
 import Pylon from '@framelabs/pylon-client'
 
-// const Pylon = require('@framelabs/pylon-client').default
 const pylon = new Pylon('wss://data.pylon.link')
 
 const addressSub = []
