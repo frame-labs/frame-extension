@@ -599,7 +599,7 @@ class _Settings extends React.Component {
                 </svg>
                 {origin}
               </TabOrigin>
-              {this.store('availableChains').lenght ? (
+              {this.store('availableChains').length ? (
                 <>
                   <SectionHeader>{'ON CHAIN: ' + currentChain}</SectionHeader>
                   {this.chainSelect()}
@@ -661,7 +661,9 @@ const updateCurrentChain = (tab) => {
 
 document.addEventListener('DOMContentLoaded', function () {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    updateCurrentChain(tabs[0])
+    setInterval(() => {
+      updateCurrentChain(tabs[0])
+    }, 1000)
     chrome.tabs.executeScript(tabs[0].id, { code: 'localStorage[\'__frameAppearAsMM__\']' }, (results) => {
       let mmAppear = false
       if (results) {
