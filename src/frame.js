@@ -67,3 +67,26 @@ if (mmAppear) {
     console.error('Frame Error:', e)
   }
 }
+
+const embedded = {
+  getChainId: async () => {
+    return {
+      chainId: await window.ethereum._send('eth_chainId', [], undefined, false)
+    }
+  }
+}
+
+window.addEventListener('message', async event => {
+  if (event && event.source === window && event.data && event.data.type === 'embedded:action') {
+    if (event.data.action) {
+      const action = event.data.action
+      if (embedded[action.type]) {
+        const res = await embedded[action.type](action)
+        const payload = { method: 'embedded_action_res', params: [action, res] }
+        window.postMessage({ type: 'eth:send', payload }, window.location.origin)
+      } else {
+        console.warn(`Could not find embedded action ${action.type}`)
+      }
+    }
+  }
+})
