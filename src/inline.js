@@ -10,6 +10,9 @@ const inject = `
         delete payload.type
         window.postMessage({type: 'eth:payload', payload: payload}, window.location.origin)
       }
+      if (payload.type === 'embedded:action') {
+        window.postMessage({type: 'embedded:action', action: payload.action}, window.location.origin)
+      }
     })
     window.addEventListener('message', event => {
       if (event.source === window && event.data && event.data.type === 'eth:send') chrome.runtime.sendMessage(event.data.payload)

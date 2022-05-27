@@ -15,27 +15,37 @@ chrome.browserAction.setPopup({ popup: 'settings.html' })
 
 const frameState = {
   connected: false,
-  availableChains: []
+  availableChains: [],
+  currentChain: ''
 }
 
 function setChains (chains) {
-  frameState.availableChains = chains.map(c => parseInt(c))
+  frameState.availableChains = chains
+  if (settingsPanel) settingsPanel.postMessage(frameState)
+}
+
+function setCurrentChain (chain) {
+  frameState.currentChain = chain
+  if (settingsPanel) settingsPanel.postMessage(frameState)
 }
 
 provider.on('connect', () => {
   frameState.connected = true
-
-  provider.request({ method: 'wallet_getChains' }).then(setChains)
+  if (settingsPanel) settingsPanel.postMessage(frameState)
+  provider.request({ method: 'wallet_getChainDetails' }).then(setChains).catch(() => {})
 })
 
 provider.on('disconnect', () => { frameState.connected = false })
-provider.on('chainsChanged', setChains)
+provider.on('chainsChanged', () => {
+  provider.request({ method: 'wallet_getChainDetails' }).then(setChains).catch(() => {})
+})
+
+let settingsPanel
 
 chrome.runtime.onConnect.addListener(port => {
   if (port.name === 'frame_connect') {
-    port.onMessage.addListener(() => {
-      port.postMessage(frameState)
-    })
+    settingsPanel = port
+    settingsPanel.postMessage(frameState)
   }
 })
 
@@ -61,7 +71,10 @@ provider.connection.on('payload', payload => {
 chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
   const { method, params, tab } = payload
 
-  if (payload.method === 'media_blob') {
+  if (payload.method === 'embedded_action_res') {
+    const [ action, res ] = params
+    if (action.type === 'getChainId' && res.chainId) setCurrentChain(res.chainId)
+  } else if (payload.method === 'media_blob') {
     const location = payload.location
     fetch(payload.src).then(res => res.blob()).then(blob => {
       const blobURL = URL.createObjectURL(blob)
