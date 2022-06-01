@@ -23,9 +23,13 @@ const firstChild = (element, count, i = 0) => {
   return firstChild(element, count, i)
 }
 
-function trim (string, prefix) {
+function trim (string = '', prefix = '@') {
   if (string.startsWith(prefix)) string = string.slice(prefix.length)
   return string
+}
+
+function equalsTwitter (s1, s2) {
+  return trim(s1.toLowerCase(), '@') === trim(s2.toLowerCase(), '@')
 }
 
 function equalsIgnoreCase (s1, s2) {
@@ -174,7 +178,7 @@ async function insertBadge (targetElement, ensName, handle) {
     }
 
     user.verified = {
-      name: address && equalsIgnoreCase(handle, twitter),
+      name: address && equalsTwitter(handle, twitter),
       avatar: false
     }
 
