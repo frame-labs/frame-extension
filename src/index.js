@@ -42,7 +42,14 @@ provider.on('chainsChanged', () => {
 
 let settingsPanel
 
+function portDisconnected (port) {
+  settingsPanel = null
+  port.onDisconnect.removeListener(portDisconnected)
+}
+
 chrome.runtime.onConnect.addListener(port => {
+  port.onDisconnect.addListener(portDisconnected)
+
   if (port.name === 'frame_connect') {
     settingsPanel = port
     settingsPanel.postMessage(frameState)

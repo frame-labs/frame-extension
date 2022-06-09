@@ -1,6 +1,6 @@
 {
   "name": "Frame Companion",
-  "version": "0.8.0",
+  "version": "0.8.2",
   "manifest_version": 2,
   "description": "Frame companion creates an injected connection to Frame desktop wallet (required) on macOS, Windows or Linux.",
   "homepage_url": "https://github.com/floating/frame",
