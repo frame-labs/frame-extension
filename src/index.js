@@ -10,6 +10,7 @@ const originFromUrl = (url) => {
   const path = url.split('/')
   return `${path[0]}//${path[2]}`
 }
+
 const getOrigin = (tab = {}, sender = {}, method) => {
   // don't add origin when opening the extension window
   if (method === 'embedded_action_res') {
