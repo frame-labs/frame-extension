@@ -6,12 +6,11 @@ const provider = ethProvider('ws://127.0.0.1:1248?identity=frame-extension')
 const subs = {}
 const pending = {}
 
+const originFromUrl = (url) => {
+  const path = url.split('/')
+  return `${path[0]}//${path[2]}`
+}
 const getOrigin = (tab = {}, sender = {}, method) => {
-  const originFromUrl = (url) => {
-    const path = url.split('/')
-    return `${path[0]}//${path[2]}`
-  }
-
   if (method === 'embedded_action_res') {
     return undefined
   }
