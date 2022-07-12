@@ -6,9 +6,18 @@ const provider = ethProvider('ws://127.0.0.1:1248?identity=frame-extension')
 const subs = {}
 const pending = {}
 
-const getOrigin = url => {
+const originFromUrl = (url) => {
   const path = url.split('/')
-  return path[0] + '//' + path[2]
+  return `${path[0]}//${path[2]}`
+}
+
+const getOrigin = (tab = {}, sender = {}, method) => {
+  // don't add origin when opening the extension window
+  if (method === 'embedded_action_res') {
+    return undefined
+  }
+
+  return originFromUrl(tab.url || sender.tab?.url || sender.url)
 }
 
 chrome.browserAction.setPopup({ popup: 'settings.html' })
@@ -105,7 +114,7 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
     id,
     method,
     params,
-    __frameOrigin: getOrigin((tab || {}).url || sender.url),
+    __frameOrigin: getOrigin(tab, sender, method),
     __extensionConnecting: payload.__extensionConnecting
   }
 
