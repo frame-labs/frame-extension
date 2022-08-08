@@ -81,7 +81,7 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
 
   if (payload.method === 'embedded_action_res') {
     const [ action, res ] = params
-    if (action.type === 'getChainId' && res.chainId) setCurrentChain(res.chainId)
+    if (action.type === 'getChainId' && res.chainId) return setCurrentChain(res.chainId)
   } else if (payload.method === 'media_blob') {
     const location = payload.location
     fetch(payload.src).then(res => res.blob()).then(blob => {
@@ -107,7 +107,7 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
     method,
     params,
     __frameOrigin: getOrigin(tab, sender),
-    __extensionConnecting: method === 'embedded_action_res' ? true : payload.__extensionConnecting
+    __extensionConnecting: payload.__extensionConnecting
   }
 
   provider.connection.send(load)
