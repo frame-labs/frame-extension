@@ -6,10 +6,11 @@ const provider = ethProvider('ws://127.0.0.1:1248?identity=frame-extension')
 const subs = {}
 const pending = {}
 
-const getOrigin = url => {
+const originFromUrl = (url) => {
   const path = url.split('/')
-  return path[0] + '//' + path[2]
+  return `${path[0]}//${path[2]}`
 }
+const getOrigin = (tab = {}, sender = {}) => originFromUrl(tab.url || sender.url)
 
 chrome.browserAction.setPopup({ popup: 'settings.html' })
 
@@ -80,7 +81,7 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
 
   if (payload.method === 'embedded_action_res') {
     const [ action, res ] = params
-    if (action.type === 'getChainId' && res.chainId) setCurrentChain(res.chainId)
+    if (action.type === 'getChainId' && res.chainId) return setCurrentChain(res.chainId)
   } else if (payload.method === 'media_blob') {
     const location = payload.location
     fetch(payload.src).then(res => res.blob()).then(blob => {
@@ -105,7 +106,7 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
     id,
     method,
     params,
-    __frameOrigin: getOrigin((tab || {}).url || sender.url),
+    __frameOrigin: getOrigin(tab, sender),
     __extensionConnecting: payload.__extensionConnecting
   }
 

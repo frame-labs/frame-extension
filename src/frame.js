@@ -69,11 +69,7 @@ if (mmAppear) {
 }
 
 const embedded = {
-  getChainId: async () => {
-    return {
-      chainId: await window.ethereum._send('eth_chainId', [], undefined, false)
-    }
-  }
+  getChainId: async () => ({ chainId: await window.ethereum._send('eth_chainId', [], undefined, false) })
 }
 
 window.addEventListener('message', async event => {
