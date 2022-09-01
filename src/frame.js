@@ -1,6 +1,37 @@
 const EventEmitter = require('events')
 const EthereumProvider = require('ethereum-provider')
 
+function shimWeb3(provider) {
+  let loggedCurrentProvider = false
+
+  if (!window.web3) {
+    let web3Shim = { currentProvider: provider }
+
+    web3Shim = new Proxy(web3Shim, {
+      get: (target, property, ...args) => {
+        if (property === 'currentProvider' && !loggedCurrentProvider) {
+          loggedCurrentProvider = true
+          console.warn('You are accessing the Frame window.web3.currentProvider shim. This property is deprecated; use window.ethereum instead.')
+        } else if (property !== 'currentProvider') {
+          console.error(`You are requesting the "${property}" property of window.web3 which no longer supported; use window.ethereum instead.`)
+        }
+        return Reflect.get(target, property, ...args)
+      },
+      set: (...args) => {
+        console.warn('You are accessing the Frame window.web3 shim. This object is deprecated; use window.ethereum instead.');
+        return Reflect.set(...args)
+      },
+    });
+
+    Object.defineProperty(window, 'web3', {
+      value: web3Shim,
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    })
+  }
+}
+
 class ExtensionProvider extends EthereumProvider {
   // override the send method in order to add a flag that identifies messages
   // as "connection messages", meaning Frame won't track an origin that sends
@@ -67,6 +98,8 @@ if (mmAppear) {
     console.error('Frame Error:', e)
   }
 }
+
+shimWeb3(window.ethereum)
 
 const embedded = {
   getChainId: async () => ({ chainId: await window.ethereum._send('eth_chainId', [], undefined, false) })
