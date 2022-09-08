@@ -75,7 +75,7 @@ provider.connection.on('payload', payload => {
 })
 
 chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendResponse) => {
-  const { tab, ...payload} = extensionPayload
+  const { tab, ...payload } = extensionPayload
   const { method, params } = payload
 
   if (payload.method === 'embedded_action_res') {
