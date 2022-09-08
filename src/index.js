@@ -74,8 +74,9 @@ provider.connection.on('payload', payload => {
   }
 })
 
-chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
-  const { method, params, tab } = payload
+chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendResponse) => {
+  const { tab, ...payload} = extensionPayload
+  const { method, params } = payload
 
   if (payload.method === 'embedded_action_res') {
     const [ action, res ] = params
@@ -100,10 +101,9 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
   pending[id] = { tabId: sender?.tab?.id || tab.id, payloadId: payload.id, method }
 
   const load = {
+    ...payload,
     jsonrpc: '2.0',
     id,
-    method,
-    params,
     __frameOrigin: getOrigin(tab, sender),
     __extensionConnecting: payload.__extensionConnecting
   }
