@@ -72,16 +72,18 @@ try {
   mmAppear = false
 }
 
+let provider
+
 if (mmAppear) {
   class MetaMaskProvider extends ExtensionProvider {}
 
   try {
-    window.ethereum = new MetaMaskProvider(new Connection())
-    window.ethereum.isMetaMask = true
-    window.ethereum._metamask = {
+    provider = new MetaMaskProvider(new Connection())
+    provider.isMetaMask = true
+    provider._metamask = {
       isUnlocked: () => true
     }
-    window.ethereum.setMaxListeners(0)
+    provider.setMaxListeners(0)
   } catch (e) {
     console.error('Frame Error:', e)
   }
@@ -89,13 +91,20 @@ if (mmAppear) {
   class FrameProvider extends ExtensionProvider {}
 
   try {
-    window.ethereum = new FrameProvider(new Connection())
-    window.ethereum.isFrame = true
-    window.ethereum.setMaxListeners(0)
+    provider = new FrameProvider(new Connection())
+    provider.isFrame = true
+    provider.setMaxListeners(0)
   } catch (e) {
     console.error('Frame Error:', e)
   }
 }
+
+Object.defineProperty(window, 'ethereum', {
+  value: provider,
+  enumerable: true,
+  writable: false,
+  configurable: false
+})
 
 shimWeb3(window.ethereum)
 

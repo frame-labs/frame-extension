@@ -539,24 +539,22 @@ class _Settings extends React.Component {
 
     return (
       <ChainSwitcher>
-        {chains.map(chain => {
-          return (
-            <ChainButton
-              onClick={() => {
-                chrome.runtime.sendMessage({
-                  tab: this.props.tab, 
-                  method: 'wallet_switchEthereumChain', 
-                  params: [{ chainId: chain.id }] 
-                })
-                updateCurrentChain(this.props.tab)
-              }}
-              isCurrentChain={chain.id === currentChain}
-            >
-              <ChainButtonIcon />
-              <div>{chain.name}</div>
-            </ChainButton>
-          )
-        })}
+        {chains.map(({ chainId, name }) => 
+          <ChainButton
+            onClick={() => {
+              chrome.runtime.sendMessage({
+                tab: this.props.tab, 
+                method: 'wallet_switchEthereumChain', 
+                params: [{ chainId }] 
+              })
+              updateCurrentChain(this.props.tab)
+            }}
+            isCurrentChain={chainId === parseInt(currentChain, 16)}
+          >
+            <ChainButtonIcon />
+            <div>{name}</div>
+          </ChainButton>
+        )}
       </ChainSwitcher>
     )
   }
@@ -565,7 +563,7 @@ class _Settings extends React.Component {
     try {
       const availableChains = this.store('availableChains')
       const currentChain = this.store('currentChain')
-      const currentChainDetails = availableChains.find(x => x.id === currentChain)
+      const currentChainDetails = availableChains.find(({ chainId }) => chainId === currentChain)
       if (currentChainDetails && currentChainDetails.name) {
         return currentChainDetails.name
       } else {
