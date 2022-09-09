@@ -1,9 +1,18 @@
 const EventEmitter = require('events')
 const EthereumProvider = require('ethereum-provider')
 
-function shimWeb3(provider) {
+function initWindowApi(provider) {
   let loggedCurrentProvider = false
 
+  // define provider access on window.ethereum
+  Object.defineProperty(window, 'ethereum', {
+    value: provider,
+    enumerable: true,
+    writable: false,
+    configurable: false
+  })
+
+  // define legacy window.web3 shim by proxying provider
   if (!window.web3) {
     const web3Shim = new Proxy({ currentProvider: provider }, {
       get: (target, property, ...args) => {
@@ -99,14 +108,7 @@ if (mmAppear) {
   }
 }
 
-Object.defineProperty(window, 'ethereum', {
-  value: provider,
-  enumerable: true,
-  writable: false,
-  configurable: false
-})
-
-shimWeb3(window.ethereum)
+initWindowApi(provider)
 
 const embedded = {
   getChainId: async () => ({ chainId: await window.ethereum._send('eth_chainId', [], undefined, false) })
