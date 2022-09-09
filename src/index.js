@@ -56,7 +56,6 @@ chrome.runtime.onConnect.addListener(port => {
 })
 
 provider.connection.on('payload', payload => {
-  console.log('provider connection payload', payload)
   if (typeof payload.id !== 'undefined') {
     if (pending[payload.id]) {
       const { tabId, payloadId } = pending[payload.id]
@@ -77,7 +76,6 @@ provider.connection.on('payload', payload => {
 
 chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
   const { method, params, tab } = payload
-  console.log('onMessage', payload)
 
   if (payload.method === 'embedded_action_res') {
     const [ action, res ] = params
