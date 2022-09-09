@@ -5,9 +5,7 @@ function shimWeb3(provider) {
   let loggedCurrentProvider = false
 
   if (!window.web3) {
-    let web3Shim = { currentProvider: provider }
-
-    web3Shim = new Proxy(web3Shim, {
+    const web3Shim = new Proxy({ currentProvider: provider }, {
       get: (target, property, ...args) => {
         if (property === 'currentProvider' && !loggedCurrentProvider) {
           loggedCurrentProvider = true
