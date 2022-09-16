@@ -34,9 +34,16 @@ provider.on('connect', () => {
   frameState.connected = true
   if (settingsPanel) settingsPanel.postMessage(frameState)
   provider.request({ method: 'wallet_getEthereumChains' }).then(setChains).catch(() => {})
+
+  sendEvent('connect')
 })
 
-provider.on('disconnect', () => { frameState.connected = false })
+provider.on('disconnect', () => {
+  frameState.connected = false
+
+  sendEvent('close')
+})
+
 provider.on('chainsChanged', (chains) => setChains(chains))
 
 let settingsPanel
@@ -129,6 +136,14 @@ const unsubscribeTab = tabId => {
       provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
       delete subs[sub]
     }
+  })
+}
+
+function sendEvent (event, args = [], tabSelector = {}) {
+  chrome.tabs.query(tabSelector, (tabs) => {
+    tabs.forEach(tab => {
+      chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
+    })
   })
 }
 
