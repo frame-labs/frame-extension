@@ -51,11 +51,21 @@ class ExtensionProvider extends EthereumProvider {
 class Connection extends EventEmitter {
   constructor () {
     super()
+
     window.addEventListener('message', event => {
-      if (event && event.source === window && event.data && event.data.type === 'eth:payload') {
-        this.emit('payload', event.data.payload)
+      if (event && event.source === window && event.data) {
+        const { type } = event.data
+
+        if (type === 'eth:payload') {
+          this.emit('payload', event.data.payload)
+        }
+
+        if (type === 'eth:event') {
+          this.emit(event.data.event, ...event.data.args)
+        }
       }
     })
+
     setTimeout(() => this.emit('connect'), 0)
   }
 
