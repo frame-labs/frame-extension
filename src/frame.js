@@ -1,5 +1,5 @@
-const EventEmitter = require('events')
-const EthereumProvider = require('ethereum-provider')
+import EventEmitter from 'events'
+import EthereumProvider from 'ethereum-provider'
 
 function shimWeb3(provider) {
   let loggedCurrentProvider = false
@@ -34,7 +34,7 @@ class ExtensionProvider extends EthereumProvider {
   // override the send method in order to add a flag that identifies messages
   // as "connection messages", meaning Frame won't track an origin that sends
   // these requests
-  _send (method, params, targetChain, waitForConnection) {
+  doSend (method, params, targetChain, waitForConnection) {
     if (!waitForConnection && (method === 'eth_chainId' || method === 'net_version')) {
       const payload = { jsonrpc: '2.0', id: this.nextId++, method, params, __extensionConnecting: true }
       
@@ -44,7 +44,7 @@ class ExtensionProvider extends EthereumProvider {
       })
     }
 
-    return super._send(method, params, targetChain, waitForConnection)
+    return super.doSend(method, params, targetChain, waitForConnection)
   }
 }
 
@@ -119,7 +119,7 @@ Object.defineProperty(window, 'ethereum', {
 shimWeb3(window.ethereum)
 
 const embedded = {
-  getChainId: async () => ({ chainId: await window.ethereum._send('eth_chainId', [], undefined, false) })
+  getChainId: async () => ({ chainId: await window.ethereum.doSend('eth_chainId', [], undefined, false) })
 }
 
 window.addEventListener('message', async event => {
