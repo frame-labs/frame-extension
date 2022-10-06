@@ -33,13 +33,18 @@ function setCurrentChain (chain) {
 provider.on('connect', () => {
   frameState.connected = true
   if (settingsPanel) settingsPanel.postMessage(frameState)
-  provider.request({ method: 'wallet_getChainDetails' }).then(setChains).catch(() => {})
+  provider.request({ method: 'wallet_getEthereumChains' }).then(setChains).catch(() => {})
+
+  sendEvent('connect')
 })
 
-provider.on('disconnect', () => { frameState.connected = false })
-provider.on('chainsChanged', () => {
-  provider.request({ method: 'wallet_getChainDetails' }).then(setChains).catch(() => {})
+provider.on('disconnect', () => {
+  frameState.connected = false
+
+  sendEvent('close')
 })
+
+provider.on('chainsChanged', (chains) => setChains(chains))
 
 let settingsPanel
 
@@ -76,8 +81,9 @@ provider.connection.on('payload', payload => {
   }
 })
 
-chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
-  const { method, params, tab } = payload
+chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendResponse) => {
+  const { tab, ...payload } = extensionPayload
+  const { method, params } = payload
 
   if (payload.method === 'embedded_action_res') {
     const [ action, res ] = params
@@ -102,10 +108,9 @@ chrome.runtime.onMessage.addListener(async (payload, sender, sendResponse) => {
   pending[id] = { tabId: sender?.tab?.id || tab.id, payloadId: payload.id, method }
 
   const load = {
+    ...payload,
     jsonrpc: '2.0',
     id,
-    method,
-    params,
     __frameOrigin: getOrigin(tab, sender),
     __extensionConnecting: payload.__extensionConnecting
   }
@@ -131,6 +136,14 @@ const unsubscribeTab = tabId => {
       provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
       delete subs[sub]
     }
+  })
+}
+
+function sendEvent (event, args = [], tabSelector = {}) {
+  chrome.tabs.query(tabSelector, (tabs) => {
+    tabs.forEach(tab => {
+      chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
+    })
   })
 }
 
