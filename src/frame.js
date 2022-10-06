@@ -1,5 +1,5 @@
-const EventEmitter = require('events')
-const EthereumProvider = require('ethereum-provider').default
+import EventEmitter from 'events'
+import EthereumProvider from 'ethereum-provider'
 
 function shimWeb3(provider) {
   let loggedCurrentProvider = false
