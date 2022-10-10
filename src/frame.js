@@ -109,12 +109,7 @@ if (mmAppear) {
   }
 }
 
-Object.defineProperty(window, 'ethereum', {
-  value: provider,
-  enumerable: true,
-  writable: true,
-  configurable: true
-})
+window.ethereum = provider
 
 shimWeb3(window.ethereum)
 
@@ -124,7 +119,7 @@ const embedded = {
 
 document.addEventListener('readystatechange', (e) => {
   if (document.readyState === 'complete') {
-    Object.defineProperty(window, 'ethereum', { value: provider, writable: true })
+    window.ethereum = provider
   }
 })
 
