@@ -112,7 +112,7 @@ if (mmAppear) {
 Object.defineProperty(window, 'ethereum', {
   value: provider,
   enumerable: true,
-  writable: false,
+  writable: true,
   configurable: true
 })
 
