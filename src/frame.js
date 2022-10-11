@@ -109,18 +109,19 @@ if (mmAppear) {
   }
 }
 
-Object.defineProperty(window, 'ethereum', {
-  value: provider,
-  enumerable: true,
-  writable: false,
-  configurable: false
-})
+window.ethereum = provider
 
 shimWeb3(window.ethereum)
 
 const embedded = {
   getChainId: async () => ({ chainId: await window.ethereum.doSend('eth_chainId', [], undefined, false) })
 }
+
+document.addEventListener('readystatechange', (e) => {
+  if (document.readyState === 'interactive') {
+    window.ethereum = provider
+  }
+})
 
 window.addEventListener('message', async event => {
   if (event && event.source === window && event.data && event.data.type === 'embedded:action') {
