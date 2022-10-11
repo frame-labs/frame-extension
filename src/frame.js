@@ -118,7 +118,7 @@ const embedded = {
 }
 
 document.addEventListener('readystatechange', (e) => {
-  if (document.readyState === 'complete') {
+  if (document.readyState === 'interactive') {
     window.ethereum = provider
   }
 })
