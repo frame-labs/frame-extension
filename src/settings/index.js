@@ -431,7 +431,7 @@ const ChainButtonIcon = styled.div`
   left: 9px;
   width: 17px;
   height: 17px;
-  background: var(--ghostY);
+  background: ${(props) => props.isCurrentChain ? 'var(--good)' : 'var(--ghostY)'};
   border-radius 9px;
 `
 
@@ -533,28 +533,32 @@ class _Settings extends React.Component {
         )
   }
 
+  chainButton (chainId, name) {
+    const currentChain = this.store('currentChain')
+    const isCurrentChain = chainId === parseInt(currentChain, 16)
+
+    return <ChainButton
+      onClick={() => {
+        chrome.runtime.sendMessage({
+          tab: this.props.tab, 
+          method: 'wallet_switchEthereumChain', 
+          params: [{ chainId }] 
+        })
+        updateCurrentChain(this.props.tab)
+      }}
+      isCurrentChain={isCurrentChain}
+    >
+      <ChainButtonIcon isCurrentChain={isCurrentChain} />
+      <div>{name}</div>
+    </ChainButton>
+  }
+
   chainSelect () {
     const chains = this.store('availableChains') || []
-    const currentChain = this.store('currentChain')
 
     return (
       <ChainSwitcher>
-        {chains.map(({ chainId, name }) => 
-          <ChainButton
-            onClick={() => {
-              chrome.runtime.sendMessage({
-                tab: this.props.tab, 
-                method: 'wallet_switchEthereumChain', 
-                params: [{ chainId }] 
-              })
-              updateCurrentChain(this.props.tab)
-            }}
-            isCurrentChain={chainId === parseInt(currentChain, 16)}
-          >
-            <ChainButtonIcon />
-            <div>{name}</div>
-          </ChainButton>
-        )}
+        {chains.map(({ chainId, name }) => this.chainButton(chainId, name))}
       </ChainSwitcher>
     )
   }
