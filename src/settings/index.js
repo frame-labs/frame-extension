@@ -394,7 +394,7 @@ const ChainSwitcher = styled.div`
   padding: 0px 0px 8px 8px;
 `
 
-const ChainButton = styled.div`
+const StyledChainButton = styled.div`
   position: relative; 
   width: calc(50% - 8px);
   display: flex;
@@ -407,8 +407,8 @@ const ChainButton = styled.div`
   font-weight: 600;
   box-sizing: border-box;
   background: var(--ghostZ);
-  background: ${props => props.isCurrentChain ? 'var(--ghostA)' : 'var(--ghostZ)'};
-  color: ${props => props.isCurrentChain ? 'var(--good)' : 'white'};
+  background: ${props => props.isSelected ? 'var(--ghostA)' : 'var(--ghostZ)'};
+  color: ${props => props.isSelected ? 'var(--good)' : 'white'};
   margin: 8px 8px 0px 0px; 
 
   &:hover {
@@ -471,6 +471,12 @@ function parseOrigin (origin) {
 }
 
 const isFirefox = Boolean(window?.browser && browser?.runtime)
+
+const ChainButton = ({ onClick, name, isSelected }) => 
+  <StyledChainButton onClick={onClick} isSelected={isSelected}>
+    <ChainButtonIcon isSelected={isSelected} />
+    <div>{name}</div>
+  </StyledChainButton>
 
 class _Settings extends React.Component {
   notConnected() {
@@ -547,11 +553,9 @@ class _Settings extends React.Component {
         })
         updateCurrentChain(this.props.tab)
       }}
-      isCurrentChain={isCurrentChain}
-    >
-      <ChainButtonIcon isCurrentChain={isCurrentChain} />
-      <div>{name}</div>
-    </ChainButton>
+      isSelected={isCurrentChain}
+      name={name}
+    />
   }
 
   chainSelect () {
