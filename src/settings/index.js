@@ -427,12 +427,13 @@ const ChainButton = styled.div`
 
 const ChainButtonIcon = styled.div`
   position: absolute;
-  top: 13px;
-  left: 9px;
-  width: 17px;
-  height: 17px;
+  top: 12px;
+  left: 10px;
+  width: 12px;
+  height: 12px;
   background: ${(props) => props.isCurrentChain ? 'var(--good)' : 'var(--ghostY)'};
   border-radius 9px;
+  border: solid 4px var(--ghostY);
 `
 
 const SectionHeader = styled.div`
