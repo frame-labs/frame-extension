@@ -431,7 +431,7 @@ const ChainButtonIcon = styled.div`
   left: 10px;
   width: 12px;
   height: 12px;
-  background: ${(props) => props.isCurrentChain ? 'var(--good)' : 'var(--ghostY)'};
+  background: ${(props) => props.isSelected ? 'var(--good)' : 'var(--ghostY)'};
   border-radius 9px;
   border: solid 4px var(--ghostY);
 `
@@ -472,10 +472,10 @@ function parseOrigin (origin) {
 
 const isFirefox = Boolean(window?.browser && browser?.runtime)
 
-const ChainButton = ({ onClick, name, isSelected }) => 
+const ChainButton = ({ onClick, children, isSelected }) => 
   <StyledChainButton onClick={onClick} isSelected={isSelected}>
     <ChainButtonIcon isSelected={isSelected} />
-    <div>{name}</div>
+    <div>{children}</div>
   </StyledChainButton>
 
 class _Settings extends React.Component {
@@ -540,30 +540,27 @@ class _Settings extends React.Component {
         )
   }
 
-  chainButton (chainId, name) {
-    const currentChain = this.store('currentChain')
-    const isCurrentChain = chainId === parseInt(currentChain, 16)
-
-    return <ChainButton
-      onClick={() => {
-        chrome.runtime.sendMessage({
-          tab: this.props.tab, 
-          method: 'wallet_switchEthereumChain', 
-          params: [{ chainId }] 
-        })
-        updateCurrentChain(this.props.tab)
-      }}
-      isSelected={isCurrentChain}
-      name={name}
-    />
-  }
-
   chainSelect () {
     const chains = this.store('availableChains') || []
-
+    const currentChain = this.store('currentChain')
+    
     return (
       <ChainSwitcher>
-        {chains.map(({ chainId, name }) => this.chainButton(chainId, name))}
+        {chains.map(({ chainId, name }) => 
+          <ChainButton
+            onClick={() => {
+              chrome.runtime.sendMessage({
+                tab: this.props.tab, 
+                method: 'wallet_switchEthereumChain', 
+                params: [{ chainId }] 
+              })
+              updateCurrentChain(this.props.tab)
+            }}
+            isSelected={chainId === parseInt(currentChain, 16)}
+          >
+            {name}
+          </ChainButton>
+        )}
       </ChainSwitcher>
     )
   }
