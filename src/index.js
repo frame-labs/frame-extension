@@ -5,6 +5,8 @@ const provider = ethProvider('ws://127.0.0.1:1248?identity=frame-extension')
 
 const subs = {}
 const pending = {}
+const tabChainsMap = {}
+let activeTabId = ''
 
 const originFromUrl = (url) => {
   const path = url.split('/')
@@ -25,8 +27,11 @@ function setChains (chains) {
   if (settingsPanel) settingsPanel.postMessage(frameState)
 }
 
-function setCurrentChain (chain) {
-  frameState.currentChain = chain
+function setCurrentChain (chain, tabId) {
+  if (tabId === activeTabId) {
+    frameState.currentChain = chain
+  }
+  tabChainsMap[tabId] = chain
   if (settingsPanel) settingsPanel.postMessage(frameState)
 }
 
@@ -87,7 +92,9 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
 
   if (payload.method === 'embedded_action_res') {
     const [ action, res ] = params
-    if (action.type === 'getChainId' && res.chainId) return setCurrentChain(res.chainId)
+    if (action.type === 'getChainId' && res.chainId) {
+      return setCurrentChain(res.chainId, sender.tab.id)
+    }
   } else if (payload.method === 'media_blob') {
     const location = payload.location
     fetch(payload.src).then(res => res.blob()).then(blob => {
@@ -147,9 +154,17 @@ function sendEvent (event, args = [], tabSelector = {}) {
   })
 }
 
-chrome.tabs.onRemoved.addListener((tabId, removed) => unsubscribeTab(tabId))
-chrome.tabs.onActivated.addListener(() => setCurrentChain(''))
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => { 
+chrome.tabs.onRemoved.addListener((tabId, removed) => {
+  if (tabId === activeTabId) {
+    activeTabId = ''
+  }
+  unsubscribeTab(tabId)
+})
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  activeTabId = tabId
+  setCurrentChain(tabChainsMap[tabId] || '', tabId)
+})
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     unsubscribeTab(tabId) 
   }
