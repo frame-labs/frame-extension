@@ -394,7 +394,7 @@ const ChainSwitcher = styled.div`
   padding: 0px 0px 8px 8px;
 `
 
-const ChainButton = styled.div`
+const StyledChainButton = styled.div`
   position: relative; 
   width: calc(50% - 8px);
   display: flex;
@@ -407,8 +407,8 @@ const ChainButton = styled.div`
   font-weight: 600;
   box-sizing: border-box;
   background: var(--ghostZ);
-  background: ${props => props.isCurrentChain ? 'var(--ghostA)' : 'var(--ghostZ)'};
-  color: ${props => props.isCurrentChain ? 'var(--good)' : 'white'};
+  background: ${props => props.isSelected ? 'var(--ghostA)' : 'var(--ghostZ)'};
+  color: ${props => props.isSelected ? 'var(--good)' : 'white'};
   margin: 8px 8px 0px 0px; 
 
   &:hover {
@@ -427,12 +427,13 @@ const ChainButton = styled.div`
 
 const ChainButtonIcon = styled.div`
   position: absolute;
-  top: 13px;
-  left: 9px;
-  width: 17px;
-  height: 17px;
-  background: var(--ghostY);
+  top: 12px;
+  left: 10px;
+  width: 12px;
+  height: 12px;
+  background: ${(props) => props.isSelected ? 'var(--good)' : 'var(--ghostY)'};
   border-radius 9px;
+  border: solid 4px var(--ghostY);
 `
 
 const SectionHeader = styled.div`
@@ -470,6 +471,12 @@ function parseOrigin (origin) {
 }
 
 const isFirefox = Boolean(window?.browser && browser?.runtime)
+
+const ChainButton = ({ onClick, children, isSelected }) => 
+  <StyledChainButton onClick={onClick} isSelected={isSelected}>
+    <ChainButtonIcon isSelected={isSelected} />
+    <div>{children}</div>
+  </StyledChainButton>
 
 class _Settings extends React.Component {
   notConnected() {
@@ -536,7 +543,7 @@ class _Settings extends React.Component {
   chainSelect () {
     const chains = this.store('availableChains') || []
     const currentChain = this.store('currentChain')
-
+    
     return (
       <ChainSwitcher>
         {chains.map(({ chainId, name }) => 
@@ -549,10 +556,9 @@ class _Settings extends React.Component {
               })
               updateCurrentChain(this.props.tab)
             }}
-            isCurrentChain={chainId === parseInt(currentChain, 16)}
+            isSelected={chainId === parseInt(currentChain, 16)}
           >
-            <ChainButtonIcon />
-            <div>{name}</div>
+            {name}
           </ChainButton>
         )}
       </ChainSwitcher>
