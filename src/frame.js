@@ -1,16 +1,26 @@
 import EventEmitter from 'events'
 import EthereumProvider from 'ethereum-provider'
 
-function shimWeb3(provider) {
+function shimWeb3(provider, appearAsMetaMask) {
   let loggedCurrentProvider = false
 
   if (!window.web3) {
-    const web3Shim = new Proxy({ currentProvider: provider }, {
+    const SHIM_IDENTIFIER = appearAsMetaMask ? '__isMetaMaskShim__' : '__isFrameShim__'
+
+    const shim = { currentProvider: provider }
+    Object.defineProperty(shim, SHIM_IDENTIFIER, {
+      value: true,
+      enumerable: true,
+      configurable: false,
+      writable: false,
+    })
+
+    const web3Shim = new Proxy(shim, {
       get: (target, property, ...args) => {
         if (property === 'currentProvider' && !loggedCurrentProvider) {
           loggedCurrentProvider = true
           console.warn('You are accessing the Frame window.web3.currentProvider shim. This property is deprecated; use window.ethereum instead.')
-        } else if (property !== 'currentProvider') {
+        } else if (property !== 'currentProvider' && property !== SHIM_IDENTIFIER) {
           console.error(`You are requesting the "${property}" property of window.web3 which no longer supported; use window.ethereum instead.`)
         }
         return Reflect.get(target, property, ...args)
@@ -111,7 +121,7 @@ if (mmAppear) {
 
 window.ethereum = provider
 
-shimWeb3(window.ethereum)
+shimWeb3(window.ethereum, mmAppear)
 
 const embedded = {
   getChainId: async () => ({ chainId: await window.ethereum.doSend('eth_chainId', [], undefined, false) })
