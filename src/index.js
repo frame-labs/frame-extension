@@ -149,3 +149,6 @@ function sendEvent (event, args = [], tabSelector = {}) {
 
 chrome.tabs.onRemoved.addListener((tabId, removed) => unsubscribeTab(tabId))
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => { if (changeInfo.url) unsubscribeTab(tabId) })
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  chrome.tabs.sendMessage(tabId, { type: 'embedded:action', action: { type: 'getChainId' } })
+})

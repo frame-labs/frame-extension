@@ -127,9 +127,18 @@ const embedded = {
   getChainId: async () => ({ chainId: await window.ethereum.doSend('eth_chainId', [], undefined, false) })
 }
 
+const reportChainId = async () => {
+  const payload = { 
+    method: 'embedded_action_res', 
+    params: [{ type: 'getChainId' }, await embedded.getChainId(action)] 
+  }
+  window.postMessage({ type: 'eth:send', payload }, window.location.origin)
+}
+
 document.addEventListener('readystatechange', (e) => {
   if (document.readyState === 'interactive') {
     window.ethereum = provider
+    reportChainId()
   }
 })
 
