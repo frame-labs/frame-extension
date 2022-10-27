@@ -124,10 +124,7 @@ window.ethereum = provider
 shimWeb3(window.ethereum, mmAppear)
 
 const embedded = {
-  getChainId: async () => {
-    window.ethereum.doSend('eth_chainId', [], undefined, false)
-    return false
-  }
+  getChainId: async () => ({ chainId: await window.ethereum.doSend('eth_chainId', [], undefined, false) })
 }
 
 document.addEventListener('readystatechange', (e) => {
