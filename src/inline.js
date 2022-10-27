@@ -4,6 +4,11 @@ const ncp = require('ncp')
 
 const inject = `
   var frame = unescape('${escape(fs.readFileSync(path.join(__dirname, '../dist/frame.js')).toString())}')
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({matches}) =>{
+    console.log("Detected theme change")
+    chrome.runtime.sendMessage({method: 'iconChange', matches})
+    })
+  
   try {
     chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
       if (payload.type === 'eth:payload') {
