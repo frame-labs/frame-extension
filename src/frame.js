@@ -139,10 +139,8 @@ window.addEventListener('message', async event => {
       const action = event.data.action
       if (embedded[action.type]) {
         const res = await embedded[action.type](action)
-        if (res) {
-          const payload = { method: 'embedded_action_res', params: [action, res] }
-          window.postMessage({ type: 'eth:send', payload }, window.location.origin)
-        }
+        const payload = { method: 'embedded_action_res', params: [action, res] }
+        window.postMessage({ type: 'eth:send', payload }, window.location.origin)
       } else {
         console.warn(`Could not find embedded action ${action.type}`)
       }
