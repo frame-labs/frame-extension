@@ -554,7 +554,6 @@ class _Settings extends React.Component {
                 method: 'wallet_switchEthereumChain', 
                 params: [{ chainId }] 
               })
-              updateCurrentChain(this.props.tab)
             }}
             isSelected={chainId === parseInt(currentChain, 16)}
           >
@@ -656,18 +655,8 @@ frameConnect.onMessage.addListener(state => {
   store.setCurrentChain(state.currentChain)
 })
 
-const updateCurrentChain = (tab) => {
-  chrome.tabs.sendMessage(tab.id, { 
-    type: 'embedded:action',
-    action: { type: 'getChainId' }
-  })
-}
-
 document.addEventListener('DOMContentLoaded', function () {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    setInterval(() => {
-      updateCurrentChain(tabs[0])
-    }, 1000)
     chrome.tabs.executeScript(tabs[0].id, { code: 'localStorage[\'__frameAppearAsMM__\']' }, (results) => {
       let mmAppear = false
       if (results) {

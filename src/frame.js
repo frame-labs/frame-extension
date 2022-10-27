@@ -124,21 +124,15 @@ window.ethereum = provider
 shimWeb3(window.ethereum, mmAppear)
 
 const embedded = {
-  getChainId: async () => ({ chainId: await window.ethereum.doSend('eth_chainId', [], undefined, false) })
-}
-
-const reportChainId = async () => {
-  const payload = { 
-    method: 'embedded_action_res', 
-    params: [{ type: 'getChainId' }, await embedded.getChainId(action)] 
+  getChainId: async () => {
+    window.ethereum.doSend('eth_chainId', [], undefined, false)
+    return false
   }
-  window.postMessage({ type: 'eth:send', payload }, window.location.origin)
 }
 
 document.addEventListener('readystatechange', (e) => {
   if (document.readyState === 'interactive') {
     window.ethereum = provider
-    reportChainId()
   }
 })
 
@@ -148,8 +142,10 @@ window.addEventListener('message', async event => {
       const action = event.data.action
       if (embedded[action.type]) {
         const res = await embedded[action.type](action)
-        const payload = { method: 'embedded_action_res', params: [action, res] }
-        window.postMessage({ type: 'eth:send', payload }, window.location.origin)
+        if (res) {
+          const payload = { method: 'embedded_action_res', params: [action, res] }
+          window.postMessage({ type: 'eth:send', payload }, window.location.origin)
+        }
       } else {
         console.warn(`Could not find embedded action ${action.type}`)
       }
