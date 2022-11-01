@@ -432,7 +432,7 @@ const ChainButtonIcon = styled.div`
   width: 17px;
   height: 17px;
   background: var(--ghostY);
-  border-radius 9px;
+  border-radius: 9px;
 `
 
 const SectionHeader = styled.div`
