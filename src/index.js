@@ -95,7 +95,7 @@ provider.connection.on('payload', payload => {
     subs[payload.params.subscription].send(payload)
   }
 })
-matchMedia('(prefers-color-scheme: dark)').matches &&(switchToWhiteIcon())
+
 chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendResponse) => {
   const { tab, ...payload } = extensionPayload
   const { method, params } = payload
@@ -115,9 +115,13 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
         code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
       })
     })
-  } else if(payload === "iconChange"){
-    const {matches: isDarkMode} = payload
-    if(isDarkMode){switchToWhiteIcon()}else switchToGreyIcon()
+  } else if (payload.method === 'iconChange') {
+    const { matches: isDarkMode } = payload
+    if (isDarkMode) {
+      switchToWhiteIcon()
+    } else {
+      switchToGreyIcon()
+    }
   }
 
   if (payload.method === 'frame_summon') return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })

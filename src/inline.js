@@ -3,12 +3,7 @@ const path = require('path')
 const ncp = require('ncp')
 
 const inject = `
-  var frame = unescape('${escape(fs.readFileSync(path.join(__dirname, '../dist/frame.js')).toString())}')
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({matches}) =>{
-    console.log("Detected theme change")
-    chrome.runtime.sendMessage({method: 'iconChange', matches})
-    })
-  
+  var frame = unescape('${escape(fs.readFileSync(path.join(__dirname, '../dist/frame.js')).toString())}')  
   try {
     chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
       if (payload.type === 'eth:payload') {
@@ -24,6 +19,9 @@ const inject = `
         window.postMessage({ type: 'eth:event', event, args })
       }
     })
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (({ matches }) => {
+      chrome.runtime.sendMessage({ method: 'iconChange', matches })
+    }))
     window.addEventListener('message', event => {
       if (event.source === window && event.data && event.data.type === 'eth:send') chrome.runtime.sendMessage(event.data.payload)
     })
