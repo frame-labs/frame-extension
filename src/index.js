@@ -30,14 +30,14 @@ function setCurrentChain (chain) {
   if (settingsPanel) settingsPanel.postMessage(frameState)
 }
 
-const switchToWhiteIcon = () =>     chrome.browserAction.setIcon({
+const switchToWhiteIcon = () => chrome.browserAction.setIcon({
   path: {
     16: '/icons/white/icon16.png',
     48: '/icons/white/icon48.png',
     96: '/icons/white/icon96.png',
   },
 })
-const switchToGreyIcon = () =>     chrome.browserAction.setIcon({
+const switchToGreyIcon = () => chrome.browserAction.setIcon({
   path: {
     16: '/icons/icon16.png',
     48: '/icons/icon48.png',
