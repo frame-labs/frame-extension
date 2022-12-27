@@ -33,7 +33,7 @@ function setCurrentChain (chain) {
 provider.on('connect', () => {
   frameState.connected = true
   if (settingsPanel) settingsPanel.postMessage(frameState)
-  provider.request({ method: 'wallet_getEthereumChains' }).then(setChains).catch(() => {})
+  provider.request({ method: 'wallet_getEthereumChains' }).then(setChains).catch(() => setChains([]))
 
   sendEvent('connect')
 })
