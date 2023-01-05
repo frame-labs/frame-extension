@@ -398,10 +398,11 @@ const StyledChainButton = styled.div`
   position: relative; 
   width: calc(50% - 8px);
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 42px;
   border-radius: 4px;
+  padding: 0px 8px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
@@ -426,7 +427,7 @@ const StyledChainButton = styled.div`
 `
 
 const ChainButtonIcon = styled.div`
-  position: absolute;
+  flex-shrink: 0;
   top: 12px;
   left: 10px;
   width: 12px;
@@ -434,6 +435,13 @@ const ChainButtonIcon = styled.div`
   background: ${(props) => props.isSelected ? 'var(--good)' : 'var(--ghostY)'};
   border-radius 9px;
   border: solid 4px var(--ghostY);
+`
+
+const ChainButtonLabel = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+  padding-left: 4px;
 `
 
 const SectionHeader = styled.div`
@@ -472,10 +480,10 @@ function parseOrigin (origin) {
 
 const isFirefox = Boolean(window?.browser && browser?.runtime)
 
-const ChainButton = ({ onClick, children, isSelected }) => 
+const ChainButton = ({ onClick, name, isSelected }) =>
   <StyledChainButton onClick={onClick} isSelected={isSelected}>
     <ChainButtonIcon isSelected={isSelected} />
-    <div>{children}</div>
+    <ChainButtonLabel><div>{name}</div></ChainButtonLabel>
   </StyledChainButton>
 
 class _Settings extends React.Component {
@@ -556,10 +564,9 @@ class _Settings extends React.Component {
               })
               updateCurrentChain(this.props.tab)
             }}
+            name={name}
             isSelected={chainId === parseInt(currentChain, 16)}
-          >
-            {name}
-          </ChainButton>
+          />
         )}
       </ChainSwitcher>
     )
