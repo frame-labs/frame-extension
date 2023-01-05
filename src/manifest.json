@@ -1,6 +1,6 @@
 {
   "name": "Frame Companion",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "manifest_version": 2,
   "description": "Frame companion creates an injected connection to Frame desktop wallet (required) on macOS, Windows or Linux.",
   "homepage_url": "https://github.com/floating/frame",
@@ -15,24 +15,21 @@
       "96": "icons/icon96.png"
     }
   },
-  "content_scripts" : [{
-    "matches": ["file://*/*", "http://*/*", "https://*/*"],
-    "js": ["inject.js"],
-    "run_at": "document_start",
-    "all_frames": true
-  },
-  {
-    "matches": ["http://twitter.com/*", "https://twitter.com/*"],
-    "js": ["augment.js"],
-    "run_at": "document_idle",
-    "all_frames": true
-  }],
-  "permissions": [
-    "activeTab",
-    "https://*/*",
-    "http://*/*",
-    "tabs"
+  "content_scripts": [
+    {
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "js": ["inject.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": ["http://twitter.com/*", "https://twitter.com/*"],
+      "js": ["augment.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
   ],
+  "permissions": ["activeTab", "https://*/*", "http://*/*", "tabs"],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

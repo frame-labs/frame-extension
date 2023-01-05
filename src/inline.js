@@ -31,7 +31,14 @@ const inject = `
     console.log(e)
   }
 `
-fs.writeFile(path.join(__dirname, '../dist/inject.js'), inject, err => { if (err) throw err })
-const copy = files => files.forEach(file => fs.createReadStream(path.join(__dirname, file)).pipe(fs.createWriteStream(path.join(__dirname, '../dist/', file))))
-copy(['./manifest.json', './settings.html', './icon.png', './FrameLogo.png'])
+fs.writeFile(path.join(__dirname, '../dist/inject.js'), inject, (err) => {
+  if (err) throw err
+})
+const copy = (files) =>
+  files.forEach((file) =>
+    fs
+      .createReadStream(path.join(__dirname, file))
+      .pipe(fs.createWriteStream(path.join(__dirname, '../dist/', file)))
+  )
+copy(['./manifest.json', './settings.html', './icon.png', './FrameLogo.png', './index.css', './fonts.css'])
 ncp(path.join(__dirname, './icons'), path.join(__dirname, '../dist/icons'))

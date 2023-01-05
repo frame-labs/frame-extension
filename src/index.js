@@ -13,6 +13,7 @@ const originFromUrl = (url) => {
 const getOrigin = (tab = {}, sender = {}) => originFromUrl(tab.url || sender.url)
 
 chrome.browserAction.setPopup({ popup: 'settings.html' })
+chrome.browserAction.setIcon({ path: 'icons/icon96moon.png' })
 
 const frameState = {
   connected: false,
@@ -20,12 +21,12 @@ const frameState = {
   currentChain: ''
 }
 
-function setChains (chains) {
+function setChains(chains) {
   frameState.availableChains = chains
   if (settingsPanel) settingsPanel.postMessage(frameState)
 }
 
-function setCurrentChain (chain) {
+function setCurrentChain(chain) {
   frameState.currentChain = chain
   if (settingsPanel) settingsPanel.postMessage(frameState)
 }
@@ -33,13 +34,22 @@ function setCurrentChain (chain) {
 provider.on('connect', () => {
   frameState.connected = true
   if (settingsPanel) settingsPanel.postMessage(frameState)
-  provider.request({ method: 'wallet_getEthereumChains' }).then(setChains).catch(() => setChains([]))
+  provider
+    .request({ method: 'wallet_getEthereumChains' })
+    .then(setChains)
+    .catch(() => setChains([]))
+
+  // change icon
+  chrome.browserAction.setIcon({ path: 'icons/icon96good.png' })
 
   sendEvent('connect')
 })
 
 provider.on('disconnect', () => {
   frameState.connected = false
+
+  // change icon
+  chrome.browserAction.setIcon({ path: 'icons/icon96moon.png' })
 
   sendEvent('close')
 })
@@ -48,12 +58,12 @@ provider.on('chainsChanged', (chains) => setChains(chains))
 
 let settingsPanel, activeTab
 
-function portDisconnected (port) {
+function portDisconnected(port) {
   settingsPanel = null
   port.onDisconnect.removeListener(portDisconnected)
 }
 
-chrome.runtime.onConnect.addListener(port => {
+chrome.runtime.onConnect.addListener((port) => {
   port.onDisconnect.addListener(portDisconnected)
 
   if (port.name === 'frame_connect') {
@@ -62,7 +72,14 @@ chrome.runtime.onConnect.addListener(port => {
   }
 })
 
-const subTypes = ['chainChanged', 'chainsChanged', 'accountsChanged', 'assetsChanged', 'networkChanged', 'message']
+const subTypes = [
+  'chainChanged',
+  'chainsChanged',
+  'accountsChanged',
+  'assetsChanged',
+  'networkChanged',
+  'message'
+]
 const subType = (pendingPayload) => {
   try {
     const type = pendingPayload.params[0]
@@ -72,15 +89,19 @@ const subType = (pendingPayload) => {
   }
 }
 
-provider.connection.on('payload', payload => {
+provider.connection.on('payload', (payload) => {
   if (typeof payload.id !== 'undefined') {
     if (pending[payload.id]) {
       const { tabId, payloadId } = pending[payload.id]
       if (pending[payload.id].method === 'eth_subscribe' && payload.result) {
-        subs[payload.result] = { tabId, send: subload => chrome.tabs.sendMessage(tabId, subload), type: subType(pending[payload.id]) }
+        subs[payload.result] = {
+          tabId,
+          send: (subload) => chrome.tabs.sendMessage(tabId, subload),
+          type: subType(pending[payload.id])
+        }
       } else if (pending[payload.id].method === 'eth_unsubscribe') {
         const params = payload.params ? [].concat(payload.params) : []
-        params.forEach(sub => delete subs[sub])
+        params.forEach((sub) => delete subs[sub])
       }
       chrome.tabs.sendMessage(tabId, Object.assign({}, payload, { id: payloadId, type: 'eth:payload' }))
       if (pending[payload.id].method === 'eth_chainId' && pending[payload.id].tabId === activeTab) {
@@ -89,7 +110,12 @@ provider.connection.on('payload', payload => {
       }
       delete pending[payload.id]
     }
-  } else if (payload.method && payload.method.indexOf('_subscription') > -1 && subs[payload.params.subscription]) { // Emit subscription result to tab
+  } else if (
+    payload.method &&
+    payload.method.indexOf('_subscription') > -1 &&
+    subs[payload.params.subscription]
+  ) {
+    // Emit subscription result to tab
     const sub = subs[payload.params.subscription]
     payload.type = 'eth:payload'
     sub.send(payload)
@@ -105,24 +131,28 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
   const { method, params } = payload
 
   if (payload.method === 'embedded_action_res') {
-    const [ action, res ] = params
+    const [action, res] = params
     if (action.type === 'getChainId' && res.chainId) return setCurrentChain(res.chainId)
   } else if (payload.method === 'media_blob') {
     const location = payload.location
-    fetch(payload.src).then(res => res.blob()).then(blob => {
-      const blobURL = URL.createObjectURL(blob)
-      chrome.tabs.executeScript(sender.tab.id, {
-        code: `window.__setMediaBlob__("${blobURL}", "${location}");`
+    fetch(payload.src)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const blobURL = URL.createObjectURL(blob)
+        chrome.tabs.executeScript(sender.tab.id, {
+          code: `window.__setMediaBlob__("${blobURL}", "${location}");`
+        })
       })
-    }).catch(e => {
-      chrome.tabs.executeScript(sender.tab.id, {
-        code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
+      .catch((e) => {
+        chrome.tabs.executeScript(sender.tab.id, {
+          code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
+        })
       })
-    })
   }
 
-  if (payload.method === 'frame_summon') return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })
-  
+  if (payload.method === 'frame_summon')
+    return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })
+
   const id = provider.nextId++
   pending[id] = { tabId: sender?.tab?.id || tab.id, payloadId: payload.id, method, params }
 
@@ -137,7 +167,6 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
   provider.connection.send(load)
 })
 
-
 // chrome.browserAction.onClicked.addListener(tab => {
 //   if (provider.connected) {
 //     const load = { jsonrpc: '2.0', id: 1, method: 'frame_summon', params: [] }
@@ -148,9 +177,11 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
 //   }
 // })
 
-const unsubscribeTab = tabId => {
-  Object.keys(pending).forEach(id => { if (pending[id].tabId === tabId) delete pending[id] })
-  Object.keys(subs).forEach(sub => {
+const unsubscribeTab = (tabId) => {
+  Object.keys(pending).forEach((id) => {
+    if (pending[id].tabId === tabId) delete pending[id]
+  })
+  Object.keys(subs).forEach((sub) => {
     if (subs[sub].tabId === tabId) {
       provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
       delete subs[sub]
@@ -158,16 +189,18 @@ const unsubscribeTab = tabId => {
   })
 }
 
-function sendEvent (event, args = [], tabSelector = {}) {
+function sendEvent(event, args = [], tabSelector = {}) {
   chrome.tabs.query(tabSelector, (tabs) => {
-    tabs.forEach(tab => {
+    tabs.forEach((tab) => {
       chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
     })
   })
 }
 
 chrome.tabs.onRemoved.addListener((tabId, removed) => unsubscribeTab(tabId))
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => { if (changeInfo.url) unsubscribeTab(tabId) })
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.url) unsubscribeTab(tabId)
+})
 chrome.tabs.onActivated.addListener(({ tabId }) => {
   activeTab = tabId
   chrome.tabs.sendMessage(tabId, { type: 'embedded:action', action: { type: 'getChainId' } })

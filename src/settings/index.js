@@ -5,6 +5,8 @@ import Restore from 'react-restore'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
+import { Cluster, ClusterValue, ClusterColumn, ClusterRow, ClusterBoxMain } from './Cluster'
+
 const initialState = {
   frameConnected: false,
   appearAsMM: false,
@@ -48,11 +50,10 @@ const getScrollBarWidth = () => {
   return w1 - w2
 }
 
-
-function mmAppearToggle () {
+function mmAppearToggle() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
-      chrome.tabs.executeScript(tabs[0].id, { code: 'localStorage[\'__frameAppearAsMM__\']' }, (results) => {
+      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAppearAsMM__']" }, (results) => {
         let mmAppear = false
         if (results) {
           try {
@@ -60,7 +61,11 @@ function mmAppearToggle () {
           } catch (e) {
             mmAppear = false
           }
-          chrome.tabs.executeScript(tabs[0].id, { code: `localStorage.setItem('__frameAppearAsMM__', ${JSON.stringify(!mmAppear)}); window.location.reload();` })
+          chrome.tabs.executeScript(tabs[0].id, {
+            code: `localStorage.setItem('__frameAppearAsMM__', ${JSON.stringify(
+              !mmAppear
+            )}); window.location.reload();`
+          })
         }
         window.close()
       })
@@ -68,11 +73,10 @@ function mmAppearToggle () {
   })
 }
 
-
-function augmentOffToggle () {
+function augmentOffToggle() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
-      chrome.tabs.executeScript(tabs[0].id, { code: 'localStorage[\'__frameAugmentOff__\']' }, (results) => {
+      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAugmentOff__']" }, (results) => {
         let augmentOff = true
         if (results) {
           try {
@@ -80,7 +84,11 @@ function augmentOffToggle () {
           } catch (e) {
             augmentOff = true
           }
-          chrome.tabs.executeScript(tabs[0].id, { code: `localStorage.setItem('__frameAugmentOff__', ${JSON.stringify(!augmentOff)}); window.location.reload();` })
+          chrome.tabs.executeScript(tabs[0].id, {
+            code: `localStorage.setItem('__frameAugmentOff__', ${JSON.stringify(
+              !augmentOff
+            )}); window.location.reload();`
+          })
         }
         window.close()
       })
@@ -88,7 +96,7 @@ function augmentOffToggle () {
   })
 }
 
-const getOrigin = url => {
+const getOrigin = (url) => {
   const path = url.split('/')
   return path[0] + '//' + path[2]
 }
@@ -101,25 +109,25 @@ const SettingsScroll = styled.div`
   margin-right: -${(props) => props.scrollBar || 0}px;
 `
 
-const SettingsWrap = styled.div`
-  text-align: center;
-  background: var(--ghostZ);
-  border-radius: 16px;
-  margin: 10px 8px 10px 8px;
-  box-shadow: 0px 4px 8px var(--ghostX);
-  box-sizing: border-box;
-  padding-bottom: 8px;
+// const SettingsWrap = styled.div`
+//   text-align: center;
+//   background: var(--ghostZ);
+//   border-radius: 16px;
+//   margin: 10px 8px 10px 8px;
+//   box-shadow: 0px 4px 8px var(--ghostX);
+//   box-sizing: border-box;
+//   padding-bottom: 8px;
 
-  img {
-    margin: 16px 0px 0px 0px;
-    height: 32px;
-    width: 32px;
-  }
-  
-  * {
-    user-select: none;
-  }
-`
+//   img {
+//     margin: 16px 0px 0px 0px;
+//     height: 32px;
+//     width: 32px;
+//   }
+
+//   * {
+//     user-select: none;
+//   }
+// `
 
 const AugmentValue = styled.div`
   position: absolute;
@@ -217,9 +225,8 @@ const FrameCheck = styled.div`
 `
 
 const SummonFrameButton = styled.div`
-  width: 75px;
-  height: 100%;
-  background: var(--ghostA);
+  width: 80px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -231,36 +238,36 @@ const SummonFrameButton = styled.div`
   }
 `
 
-const SummonFrameWrap = styled.div`
-  margin: 16px;
-  padding: 8px;
-  background: var(--ghostY);
-  border-radius: 8px;
-`
+// const SummonFrameWrap = styled.div`
+//   margin: 16px;
+//   padding: 8px;
+//   background: var(--ghostY);
+//   border-radius: 8px;
+// `
 
-const SummonFrame = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 4px;
-  height: 42px;
-  background: var(--ghostZ);
-  flex-shrink: 1;
-  overflow: hidden;
-  cursor: pointer;
+// const SummonFrame = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   border-radius: 4px;
+//   height: 42px;
+//   background: var(--ghostZ);
+//   flex-shrink: 1;
+//   overflow: hidden;
+//   cursor: pointer;
 
-  * {
-    pointer-events: none;
-  }
+//   * {
+//     pointer-events: none;
+//   }
 
-  &:hover {
-    background: var(--ghostA);
-    ${SummonFrameButton} {
-      background: var(--ghostB);
-      color: var(--good);
-    }
-  }
-`
+//   &:hover {
+//     background: var(--ghostA);
+//     ${SummonFrameButton} {
+//       background: var(--ghostB);
+//       color: var(--good);
+//     }
+//   }
+// `
 
 const TabOrigin = styled.div`
   color: var(--moon);
@@ -268,12 +275,9 @@ const TabOrigin = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  border-radius: 8px;
-  height: 48px;
+  height: 54px;
   font-weight: 400;
-  margin: 0px 8px 8px 8px;
-  font-size: 18px;
-  background: var(--ghostY);
+  font-size: 16px;
 
   * {
     pointer-events: none;
@@ -282,18 +286,18 @@ const TabOrigin = styled.div`
   svg {
     position: relative;
     height: 14px;
-    top: 2px;
+    top: 1px;
     margin-right: 8px;
   }
 `
 
-const Appear = styled.div`
-  background: var(--ghostZ);
-  border-radius: 8px;
-  width: 100%;
-  background: var(--ghostY);
-  margin: 0px 8px 0px 8px;
-`
+// const Appear = styled.div`
+//   background: var(--ghostZ);
+//   border-radius: 8px;
+//   width: 100%;
+//   background: var(--ghostY);
+//   margin: 0px 8px 0px 8px;
+// `
 
 const AppearDescription = styled.div`
   font-weight: 600;
@@ -306,8 +310,7 @@ const AppearDescription = styled.div`
   align-items: center;
   padding-left: 1px;
   letter-spacing: 1px;
-  height: 42px;
-  margin-top: 8px;
+  height: 64px;
 
   svg {
     height: 16px;
@@ -317,8 +320,7 @@ const AppearDescription = styled.div`
 
 const AppearToggle = styled.div`
   position: relative;
-  background: var(--ghostZ);
-  height: 42px;
+  height: 32px;
   border-radius: 4px;
   font-weight: 600;
   display: flex;
@@ -331,14 +333,10 @@ const AppearToggle = styled.div`
   overflow: hidden;
   padding-left: 1px;
   letter-spacing: 1px;
-
-  &:hover {
-    background: var(--ghostA);
-  }
 `
 
 const NotConnected = styled.div`
-  padding: 32px 64px 16px 64px;
+  padding: 32px 32px 16px 32px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -395,7 +393,7 @@ const ChainSwitcher = styled.div`
 `
 
 const StyledChainButton = styled.div`
-  position: relative; 
+  position: relative;
   width: calc(50% - 8px);
   display: flex;
   justify-content: flex-start;
@@ -408,9 +406,9 @@ const StyledChainButton = styled.div`
   font-weight: 600;
   box-sizing: border-box;
   background: var(--ghostZ);
-  background: ${props => props.isSelected ? 'var(--ghostA)' : 'var(--ghostZ)'};
-  color: ${props => props.isSelected ? 'var(--good)' : 'white'};
-  margin: 8px 8px 0px 0px; 
+  background: ${(props) => (props.isSelected ? 'var(--ghostA)' : 'var(--ghostZ)')};
+  color: ${(props) => (props.isSelected ? 'var(--good)' : 'white')};
+  margin: 8px 8px 0px 0px;
 
   &:hover {
     background: var(--ghostA);
@@ -427,27 +425,33 @@ const StyledChainButton = styled.div`
 `
 
 const ChainButtonIcon = styled.div`
-  flex-shrink: 0;
+  // flex-shrink: 0;
+  position: absolute;
   top: 12px;
   left: 10px;
-  width: 12px;
-  height: 12px;
-  background: ${(props) => props.isSelected ? 'var(--good)' : 'var(--ghostY)'};
-  border-radius 9px;
-  border: solid 4px var(--ghostY);
+  width: 20px;
+  height: 20px;
+  background: ${(props) => (props.isSelected ? 'var(--good)' : 'var(--ghostAZ)')};
+  border-radius: 10px;
+  box-sizing: border-box;
+  border: solid 3px var(--ghostZ);
 `
 
 const ChainButtonLabel = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
   flex-grow: 1;
+  font-size: 14px;
   padding-left: 4px;
+  font-weight: 500;
+  height: 44px;
 `
 
 const SectionHeader = styled.div`
   width: 100%;
-  font-size: 9px;
-  margin: 8px 16px 6px 16px;
+  font-size: 10px;
+  margin: 16px 16px 6px 16px;
   color: var(--outerspace);
   font-weight: 600;
   letter-spacing: 2px;
@@ -459,7 +463,7 @@ const Overlay = styled.div`
   position: absolute;
   top: 0;
   right: 0;
-  bottom: 0; 
+  bottom: 0;
   left: 0;
   background: linear-gradient(-35deg, var(--overlayA) 0%, var(--overlayB) 100%);
   z-index: 9999999999999;
@@ -468,7 +472,7 @@ const Overlay = styled.div`
 
 const originDomainRegex = /^(?:.+(?::\/\/))?(?<origin>.*)/
 
-function parseOrigin (origin) {
+function parseOrigin(origin) {
   const m = origin.match(originDomainRegex)
   if (!m) {
     log.warn(`could not parse origin: ${origin}`)
@@ -480,99 +484,143 @@ function parseOrigin (origin) {
 
 const isFirefox = Boolean(window?.browser && browser?.runtime)
 
-const ChainButton = ({ onClick, name, isSelected }) =>
-  <StyledChainButton onClick={onClick} isSelected={isSelected}>
-    <ChainButtonIcon isSelected={isSelected} />
-    <ChainButtonLabel><div>{name}</div></ChainButtonLabel>
-  </StyledChainButton>
-
 class _Settings extends React.Component {
   notConnected() {
     return (
       <>
-        <NotConnected>Frame is not currently running on your machine</NotConnected>
-        <Download href='https://frame.sh' target='_newtab'>Download Frame</Download>
+        <NotConnected>Frame is not currently connected</NotConnected>
+        <div>{'Is Frame running on your machine?'}</div>
+        <Download href='https://frame.sh' target='_newtab'>
+          Download Frame
+        </Download>
       </>
     )
   }
 
-  frameConnected () {
+  frameConnected() {
     return (
-      <SummonFrameWrap>
-        <SummonFrame onClick={() => {
-          chrome.runtime.sendMessage({ method: 'frame_summon', params: [] })
-        }}>
-          <FrameCheck>
-            <svg viewBox='0 0 448 512'>
-              <path fill='currentColor'  d='M438.6 105.4C451.1 117.9 451.1 138.1 438.6 150.6L182.6 406.6C170.1 419.1 149.9 419.1 137.4 406.6L9.372 278.6C-3.124 266.1-3.124 245.9 9.372 233.4C21.87 220.9 42.13 220.9 54.63 233.4L159.1 338.7L393.4 105.4C405.9 92.88 426.1 92.88 438.6 105.4H438.6z'/>
-            </svg>
-          </FrameCheck>
-          <FrameConnected>Frame Connected</FrameConnected>
-          <SummonFrameButton>
-            <svg viewBox='0 0 512 512'>
-              <path fill='currentColor'  d='M416 32h-64c-17.67 0-32 14.33-32 32s14.33 32 32 32h64c17.67 0 32 14.33 32 32v256c0 17.67-14.33 32-32 32h-64c-17.67 0-32 14.33-32 32s14.33 32 32 32h64c53.02 0 96-42.98 96-96V128C512 74.98 469 32 416 32zM342.6 233.4l-128-128c-12.51-12.51-32.76-12.49-45.25 0c-12.5 12.5-12.5 32.75 0 45.25L242.8 224H32C14.31 224 0 238.3 0 256s14.31 32 32 32h210.8l-73.38 73.38c-12.5 12.5-12.5 32.75 0 45.25s32.75 12.5 45.25 0l128-128C355.1 266.1 355.1 245.9 342.6 233.4z'/>
-            </svg>
-          </SummonFrameButton>
-        </SummonFrame>
-      </SummonFrameWrap>
+      <Cluster>
+        <ClusterRow>
+          <ClusterValue>
+            <FrameCheck>
+              <svg viewBox='0 0 448 512'>
+                <path
+                  fill='currentColor'
+                  d='M438.6 105.4C451.1 117.9 451.1 138.1 438.6 150.6L182.6 406.6C170.1 419.1 149.9 419.1 137.4 406.6L9.372 278.6C-3.124 266.1-3.124 245.9 9.372 233.4C21.87 220.9 42.13 220.9 54.63 233.4L159.1 338.7L393.4 105.4C405.9 92.88 426.1 92.88 438.6 105.4H438.6z'
+                />
+              </svg>
+            </FrameCheck>
+            <FrameConnected>Frame Connected</FrameConnected>
+          </ClusterValue>
+          <ClusterValue
+            onClick={() => {
+              chrome.runtime.sendMessage({ method: 'frame_summon', params: [] })
+            }}
+          >
+            <SummonFrameButton>
+              <svg viewBox='0 0 512 512'>
+                <path
+                  fill='currentColor'
+                  d='M416 32h-64c-17.67 0-32 14.33-32 32s14.33 32 32 32h64c17.67 0 32 14.33 32 32v256c0 17.67-14.33 32-32 32h-64c-17.67 0-32 14.33-32 32s14.33 32 32 32h64c53.02 0 96-42.98 96-96V128C512 74.98 469 32 416 32zM342.6 233.4l-128-128c-12.51-12.51-32.76-12.49-45.25 0c-12.5 12.5-12.5 32.75 0 45.25L242.8 224H32C14.31 224 0 238.3 0 256s14.31 32 32 32h210.8l-73.38 73.38c-12.5 12.5-12.5 32.75 0 45.25s32.75 12.5 45.25 0l128-128C355.1 266.1 355.1 245.9 342.6 233.4z'
+                />
+              </svg>
+            </SummonFrameButton>
+          </ClusterValue>
+        </ClusterRow>
+      </Cluster>
     )
   }
 
-  appearAsMMToggle () {
-    return this.props.mmAppear 
-      ? (
-          <Appear>
+  appearAsMMToggle() {
+    return this.props.mmAppear ? (
+      <>
+        <ClusterRow>
+          <ClusterValue>
             <AppearDescription>
               <svg viewBox='0 0 576 512'>
-                <path fill='var(--mm)' d='M288 64C39.52 64 0 182.1 0 273.5C0 379.5 78.8 448 176 448c27.33 0 51.21-6.516 66.11-36.79l19.93-40.5C268.3 358.6 278.1 352.4 288 352.1c9.9 .3711 19.7 6.501 25.97 18.63l19.93 40.5C348.8 441.5 372.7 448 400 448c97.2 0 176-68.51 176-174.5C576 182.1 536.5 64 288 64zM160 320c-35.35 0-64-28.65-64-64s28.65-64 64-64c35.35 0 64 28.65 64 64S195.3 320 160 320zM416 320c-35.35 0-64-28.65-64-64s28.65-64 64-64c35.35 0 64 28.65 64 64S451.3 320 416 320z'/>
+                <path
+                  fill='var(--mm)'
+                  d='M288 64C39.52 64 0 182.1 0 273.5C0 379.5 78.8 448 176 448c27.33 0 51.21-6.516 66.11-36.79l19.93-40.5C268.3 358.6 278.1 352.4 288 352.1c9.9 .3711 19.7 6.501 25.97 18.63l19.93 40.5C348.8 441.5 372.7 448 400 448c97.2 0 176-68.51 176-174.5C576 182.1 536.5 64 288 64zM160 320c-35.35 0-64-28.65-64-64s28.65-64 64-64c35.35 0 64 28.65 64 64S195.3 320 160 320zM416 320c-35.35 0-64-28.65-64-64s28.65-64 64-64c35.35 0 64 28.65 64 64S451.3 320 416 320z'
+                />
               </svg>
-              <span>Injecting as <span className='mm'>Metamask</span></span>
+              <span>
+                Injecting as <span className='mm'>Metamask</span>
+              </span>
             </AppearDescription>
-            <AppearToggle onClick={() => mmAppearToggle()}>
-              <span>Appear As <span className='frame'>Frame</span> Instead</span>
+          </ClusterValue>
+        </ClusterRow>
+        <ClusterRow>
+          <ClusterValue onClick={() => mmAppearToggle()}>
+            <AppearToggle>
+              <span>
+                Appear As <span className='frame'>Frame</span> Instead
+              </span>
             </AppearToggle>
-          </Appear>
-        )
-      : (
-          <Appear>
+          </ClusterValue>
+        </ClusterRow>
+      </>
+    ) : (
+      <>
+        <ClusterRow>
+          <ClusterValue>
             <AppearDescription>
               <svg viewBox='0 0 448 512'>
-                <path fill='var(--good)' d='M176 448C167.3 448 160 455.3 160 464V512h32v-48C192 455.3 184.8 448 176 448zM272 448c-8.75 0-16 7.25-16 16s7.25 16 16 16s16-7.25 16-16S280.8 448 272 448zM164 172l8.205 24.62c1.215 3.645 6.375 3.645 7.59 0L188 172l24.62-8.203c3.646-1.219 3.646-6.375 0-7.594L188 148L179.8 123.4c-1.215-3.648-6.375-3.648-7.59 0L164 148L139.4 156.2c-3.646 1.219-3.646 6.375 0 7.594L164 172zM336.1 315.4C304 338.6 265.1 352 224 352s-80.03-13.43-112.1-36.59C46.55 340.2 0 403.3 0 477.3C0 496.5 15.52 512 34.66 512H128v-64c0-17.75 14.25-32 32-32h128c17.75 0 32 14.25 32 32v64h93.34C432.5 512 448 496.5 448 477.3C448 403.3 401.5 340.2 336.1 315.4zM64 224h13.5C102.3 280.5 158.4 320 224 320s121.8-39.5 146.5-96H384c8.75 0 16-7.25 16-16v-96C400 103.3 392.8 96 384 96h-13.5C345.8 39.5 289.6 0 224 0S102.3 39.5 77.5 96H64C55.25 96 48 103.3 48 112v96C48 216.8 55.25 224 64 224zM104 136C104 113.9 125.5 96 152 96h144c26.5 0 48 17.88 48 40V160c0 53-43 96-96 96h-48c-53 0-96-43-96-96V136z'/>
+                <path
+                  fill='var(--good)'
+                  d='M176 448C167.3 448 160 455.3 160 464V512h32v-48C192 455.3 184.8 448 176 448zM272 448c-8.75 0-16 7.25-16 16s7.25 16 16 16s16-7.25 16-16S280.8 448 272 448zM164 172l8.205 24.62c1.215 3.645 6.375 3.645 7.59 0L188 172l24.62-8.203c3.646-1.219 3.646-6.375 0-7.594L188 148L179.8 123.4c-1.215-3.648-6.375-3.648-7.59 0L164 148L139.4 156.2c-3.646 1.219-3.646 6.375 0 7.594L164 172zM336.1 315.4C304 338.6 265.1 352 224 352s-80.03-13.43-112.1-36.59C46.55 340.2 0 403.3 0 477.3C0 496.5 15.52 512 34.66 512H128v-64c0-17.75 14.25-32 32-32h128c17.75 0 32 14.25 32 32v64h93.34C432.5 512 448 496.5 448 477.3C448 403.3 401.5 340.2 336.1 315.4zM64 224h13.5C102.3 280.5 158.4 320 224 320s121.8-39.5 146.5-96H384c8.75 0 16-7.25 16-16v-96C400 103.3 392.8 96 384 96h-13.5C345.8 39.5 289.6 0 224 0S102.3 39.5 77.5 96H64C55.25 96 48 103.3 48 112v96C48 216.8 55.25 224 64 224zM104 136C104 113.9 125.5 96 152 96h144c26.5 0 48 17.88 48 40V160c0 53-43 96-96 96h-48c-53 0-96-43-96-96V136z'
+                />
               </svg>
-                <span>Injecting as <span className='frame'>Frame</span></span>
+              <span>
+                Injecting as <span className='frame'>Frame</span>
+              </span>
             </AppearDescription>
-            <AppearToggle onClick={() => mmAppearToggle()}>
-              <span>Appear As <span className='mm'>Metamask</span> Instead</span>
+          </ClusterValue>
+        </ClusterRow>
+        <ClusterRow>
+          <ClusterValue onClick={() => mmAppearToggle()}>
+            <AppearToggle>
+              <span>
+                Appear As <span className='mm'>Metamask</span> Instead
+              </span>
             </AppearToggle>
-          </Appear>
-        )
+          </ClusterValue>
+        </ClusterRow>
+      </>
+    )
   }
 
-  chainSelect () {
+  chainSelect() {
     const chains = this.store('availableChains') || []
     const currentChain = this.store('currentChain')
-    
-    return (
-      <ChainSwitcher>
-        {chains.map(({ chainId, name }) => 
-          <ChainButton
+
+    const rows = chains.reduce((result, value, index, array) => {
+      if (index % 2 === 0) result.push(array.slice(index, index + 2))
+      return result
+    }, [])
+
+    return rows.map((row) => (
+      <ClusterRow style={{ justifyContent: 'flex-start' }}>
+        {row.map(({ chainId, name }) => (
+          <ClusterValue
+            style={{ flexGrow: 0, width: 'calc(50% - 3px)' }}
             onClick={() => {
               chrome.runtime.sendMessage({
-                tab: this.props.tab, 
-                method: 'wallet_switchEthereumChain', 
-                params: [{ chainId }] 
+                tab: this.props.tab,
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId }]
               })
               updateCurrentChain(this.props.tab)
             }}
-            name={name}
-            isSelected={chainId === parseInt(currentChain, 16)}
-          />
-        )}
-      </ChainSwitcher>
-    )
+          >
+            <ChainButtonIcon isSelected={chainId === parseInt(currentChain, 16)} />
+            <ChainButtonLabel>{name}</ChainButtonLabel>
+          </ClusterValue>
+        ))}
+      </ClusterRow>
+    ))
   }
 
-  currentChain () {
+  currentChain() {
     try {
       const availableChains = this.store('availableChains')
       const currentChain = this.store('currentChain')
@@ -592,63 +640,74 @@ class _Settings extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const isConnected = this.store('frameConnected')
     const origin = parseOrigin(getOrigin(this.props.tab.url))
 
     const currentChain = this.currentChain()
 
-    const mainPanel = isConnected
-      ? (
-          <>
-            <Overlay />
-            {this.frameConnected()}
-            <DappControls>
+    const mainPanel = isConnected ? (
+      <>
+        {this.frameConnected()}
+
+        <Cluster style={{ marginTop: '20px' }}>
+          <ClusterRow>
+            <ClusterValue>
               <TabOrigin>
                 <svg viewBox='0 0 512 512'>
-                  <path fill='var(--moon)' d='M448 32C483.3 32 512 60.65 512 96V416C512 451.3 483.3 480 448 480H64C28.65 480 0 451.3 0 416V96C0 60.65 28.65 32 64 32H448zM96 96C78.33 96 64 110.3 64 128C64 145.7 78.33 160 96 160H416C433.7 160 448 145.7 448 128C448 110.3 433.7 96 416 96H96z'/>
+                  <path
+                    fill='var(--moon)'
+                    d='M448 32C483.3 32 512 60.65 512 96V416C512 451.3 483.3 480 448 480H64C28.65 480 0 451.3 0 416V96C0 60.65 28.65 32 64 32H448zM96 96C78.33 96 64 110.3 64 128C64 145.7 78.33 160 96 160H416C433.7 160 448 145.7 448 128C448 110.3 433.7 96 416 96H96z'
+                  />
                 </svg>
                 {origin}
               </TabOrigin>
-              {this.store('availableChains').length ? (
-                <>
-                  <SectionHeader>{'ON CHAIN: ' + currentChain}</SectionHeader>
-                  {this.chainSelect()}
-                </>
-              ) : null}
-              <SectionHeader>{'APPEAR AS: ' + (this.props.mmAppear ? 'METAMASK' : 'FRAME')}</SectionHeader>
-              {this.appearAsMMToggle()}
-              {origin === 'twitter.com' && !isFirefox ? (
-                <div style={{ marginTop: '8px', width: '100%' }}>
-                  <SectionHeader>{'VERIFY ENS: ' + (this.props.augmentOff ? 'OFF' : 'ON')}</SectionHeader>
-                  {this.props.augmentOff ? (
-                    <AugmentWrap>
-                      <Augment onClick={() => augmentOffToggle()}>
-                        <AugmentValue>Verify ENS Names</AugmentValue>
-                        <AugmentStateOff>OFF</AugmentStateOff>
-                      </Augment>
-                    </AugmentWrap>
-                  ) : (
-                    <AugmentWrap>
-                      <Augment onClick={() => augmentOffToggle()}>
-                        <AugmentValue>Verify ENS Names</AugmentValue>
-                        <AugmentStateOn>ON</AugmentStateOn>
-                      </Augment>
-                    </AugmentWrap>
-                  )}
-                </div>
-              ) : null}
-            </DappControls>
-          </>
-        )
-      : this.notConnected()
+            </ClusterValue>
+          </ClusterRow>
+          {this.store('availableChains').length ? (
+            <>
+              <SectionHeader>{'CHAIN'}</SectionHeader>
+              {this.chainSelect()}
+            </>
+          ) : null}
+          <SectionHeader>{'INJECTION'}</SectionHeader>
+          {this.appearAsMMToggle()}
+        </Cluster>
+
+        {origin === 'twitter.com' && !isFirefox ? (
+          <div style={{ marginTop: '8px', width: '100%' }}>
+            <SectionHeader>{'VERIFY ENS: ' + (this.props.augmentOff ? 'OFF' : 'ON')}</SectionHeader>
+            {this.props.augmentOff ? (
+              <AugmentWrap>
+                <Augment onClick={() => augmentOffToggle()}>
+                  <AugmentValue>Verify ENS Names</AugmentValue>
+                  <AugmentStateOff>OFF</AugmentStateOff>
+                </Augment>
+              </AugmentWrap>
+            ) : (
+              <AugmentWrap>
+                <Augment onClick={() => augmentOffToggle()}>
+                  <AugmentValue>Verify ENS Names</AugmentValue>
+                  <AugmentStateOn>ON</AugmentStateOn>
+                </Augment>
+              </AugmentWrap>
+            )}
+          </div>
+        ) : null}
+      </>
+    ) : (
+      this.notConnected()
+    )
     return (
-      <SettingsScroll scrollBar={getScrollBarWidth()}>
-        <SettingsWrap>
-          <img src='FrameLogo.png' />
-          {mainPanel}
-        </SettingsWrap>
-      </SettingsScroll>
+      <>
+        <Overlay />
+        <SettingsScroll scrollBar={getScrollBarWidth()}>
+          <ClusterBoxMain>
+            <img src='FrameLogo.png' />
+            {mainPanel}
+          </ClusterBoxMain>
+        </SettingsScroll>
+      </>
     )
   }
 }
@@ -657,14 +716,14 @@ const Settings = Restore.connect(_Settings, store)
 
 const frameConnect = chrome.runtime.connect({ name: 'frame_connect' })
 
-frameConnect.onMessage.addListener(state => {
+frameConnect.onMessage.addListener((state) => {
   store.setFrameConnected(state.connected)
   store.setChains(state.availableChains)
   store.setCurrentChain(state.currentChain)
 })
 
 const updateCurrentChain = (tab) => {
-  chrome.tabs.sendMessage(tab.id, { 
+  chrome.tabs.sendMessage(tab.id, {
     type: 'embedded:action',
     action: { type: 'getChainId' }
   })
@@ -675,7 +734,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setInterval(() => {
       updateCurrentChain(tabs[0])
     }, 1000)
-    chrome.tabs.executeScript(tabs[0].id, { code: 'localStorage[\'__frameAppearAsMM__\']' }, (results) => {
+    chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAppearAsMM__']" }, (results) => {
       let mmAppear = false
       if (results) {
         try {
@@ -684,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function () {
           mmAppear = false
         }
       }
-      chrome.tabs.executeScript(tabs[0].id, { code: 'localStorage[\'__frameAugmentOff__\']' }, (results) => {
+      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAugmentOff__']" }, (results) => {
         let augmentOff = false
         if (results) {
           try {
@@ -696,11 +755,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const root = document.getElementById('root')
 
-        ReactDOM.render(<Settings 
-          tab={tabs[0]}
-          mmAppear={mmAppear}
-          augmentOff={augmentOff}
-        />, root)
+        ReactDOM.render(<Settings tab={tabs[0]} mmAppear={mmAppear} augmentOff={augmentOff} />, root)
       })
     })
   })

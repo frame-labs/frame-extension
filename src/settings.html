@@ -1,119 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Frame</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-      body, html {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-      }
-
-      html {
-        --mm: rgba(230, 138, 60, 1);
-        --outerspace01: rgba(217, 225, 255, 0.1);
-        --outerspace02: rgba(219, 227, 255, 0.2);
-        --outerspace03: rgba(221, 229, 255, 0.3);
-        --outerspace04: rgba(223, 231, 255, 0.4);
-        --outerspace05: rgba(225, 233, 255, 0.5);
-        --outerspace06: rgba(227, 235, 255, 0.6);
-        --outerspace07: rgba(229, 237, 255, 0.7);
-        --outerspace08: rgba(231, 239, 255, 0.8);
-        --outerspace09: rgba(233, 241, 255, 0.9);
-        --outerspace: rgba(236, 241, 255, 1);
-        --nebula: #3a4547;
-        
-        --outerspaceLight: #29393a;
-        --outerspacePulse: #395153;
-        --outerspacePhase: rgba(30, 65, 70, 1);
-        --outerspaceShader: rgb(16, 36, 38);
-        --outerspaceDark: #0b1819;
-        --spacewhite: rgba(38, 42, 50, 1);
-
-        --ghostX09: rgba(23, 23, 20, 0.9);
-        --ghostX04: rgba(23, 23, 20, 0.4);
-        --ghostX: rgba(23, 23, 22, 1);
-        --ghostY: rgba(27, 27, 26, 1);
-        --ghostZ05: rgba(31, 31, 30, 0.5);
-        --ghostZ08: rgba(31, 31, 30, 0.8);
-        --ghostZ: rgba(31, 31, 30, 1);
-
-        --ghostA: rgba(34, 34, 34, 1);
-        --ghostB0: rgba(39, 39, 40, 0);
-        --ghostB: rgba(39, 39, 40, 1);
-        --ghostC0: rgba(44, 44, 46, 0);
-        --ghostC: rgba(44, 44, 46, 1);
-        --ghostD: rgba(49, 49, 52, 1);
-        --ghostE04: rgba(54, 54, 58, 0.4);
-        --ghostE: rgba(54, 54, 58, 1);
-        --ghostF: rgba(59, 59, 64, 1);
-        --ghostG: rgba(64, 64, 70, 1);
-
-        --moon: rgba(255, 165, 155, 1);
-        --hardware: rgba(110, 230, 255, 1);
-        --hardware2: rgba(190, 220, 255, 1);
-        --smart: rgba(150, 255, 210, 1);
-        --smart04: rgba(150, 255, 210, 0.4);
-        --smart02: rgba(150, 255, 210, 0.2);
-        --smartShade: rgba(100, 205, 150, 1);
-        --hot: rgba(255, 150, 150, 1);
-        --shader: rgba(16, 44, 60, 0.7);
-        --phase: rgba(18, 45, 56, 1);
-        --phaseLight: rgba(28, 60, 76, 1);
-        --phaseShade: rgba(8 , 20, 26, 1);
-        --goodHighlighter: rgb(150, 255, 235);
-        --goodHighlight: rgb(120, 255, 235);
-        --goodLight: rgb(0, 220, 200);
-        --goodOver: rgba(0, 90, 100, 1);
-        --good: rgb(0, 210, 190);
-        --goodUp: rgb(120, 230, 200);
-        --goodShade: rgb(0, 190, 160);
-        --good0: rgba(0, 210, 180, 0);
-        --good01: rgba(0, 210, 180, 0.1);
-        --good02: rgba(0, 210, 180, 0.2);
-        --good03: rgba(0, 210, 180, 0.3);
-        --good04: rgba(0, 210, 180, 0.4);
-        --good06: rgba(0, 210, 180, 0.6);
-        --goodDark: rgba(0, 70, 50, 1);
-        --badOver: rgb(140, 00, 50);
-        --bad: rgb(255, 110, 155);
-        --bad0: rgba(255, 110, 155, 0);
-        --bad01: rgba(255, 110, 155, 0.1);
-        --bad04: rgba(255, 110, 155, 0.4);
-        --bad06: rgba(255, 110, 155, 0.6);
-
-        --overlayA: rgba(230, 0, 180, 0.024);
-        --overlayB: rgba(30, 140, 180, 0.024);
-      }
-
-      body {
-        width: 400px;
-        background: var(--ghostX);
-        color: white;
-        font-family: 'Exo 2', sans-serif;
-        font-weight: 300;
-        font-size: 14px;
-        height: 100%;
-      }
-
-      a, a:hover, a:visited {
-        text-decoration: none;
-      }
-
-      .mm {
-        color: var(--mm);
-      }
-
-      .frame {
-        color: var(--good);
-      }
-    </style>
-    <script src='settings.js'></script>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="fonts.css" />
+    <script src="settings.js"></script>
   </head>
   <body>
-    <div id='root'></div>
+    <div id="root"></div>
   </body>
 </html>
