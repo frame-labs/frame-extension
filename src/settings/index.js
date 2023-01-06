@@ -107,21 +107,7 @@ const SettingsScroll = styled.div`
   box-sizing: border-box;
   max-height: 600px;
   margin-right: -${(props) => props.scrollBar || 0}px;
-`
-
-const AugmentValue = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 64px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-  padding-left: 1px;
-  letter-spacing: 1px;
-  font-weight: 600;
+  padding: 10px;
 `
 
 const AugmentStateOn = styled.div`
@@ -190,28 +176,6 @@ const FrameButton = styled.div`
   box-sizing: border-box;
   font-size: 16px;
   font-weight: 400;
-`
-
-const TabOrigin = styled.div`
-  color: var(--moon);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 54px;
-  font-weight: 400;
-  font-size: 16px;
-
-  * {
-    pointer-events: none;
-  }
-
-  svg {
-    position: relative;
-    height: 14px;
-    top: 1px;
-    margin-right: 8px;
-  }
 `
 
 const AppearDescription = styled.div`
@@ -351,7 +315,7 @@ function parseOrigin(origin) {
   return (m.groups || {}).origin || origin
 }
 
-const isFirefox = Boolean(window?.browser && browser?.runtime)
+// const isFirefox = Boolean(window?.browser && browser?.runtime)
 
 class _Settings extends React.Component {
   notConnected() {
@@ -586,7 +550,6 @@ class _Settings extends React.Component {
   }
 
   render() {
-    const origin = parseOrigin(getOrigin(this.props.tab.url))
     return (
       <>
         <Overlay />

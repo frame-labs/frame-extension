@@ -40,5 +40,6 @@ const copy = (files) =>
       .createReadStream(path.join(__dirname, file))
       .pipe(fs.createWriteStream(path.join(__dirname, '../dist/', file)))
   )
-copy(['./manifest.json', './settings.html', './icon.png', './FrameLogo.png', './index.css', './fonts.css'])
+copy(['./manifest.json', './settings.html', './icon.png', './FrameLogo.png'])
 ncp(path.join(__dirname, './icons'), path.join(__dirname, '../dist/icons'))
+ncp(path.join(__dirname, './style'), path.join(__dirname, '../dist/style'))
