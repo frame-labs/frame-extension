@@ -352,7 +352,11 @@ class _Settings extends React.Component {
             </LogoWrap>
           </ClusterValue>
           <ClusterValue>
-            <FrameConnected>{isConnected ? 'Frame Connected' : 'Frame Disconnected'}</FrameConnected>
+            {isConnected ? (
+              <FrameConnected style={{ color: 'var(--good)' }}>{'Frame Connected'}</FrameConnected>
+            ) : (
+              <FrameConnected style={{ color: 'var(--moon)' }}>{'Frame Disconnected'}</FrameConnected>
+            )}
           </ClusterValue>
           <ClusterValue
             style={{ flexGrow: 0, color: isConnected ? 'var(--good)' : 'var(--moon)' }}
