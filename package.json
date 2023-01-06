@@ -1,6 +1,6 @@
 {
   "name": "frame-extension",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/floating/frame-extension.git"
@@ -10,6 +10,7 @@
   "scripts": {
     "test": "standard",
     "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js",
+    "bundle": "webpack --config webpack.config.js",
     "watch": "webpack --config webpack.dev.config.js",
     "serve": "webpack serve --config webpack.dev.layer.config.js"
   },
