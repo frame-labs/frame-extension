@@ -54,7 +54,11 @@ provider.on('disconnect', () => {
   sendEvent('close')
 })
 
-provider.on('chainsChanged', (chains) => setChains(chains))
+provider.on('chainsChanged', (chains = []) => {
+  if (chains[0] && chains[0] !== null && typeof chains[0] === 'object') {
+    setChains(chains)
+  }
+})
 
 let settingsPanel, activeTab
 
