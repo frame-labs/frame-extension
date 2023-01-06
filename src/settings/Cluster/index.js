@@ -10,67 +10,32 @@ export const ClusterBoxMain = styled.div`
   border-bottom: 2px solid var(--ghostZ);
   padding: 0;
   text-align: center;
-  margin: 16px 8px 16px 8px;
+  margin: 12px 8px 12px 8px;
   box-sizing: border-box;
   background: var(--ghostAZ);
-
-  img {
-    margin: 16px 0px 0px 0px;
-    height: 32px;
-    width: 32px;
-  }
 
   * {
     user-select: none;
   }
 `
 
-// export const ClusterBoxMainInner = styled.div`
-//   position: relative;
-//   margin: 0px 0px;
-//   overflow: hidden;
-// `
-
-// export const ClusterBoxLabel = styled.div`
-//   position: relative;
-//   font-size: 11px;
-//   text-transform: uppercase;
-//   letter-spacing: 2px;
-//   padding: 16px 0px 8px 18px;
-//   font-family: 'MainFont';
-//   font-weight: 500;
-//   display: flex;
-//   align-items: center;
-// `
-
-// export const ClusterBox = ({ title, subtitle, children, style = {} }) => {
-//   style.animationDelay = 0.1 * animationSlot + 's'
-//   return (
-//     <ClusterBoxMain>
-//       <ClusterBoxMainInner>
-//         {title ? (
-//           <ClusterBoxLabel>
-//             <div>{title}</div>
-//             {subtitle && (
-//               <span
-//                 style={{
-//                   opacity: 0.9,
-//                   fontSize: '9px',
-//                   position: 'relative',
-//                   top: '0px',
-//                   left: '4px'
-//                 }}
-//               >
-//                 {`(${subtitle})`}
-//               </span>
-//             )}
-//           </ClusterBoxLabel>
-//         ) : null}
-//         {children}
-//       </ClusterBoxMainInner>
-//     </ClusterBoxMain>
-//   )
-// }
+export const ClusterBoxLabel = styled.div`
+  position: relative;
+  font-size: 16px;
+  padding: 16px 0px 8px 0px;
+  font-family: 'MainFont';
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--moon);
+  svg {
+    position: relative;
+    top: -1px;
+    height: 16px;
+    margin-right: 12px;
+  }
+`
 
 export const Cluster = styled.div`
   font-size: 17px;
@@ -108,7 +73,6 @@ export const ClusterValue = styled.div`
   overflow: hidden;
   margin-top: 1px;
 
-  // Update children pointer events
   ${(props) => {
     return props.pointerEvents
       ? css`
@@ -123,10 +87,9 @@ export const ClusterValue = styled.div`
         `
   }}
 
-  // Update styles for when onClick
   ${(props) => {
     return (
-      props.onClick &&
+      (props.onClick || props.pointerEvents) &&
       css`
         cursor: pointer;
         margin-bottom: 0px;
@@ -151,7 +114,6 @@ export const ClusterValue = styled.div`
     )
   }}
 
-  // Update styles for when transparent
   ${(props) => {
     return (
       props.transparent &&
@@ -337,84 +299,3 @@ export const ClusterFira = styled.div`
   font-size: 13px;
   font-family: 'FiraCode';
 `
-
-// Old
-
-export const ClusterValueOld = ({
-  children,
-  style = {},
-  onClick,
-  grow = 1,
-  pointerEvents = false,
-  transparent = false
-}) => {
-  let valueClass = 'clusterValue'
-  if (onClick) valueClass += ' clusterValueClickable'
-  if (pointerEvents) valueClass += ' clusterValueInteractable'
-  if (transparent) valueClass += ' clusterValueTransparent'
-  style.flexGrow = grow
-  return (
-    <div className={valueClass} style={style} onClick={onClick}>
-      {children}
-    </div>
-  )
-}
-
-export const ClusterRowOld = ({ children, style = {} }) => {
-  return (
-    <div className='clusterRow' style={style}>
-      {children}
-    </div>
-  )
-}
-
-export const ClusterColumnOld = ({ children, style = {}, grow = 1, width }) => {
-  style.flexGrow = grow
-  if (width) {
-    style.width = width
-    style.minWidth = width
-    style.maxWidth = width
-  }
-  return (
-    <div className='clusterColumn' style={style}>
-      {children}
-    </div>
-  )
-}
-
-export const ClusterOld = ({ children, style = {} }) => {
-  return (
-    <div className='cluster' style={style}>
-      {children}
-    </div>
-  )
-}
-
-export const ClusterBoxOld = ({ title, subtitle, children, style = {}, animationSlot = 0 }) => {
-  style.animationDelay = 0.1 * animationSlot + 's'
-  return (
-    <div className='_txMain' style={style}>
-      <div className='_txMainInner'>
-        {title ? (
-          <div className='_txLabel'>
-            <div>{title}</div>
-            {subtitle && (
-              <span
-                style={{
-                  opacity: 0.9,
-                  fontSize: '9px',
-                  position: 'relative',
-                  top: '0px',
-                  left: '4px'
-                }}
-              >
-                {`(${subtitle})`}
-              </span>
-            )}
-          </div>
-        ) : null}
-        {children}
-      </div>
-    </div>
-  )
-}

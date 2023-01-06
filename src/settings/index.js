@@ -5,7 +5,7 @@ import Restore from 'react-restore'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
-import { Cluster, ClusterValue, ClusterColumn, ClusterRow, ClusterBoxMain } from './Cluster'
+import { Cluster, ClusterValue, ClusterRow, ClusterBoxMain } from './Cluster'
 
 const initialState = {
   frameConnected: false,
@@ -109,26 +109,6 @@ const SettingsScroll = styled.div`
   margin-right: -${(props) => props.scrollBar || 0}px;
 `
 
-// const SettingsWrap = styled.div`
-//   text-align: center;
-//   background: var(--ghostZ);
-//   border-radius: 16px;
-//   margin: 10px 8px 10px 8px;
-//   box-shadow: 0px 4px 8px var(--ghostX);
-//   box-sizing: border-box;
-//   padding-bottom: 8px;
-
-//   img {
-//     margin: 16px 0px 0px 0px;
-//     height: 32px;
-//     width: 32px;
-//   }
-
-//   * {
-//     user-select: none;
-//   }
-// `
-
 const AugmentValue = styled.div`
   position: absolute;
   top: 0;
@@ -144,40 +124,17 @@ const AugmentValue = styled.div`
   font-weight: 600;
 `
 
-const AugmentState = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 75px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  background: var(--ghostA);
-`
-
-const AugmentStateOn = styled(AugmentState)`
+const AugmentStateOn = styled.div`
   color: var(--good);
 `
 
-const AugmentStateOff = styled(AugmentState)`
+const AugmentStateOff = styled.div`
   color: var(--bad);
-`
-
-const AugmentWrap = styled.div`
-  background: var(--ghostY);
-  padding: 8px;
-  margin: 0px 8px 0px 8px;
-  width: calc(100% - 32px);
-  border-radius: 8px;
-  position: relative;
 `
 
 const Augment = styled.div`
   position: relative;
-  background: var(--ghostZ);
-  height: 42px;
+  height: 50px;
   border-radius: 4px;
   font-weight: 600;
   display: flex;
@@ -187,21 +144,9 @@ const Augment = styled.div`
   cursor: pointer;
   font-size: 12px;
   overflow: hidden;
-
-  &:hover {
-    background: var(--ghostA);
-    ${AugmentState} {
-      background: var(--ghostB);
-    }
-  }
-
-  * {
-    pointer-events: none;
-  }
 `
 
 const FrameConnected = styled.div`
-  padding: 0px 16px 0px 0px;
   font-size: 13px;
   text-transform: uppercase;
   font-weight: 600;
@@ -209,17 +154,15 @@ const FrameConnected = styled.div`
   padding-left: 1px;
 `
 
-const FrameCheck = styled.div`
-  height: 100%;
-  width: 75px;
+const LogoWrap = styled.div`
+  width: 80px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  color: var(--good);
-  padding: 0px 10px;
 
-  svg {
+  img {
     height: 20px;
   }
 `
@@ -238,36 +181,16 @@ const SummonFrameButton = styled.div`
   }
 `
 
-// const SummonFrameWrap = styled.div`
-//   margin: 16px;
-//   padding: 8px;
-//   background: var(--ghostY);
-//   border-radius: 8px;
-// `
-
-// const SummonFrame = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   border-radius: 4px;
-//   height: 42px;
-//   background: var(--ghostZ);
-//   flex-shrink: 1;
-//   overflow: hidden;
-//   cursor: pointer;
-
-//   * {
-//     pointer-events: none;
-//   }
-
-//   &:hover {
-//     background: var(--ghostA);
-//     ${SummonFrameButton} {
-//       background: var(--ghostB);
-//       color: var(--good);
-//     }
-//   }
-// `
+const FrameButton = styled.div`
+  width: 140px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-weight: 400;
+`
 
 const TabOrigin = styled.div`
   color: var(--moon);
@@ -291,14 +214,6 @@ const TabOrigin = styled.div`
   }
 `
 
-// const Appear = styled.div`
-//   background: var(--ghostZ);
-//   border-radius: 8px;
-//   width: 100%;
-//   background: var(--ghostY);
-//   margin: 0px 8px 0px 8px;
-// `
-
 const AppearDescription = styled.div`
   font-weight: 600;
   text-transform: uppercase;
@@ -310,7 +225,7 @@ const AppearDescription = styled.div`
   align-items: center;
   padding-left: 1px;
   letter-spacing: 1px;
-  height: 64px;
+  height: 50px;
 
   svg {
     height: 16px;
@@ -321,7 +236,6 @@ const AppearDescription = styled.div`
 const AppearToggle = styled.div`
   position: relative;
   height: 32px;
-  border-radius: 4px;
   font-weight: 600;
   display: flex;
   justify-content: center;
@@ -329,103 +243,69 @@ const AppearToggle = styled.div`
   text-transform: uppercase;
   cursor: pointer;
   font-size: 12px;
-  margin: 8px;
   overflow: hidden;
   padding-left: 1px;
   letter-spacing: 1px;
 `
 
 const NotConnected = styled.div`
-  padding: 32px 32px 16px 32px;
+  padding: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 18px;
 `
 
+const NotConnectedSub = styled.div`
+  padding: 0px 32px 0px 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+`
+
 const Download = styled.a`
-  background: var(--good);
-  color: var(--goodOver);
-  height: 50px;
-  border-radius: 12px;
+  color: var(--good);
+  height: 64px;
+  width: 100%;
   font-weight: 700;
   display: flex;
   justify-content: center;
   align-items: center;
   text-transform: uppercase;
-  margin: 16px;
   cursor: pointer;
   font-size: 17px;
   letter-spacing: 1px;
   padding-right: 1px;
-  border: 8px solid var(--ghostY);
-
-  &:hover {
-    background: var(--goodUp);
-    color: var(--goodOver);
-  }
 
   * {
     pointer-events: none;
   }
 
   &:visited {
-    color: var(--goodOver);
-  }
-`
-
-const DappControls = styled.div`
-  margin: 8px;
-  border-radius: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  width: cale(100% - 16px);
-`
-
-const ChainSwitcher = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  background: var(--ghostY);
-  margin: 0px 8px 8px 8px;
-  border-radius: 8px;
-  padding: 0px 0px 8px 8px;
-`
-
-const StyledChainButton = styled.div`
-  position: relative;
-  width: calc(50% - 8px);
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  height: 42px;
-  border-radius: 4px;
-  padding: 0px 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  box-sizing: border-box;
-  background: var(--ghostZ);
-  background: ${(props) => (props.isSelected ? 'var(--ghostA)' : 'var(--ghostZ)')};
-  color: ${(props) => (props.isSelected ? 'var(--good)' : 'white')};
-  margin: 8px 8px 0px 0px;
-
-  &:hover {
-    background: var(--ghostA);
     color: var(--good);
   }
+`
 
-  * {
-    pointer-events: none;
-  }
-
-  &:visited {
-    color: var(--goodOver);
+const CurrentOriginTitle = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  height: 34px;
+  padding-top: 8px;
+  margin-top: 0px;
+  font-weight: 400;
+  svg {
+    position: relative;
+    top: 1px;
+    margin-right: 10px;
+    height: 15px;
   }
 `
 
 const ChainButtonIcon = styled.div`
-  // flex-shrink: 0;
   position: absolute;
   top: 12px;
   left: 10px;
@@ -446,17 +326,6 @@ const ChainButtonLabel = styled.div`
   padding-left: 4px;
   font-weight: 500;
   height: 44px;
-`
-
-const SectionHeader = styled.div`
-  width: 100%;
-  font-size: 10px;
-  margin: 16px 16px 6px 16px;
-  color: var(--outerspace);
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-align: left;
-  text-transform: uppercase;
 `
 
 const Overlay = styled.div`
@@ -487,35 +356,45 @@ const isFirefox = Boolean(window?.browser && browser?.runtime)
 class _Settings extends React.Component {
   notConnected() {
     return (
-      <>
-        <NotConnected>Frame is not currently connected</NotConnected>
-        <div>{'Is Frame running on your machine?'}</div>
-        <Download href='https://frame.sh' target='_newtab'>
-          Download Frame
-        </Download>
-      </>
+      <Cluster>
+        <ClusterRow>
+          <ClusterValue>
+            <div style={{ paddingBottom: '32px' }}>
+              <NotConnected>Unable to connect to Frame</NotConnected>
+              <NotConnectedSub>Make sure the Frame desktop app is running</NotConnectedSub>
+              <NotConnectedSub>on your machine or download it below</NotConnectedSub>
+            </div>
+          </ClusterValue>
+        </ClusterRow>
+        <ClusterRow>
+          <ClusterValue pointerEvents={true}>
+            <Download href='https://frame.sh' target='_newtab'>
+              Download Frame
+            </Download>
+          </ClusterValue>
+        </ClusterRow>
+      </Cluster>
     )
   }
 
   frameConnected() {
+    const isConnected = this.store('frameConnected')
     return (
       <Cluster>
         <ClusterRow>
+          <ClusterValue style={{ flexGrow: 0 }}>
+            <LogoWrap>
+              <img src={isConnected ? '../icons/icon96good.png' : '../icons/icon96moon.png'} />
+            </LogoWrap>
+          </ClusterValue>
           <ClusterValue>
-            <FrameCheck>
-              <svg viewBox='0 0 448 512'>
-                <path
-                  fill='currentColor'
-                  d='M438.6 105.4C451.1 117.9 451.1 138.1 438.6 150.6L182.6 406.6C170.1 419.1 149.9 419.1 137.4 406.6L9.372 278.6C-3.124 266.1-3.124 245.9 9.372 233.4C21.87 220.9 42.13 220.9 54.63 233.4L159.1 338.7L393.4 105.4C405.9 92.88 426.1 92.88 438.6 105.4H438.6z'
-                />
-              </svg>
-            </FrameCheck>
-            <FrameConnected>Frame Connected</FrameConnected>
+            <FrameConnected>{isConnected ? 'Frame Connected' : 'Frame Disconnected'}</FrameConnected>
           </ClusterValue>
           <ClusterValue
-            onClick={() => {
-              chrome.runtime.sendMessage({ method: 'frame_summon', params: [] })
-            }}
+            style={{ flexGrow: 0, color: isConnected ? 'var(--good)' : 'var(--moon)' }}
+            onClick={
+              isConnected ? () => chrome.runtime.sendMessage({ method: 'frame_summon', params: [] }) : null
+            }
           >
             <SummonFrameButton>
               <svg viewBox='0 0 512 512'>
@@ -600,9 +479,13 @@ class _Settings extends React.Component {
 
     return rows.map((row) => (
       <ClusterRow style={{ justifyContent: 'flex-start' }}>
-        {row.map(({ chainId, name }) => (
+        {row.map(({ chainId, name }, i) => (
           <ClusterValue
-            style={{ flexGrow: 0, width: 'calc(50% - 3px)' }}
+            style={{
+              flexGrow: 0,
+              width: 'calc(50% - 3px)',
+              borderBottomRightRadius: i === 0 ? '8px' : 'auto'
+            }}
             onClick={() => {
               chrome.runtime.sendMessage({
                 tab: this.props.tab,
@@ -640,72 +523,76 @@ class _Settings extends React.Component {
     }
   }
 
-  render() {
+  renderMainPanel() {
     const isConnected = this.store('frameConnected')
     const origin = parseOrigin(getOrigin(this.props.tab.url))
 
-    const currentChain = this.currentChain()
-
-    const mainPanel = isConnected ? (
+    return isConnected ? (
       <>
-        {this.frameConnected()}
-
-        <Cluster style={{ marginTop: '20px' }}>
-          <ClusterRow>
-            <ClusterValue>
-              <TabOrigin>
-                <svg viewBox='0 0 512 512'>
-                  <path
-                    fill='var(--moon)'
-                    d='M448 32C483.3 32 512 60.65 512 96V416C512 451.3 483.3 480 448 480H64C28.65 480 0 451.3 0 416V96C0 60.65 28.65 32 64 32H448zM96 96C78.33 96 64 110.3 64 128C64 145.7 78.33 160 96 160H416C433.7 160 448 145.7 448 128C448 110.3 433.7 96 416 96H96z'
-                  />
-                </svg>
-                {origin}
-              </TabOrigin>
-            </ClusterValue>
-          </ClusterRow>
-          {this.store('availableChains').length ? (
-            <>
-              <SectionHeader>{'CHAIN'}</SectionHeader>
-              {this.chainSelect()}
-            </>
-          ) : null}
-          <SectionHeader>{'INJECTION'}</SectionHeader>
-          {this.appearAsMMToggle()}
-        </Cluster>
-
-        {origin === 'twitter.com' && !isFirefox ? (
-          <div style={{ marginTop: '8px', width: '100%' }}>
-            <SectionHeader>{'VERIFY ENS: ' + (this.props.augmentOff ? 'OFF' : 'ON')}</SectionHeader>
-            {this.props.augmentOff ? (
-              <AugmentWrap>
-                <Augment onClick={() => augmentOffToggle()}>
-                  <AugmentValue>Verify ENS Names</AugmentValue>
-                  <AugmentStateOff>OFF</AugmentStateOff>
-                </Augment>
-              </AugmentWrap>
-            ) : (
-              <AugmentWrap>
-                <Augment onClick={() => augmentOffToggle()}>
-                  <AugmentValue>Verify ENS Names</AugmentValue>
-                  <AugmentStateOn>ON</AugmentStateOn>
-                </Augment>
-              </AugmentWrap>
-            )}
-          </div>
-        ) : null}
+        <ClusterBoxMain>
+          <CurrentOriginTitle>
+            <svg viewBox='0 0 512 512'>
+              <path
+                fill='currentColor'
+                d='M448 32C483.3 32 512 60.65 512 96V416C512 451.3 483.3 480 448 480H64C28.65 480 0 451.3 0 416V96C0 60.65 28.65 32 64 32H448zM96 96C78.33 96 64 110.3 64 128C64 145.7 78.33 160 96 160H416C433.7 160 448 145.7 448 128C448 110.3 433.7 96 416 96H96z'
+              />
+            </svg>
+            {origin}
+          </CurrentOriginTitle>
+          <Cluster>
+            {this.store('availableChains').length ? (
+              <>
+                {this.chainSelect()}
+                <div style={{ height: '9px' }} />
+              </>
+            ) : null}
+            {this.appearAsMMToggle()}
+            {origin === 'twitter.com' ? (
+              <>
+                <div style={{ height: '9px' }} />
+                <ClusterRow>
+                  {this.props.augmentOff ? (
+                    <>
+                      <ClusterValue>
+                        <Augment>Verify ENS Names</Augment>
+                      </ClusterValue>
+                      <ClusterValue onClick={() => augmentOffToggle()} style={{ flexGrow: '0' }}>
+                        <FrameButton>
+                          <AugmentStateOff>OFF</AugmentStateOff>
+                        </FrameButton>
+                      </ClusterValue>
+                    </>
+                  ) : (
+                    <>
+                      <ClusterValue>
+                        <Augment>Verify ENS Names</Augment>
+                      </ClusterValue>
+                      <ClusterValue onClick={() => augmentOffToggle()} style={{ flexGrow: '0' }}>
+                        <FrameButton>
+                          <AugmentStateOn>ON</AugmentStateOn>
+                        </FrameButton>
+                      </ClusterValue>
+                    </>
+                  )}
+                </ClusterRow>
+              </>
+            ) : null}
+          </Cluster>
+        </ClusterBoxMain>
       </>
     ) : (
-      this.notConnected()
+      <ClusterBoxMain>{this.notConnected()}</ClusterBoxMain>
     )
+  }
+
+  render() {
+    const origin = parseOrigin(getOrigin(this.props.tab.url))
     return (
       <>
         <Overlay />
         <SettingsScroll scrollBar={getScrollBarWidth()}>
-          <ClusterBoxMain>
-            <img src='FrameLogo.png' />
-            {mainPanel}
-          </ClusterBoxMain>
+          <ClusterBoxMain>{this.frameConnected()}</ClusterBoxMain>
+          {this.renderMainPanel()}
         </SettingsScroll>
       </>
     )
