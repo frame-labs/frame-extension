@@ -500,7 +500,7 @@ class _Settings extends React.Component {
 
     return isConnected ? (
       <>
-        <ClusterBoxMain>
+        <ClusterBoxMain style={{ marginTop: '12px' }}>
           <CurrentOriginTitle>
             <svg viewBox='0 0 512 512'>
               <path
@@ -552,7 +552,7 @@ class _Settings extends React.Component {
         </ClusterBoxMain>
       </>
     ) : (
-      <ClusterBoxMain>{this.notConnected()}</ClusterBoxMain>
+      <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
     )
   }
 
