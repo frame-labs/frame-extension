@@ -11,7 +11,7 @@
     "test": "standard",
     "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js",
     "bundle": "webpack --config webpack.config.js",
-    "watch": "webpack --config webpack.dev.config.js",
+    "watch": "npm run build && webpack --config webpack.dev.config.js",
     "serve": "webpack serve --config webpack.dev.layer.config.js"
   },
   "author": "Frame Labs, Inc.",

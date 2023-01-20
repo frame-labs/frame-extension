@@ -105,9 +105,11 @@ const SettingsScroll = styled.div`
   overflow-x: hidden;
   overflow-y: scroll;
   box-sizing: border-box;
-  max-height: 600px;
+  max-height: 580px;
   margin-right: -${(props) => props.scrollBar || 0}px;
-  padding: 10px;
+  background: var(--ghostY);
+  margin: 10px;
+  border-radius: 30px;
 `
 
 const AugmentStateOn = styled.div`
@@ -133,7 +135,7 @@ const Augment = styled.div`
 `
 
 const FrameConnected = styled.div`
-  font-size: 13px;
+  font-size: 14px;
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 1px;
@@ -257,7 +259,7 @@ const CurrentOriginTitle = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 15px;
-  height: 34px;
+  height: 44px;
   padding-top: 8px;
   margin-top: 0px;
   font-weight: 400;
@@ -346,24 +348,25 @@ class _Settings extends React.Component {
     return (
       <Cluster>
         <ClusterRow>
-          <ClusterValue style={{ flexGrow: 0 }}>
+          <ClusterValue
+            onClick={() => {
+              if (isConnected) chrome.runtime.sendMessage({ method: 'frame_summon', params: [] })
+            }}
+            style={{
+              flexGrow: 1,
+              color: isConnected ? 'var(--good)' : 'var(--moon)',
+              justifyContent: 'space-between',
+              height: '64px'
+            }}
+          >
             <LogoWrap>
               <img src={isConnected ? '../icons/icon96good.png' : '../icons/icon96moon.png'} />
             </LogoWrap>
-          </ClusterValue>
-          <ClusterValue>
             {isConnected ? (
               <FrameConnected style={{ color: 'var(--good)' }}>{'Frame Connected'}</FrameConnected>
             ) : (
               <FrameConnected style={{ color: 'var(--moon)' }}>{'Frame Disconnected'}</FrameConnected>
             )}
-          </ClusterValue>
-          <ClusterValue
-            style={{ flexGrow: 0, color: isConnected ? 'var(--good)' : 'var(--moon)' }}
-            onClick={
-              isConnected ? () => chrome.runtime.sendMessage({ method: 'frame_summon', params: [] }) : null
-            }
-          >
             <SummonFrameButton>
               <svg viewBox='0 0 512 512'>
                 <path
@@ -497,7 +500,7 @@ class _Settings extends React.Component {
 
     return isConnected ? (
       <>
-        <ClusterBoxMain>
+        <ClusterBoxMain style={{ marginTop: '12px' }}>
           <CurrentOriginTitle>
             <svg viewBox='0 0 512 512'>
               <path
@@ -549,7 +552,7 @@ class _Settings extends React.Component {
         </ClusterBoxMain>
       </>
     ) : (
-      <ClusterBoxMain>{this.notConnected()}</ClusterBoxMain>
+      <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
     )
   }
 

@@ -10,7 +10,7 @@ export const ClusterBoxMain = styled.div`
   border-bottom: 2px solid var(--ghostZ);
   padding: 0;
   text-align: center;
-  margin: 12px 8px 12px 8px;
+  margin: 6px;
   box-sizing: border-box;
   background: var(--ghostAZ);
 
