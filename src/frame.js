@@ -101,7 +101,9 @@ if (mmAppear) {
     provider = new MetaMaskProvider(new Connection())
     provider.isMetaMask = true
     provider._metamask = {
-      isUnlocked: () => true
+      isUnlocked: () => new Promise((resolve) => {
+        resolve(true)
+      })
     }
     provider.setMaxListeners(0)
   } catch (e) {
