@@ -47,6 +47,7 @@ provider.on('connect', () => {
 
 provider.on('disconnect', () => {
   frameState.connected = false
+  if (settingsPanel) settingsPanel.postMessage(frameState)
 
   // change icon
   chrome.browserAction.setIcon({ path: 'icons/icon96moon.png' })
