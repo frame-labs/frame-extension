@@ -122,7 +122,8 @@ if (mmAppear) {
 Object.defineProperty(window, 'ethereum', {
   value: provider,
   writable: true,
-  configurable: false
+  configurable: true,
+  enumerable: true
 })
 
 shimWeb3(window.ethereum, mmAppear)
@@ -136,7 +137,8 @@ document.addEventListener('readystatechange', (e) => {
     Object.defineProperty(window, 'ethereum', {
       value: provider,
       writable: true,
-      configurable: false
+      configurable: true,
+      enumerable: true
     })
   }
 })
