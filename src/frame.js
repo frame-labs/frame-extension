@@ -1,6 +1,22 @@
 import EventEmitter from 'events'
 import EthereumProvider from 'ethereum-provider'
 
+function setProvider() {
+  const existingProvider = Object.getOwnPropertyDescriptor(window, 'ethereum')
+
+  if (existingProvider?.configurable) {
+    Object.defineProperty(window, 'ethereum', {
+      value: provider,
+      writable: true,
+      configurable: true,
+      enumerable: true
+    })
+  } else {
+    window.ethereum = provider
+  }
+}
+
+
 function shimWeb3(provider, appearAsMetaMask) {
   let loggedCurrentProvider = false
 
@@ -119,12 +135,7 @@ if (mmAppear) {
   }
 }
 
-Object.defineProperty(window, 'ethereum', {
-  value: provider,
-  writable: true,
-  configurable: true,
-  enumerable: true
-})
+setProvider()
 
 shimWeb3(window.ethereum, mmAppear)
 
@@ -134,12 +145,7 @@ const embedded = {
 
 document.addEventListener('readystatechange', (e) => {
   if (document.readyState === 'interactive') {
-    Object.defineProperty(window, 'ethereum', {
-      value: provider,
-      writable: true,
-      configurable: true,
-      enumerable: true
-    })
+    setProvider()
   }
 })
 
