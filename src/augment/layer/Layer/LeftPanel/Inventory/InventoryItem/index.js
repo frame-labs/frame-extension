@@ -3,20 +3,16 @@ import Restore from 'react-restore'
 
 import { Video, Image } from '../../../media'
 
-import {
-  PopCollection,
-  ItemSelected,
-  TextImg
-} from './styled'
+import { PopCollection, ItemSelected, TextImg } from './styled'
 
 class InventoryItem extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {
       hovered: false
     }
   }
-  render () {
+  render() {
     const { userId } = this.store('layerPop')
     const user = this.store('users', userId)
 
@@ -26,45 +22,47 @@ class InventoryItem extends React.Component {
       const select = this.store('select')
 
       return (
-        <PopCollection 
+        <PopCollection
           onClick={() => {
             if (select?.asset === this.props.asset) {
-              this.store.setSelect({ 
-                type: 'collection', 
-                collection: this.props.collection 
+              this.store.setSelect({
+                type: 'collection',
+                collection: this.props.collection
               })
             } else {
-              this.store.setSelect({ 
-                type: 'asset', 
+              this.store.setSelect({
+                type: 'asset',
                 asset: this.props.asset,
-                collection: this.props.collection 
+                collection: this.props.collection
               })
             }
           }}
-          onMouseMove = {() => {
-            this.store.setHover({ 
-              type: 'asset', 
-              asset:this.props.asset,
-              collection: this.props.collection 
+          onMouseMove={() => {
+            this.store.setHover({
+              type: 'asset',
+              asset: this.props.asset,
+              collection: this.props.collection
             })
           }}
           onMouseEnter={() => {
-            this.store.setHover({ 
-              type: 'asset', 
-              asset:this.props.asset,
-              collection: this.props.collection 
+            this.store.setHover({
+              type: 'asset',
+              asset: this.props.asset,
+              collection: this.props.collection
             })
           }}
           onMouseLeave={() => {
             this.store.setHover(false)
           }}
         >
-          {select?.asset === this.props.asset ? <ItemSelected /> : null }
+          {select?.asset === this.props.asset ? <ItemSelected /> : null}
           {img?.src && img.type === 'video' ? (
             <Video src={img.src} soundOff={true} />
           ) : img?.src && img.type === 'img' ? (
             <Image src={img.src} />
-          ) : <TextImg>{asset.name}</TextImg>}
+          ) : (
+            <TextImg>{asset.name}</TextImg>
+          )}
         </PopCollection>
       )
     } else if (this.props.collection) {
@@ -72,31 +70,33 @@ class InventoryItem extends React.Component {
       const img = collection.meta.img
       const select = this.store('select')
       return (
-        <PopCollection 
+        <PopCollection
           onClick={() => {
-            this.store.setSelect({ 
-              type: 'collection', 
-              collection: this.props.collection 
+            this.store.setSelect({
+              type: 'collection',
+              collection: this.props.collection
             })
           }}
           onMouseEnter={() => {
-            this.store.setHover({ 
-              type: 'collection', 
-              collection: this.props.collection 
+            this.store.setHover({
+              type: 'collection',
+              collection: this.props.collection
             })
           }}
           onMouseLeave={() => {
             this.store.setHover(false)
           }}
         >
-          {select?.collection === this.props.collection ? <ItemSelected /> : null }
+          {select?.collection === this.props.collection ? <ItemSelected /> : null}
           {img?.src && img.type === 'video' ? (
             <Video src={img.src} soundOff={true} />
           ) : img?.src && img.type === 'img' ? (
             <Image src={img.src} />
-          ) : <TextImg>{collection.meta.name}</TextImg>}
+          ) : (
+            <TextImg>{collection.meta.name}</TextImg>
+          )}
         </PopCollection>
-       )
+      )
     } else {
       return null
     }

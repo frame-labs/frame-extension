@@ -22,10 +22,10 @@ const initialState = {
 }
 
 // Grab persisted state from local storage
-window.localStorage.removeItem('__frameLayer__') 
+window.localStorage.removeItem('__frameLayer__')
 const persist = {} // JSON.parse(window.localStorage.getItem('__frameLayer__') || '{}')
 
-const store = Restore.create({...initialState, ...persist}, actions)
+const store = Restore.create({ ...initialState, ...persist }, actions)
 
 // store.observer(() => {
 //   window.localStorage.setItem('__frameLayer__', JSON.stringify(store()))
@@ -34,8 +34,8 @@ const store = Restore.create({...initialState, ...persist}, actions)
 window.__setMediaBlob__ = (blobURL, location, error) => {
   if (error) return store.setBlob(blobURL, location, error)
   fetch(blobURL)
-    .then(res => res.blob())
-    .then(blob => {
+    .then((res) => res.blob())
+    .then((blob) => {
       const localBlob = URL.createObjectURL(blob)
       store.setBlob(localBlob, location)
     })
@@ -79,6 +79,6 @@ getScrollBarWidth()
 // const position = { x: 100, y: 50}
 // const userId = liquidId
 
-// store.setLayerPop({ position, active: true, userId, created: Date.now() })  
+// store.setLayerPop({ position, active: true, userId, created: Date.now() })
 
 export default store

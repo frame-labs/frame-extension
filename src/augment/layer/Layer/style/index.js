@@ -195,7 +195,7 @@ export const shake = keyframes`
   0%, 100% {
     transform: translate(0, 0) rotate(0);
   }
-` 
+`
 
 export const rotate = keyframes`
   100% {

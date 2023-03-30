@@ -7,37 +7,31 @@ import store from '../../store'
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
 
-import {
-  PopWrap,
-  Pop,
-  Loading,
-  LoadingSpinner
-} from './styled'
-
+import { PopWrap, Pop, Loading, LoadingSpinner } from './styled'
 
 class Layer extends React.Component {
-  constructor (...args) {
+  constructor(...args) {
     super(...args)
     this.state = {}
   }
-  componentDidMount () {
+  componentDidMount() {
     document.addEventListener('scroll', () => {
       this.resetLayer()
     })
   }
-  resetLayer () {
+  resetLayer() {
     const { active, created } = this.store('layerPop')
     if (active && Date.now() - created > 500) {
-      this.store.setLayerPop({ position: { x: 0 , y: 0 }, active: false, user: {} })
+      this.store.setLayerPop({ position: { x: 0, y: 0 }, active: false, user: {} })
       this.store.setSelect(false)
       this.store.setHover(false)
     }
   }
-  block (e) {
+  block(e) {
     e.preventDefault()
     e.stopPropagation()
   }
-  render () {
+  render() {
     const { active, position, userId, created } = this.store('layerPop')
     const user = this.store('users', userId)
     const theme = this.store('theme')
@@ -47,13 +41,13 @@ class Layer extends React.Component {
           <ThemeProvider theme={theme}>
             <PopWrap onClick={(e) => this.resetLayer()}>
               <Pop
-                onClick={this.block} 
+                onClick={this.block}
                 style={{
-                  left: `${position.x - 65}px`, 
+                  left: `${position.x - 65}px`,
                   top: `${position.y - 5}px`,
                   pointerEvents: 'auto'
                 }}
-              > 
+              >
                 <LeftPanel />
                 <RightPanel />
               </Pop>
@@ -65,10 +59,10 @@ class Layer extends React.Component {
           <ThemeProvider theme={theme}>
             <PopWrap onClick={(e) => this.resetLayer()}>
               <Pop
-                onMouseDown={(e) => e.stopPropagation()} 
-                onMouseOver={(e) => e.stopPropagation()} 
+                onMouseDown={(e) => e.stopPropagation()}
+                onMouseOver={(e) => e.stopPropagation()}
                 style={{
-                  left: `${position.x - 65}px`, 
+                  left: `${position.x - 65}px`,
                   top: `${position.y - 5}px`,
                   pointerEvents: 'auto'
                 }}

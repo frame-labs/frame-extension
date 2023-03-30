@@ -1,4 +1,3 @@
-
 import styled from 'styled-components'
 import { cardShow, dash, rotate } from '../style'
 
@@ -23,10 +22,10 @@ export const Pop = styled.div`
   animation: ${cardShow} 400ms linear both;
   overscroll-behavior: contain;
   overflow: hidden;
-  color: ${props => props.theme.top0};
-  background: ${props => props.theme.base0};
+  color: ${(props) => props.theme.top0};
+  background: ${(props) => props.theme.base0};
   font-size: 15px;
-  box-shadow: 0px 5px 10px ${props => props.theme.baseShadow};
+  box-shadow: 0px 5px 10px ${(props) => props.theme.baseShadow};
   transform: translate3d(0, 0, 0) rotate(0.01deg);
 `
 
@@ -43,7 +42,7 @@ export const Loading = styled.div`
   font-size: 12px;
   letter-spacing: 2px;
   margin-left: 2px;
-  color: ${props => props.theme.top0};
+  color: ${(props) => props.theme.top0};
   display: flex;
   flex-direction: column;
 `
@@ -62,9 +61,9 @@ export const LoadingSpinner = styled.div`
     margin: -25px 0 0 -25px;
     width: 50px;
     height: 50px;
-    
+
     & circle {
-      stroke: ${props => props.theme.top0};
+      stroke: ${(props) => props.theme.top0};
       stroke-linecap: round;
       animation: ${dash} 1.5s ease-in-out infinite;
     }

@@ -87,4 +87,3 @@ export default (backgroundColor) => {
   if (themes[backgroundColor]) return themes[backgroundColor]
   return defaultTheme
 }
-

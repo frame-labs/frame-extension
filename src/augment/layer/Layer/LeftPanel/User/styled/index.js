@@ -12,7 +12,7 @@ export const PopAvatarImg = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${props => props.theme.base0};
+  color: ${(props) => props.theme.base0};
 
   img {
     width: 30px;
@@ -58,18 +58,18 @@ export const PopName = styled.div`
   z-index: 20000;
   font-weight: 400;
   border-radius: 6px;
-  background: ${props => props.theme.base1};
+  background: ${(props) => props.theme.base1};
   cursor: pointer;
 
   &:hover {
     animation: 5s ${float} ease-in-out infinite alternate;
-    background: ${props => props.theme.base2};
+    background: ${(props) => props.theme.base2};
     z-index: 2000;
   }
 
   &:active {
     animation: ${shake} 2s ease-in-out infinite;
-    background: ${props => props.theme.base2};
+    background: ${(props) => props.theme.base2};
     z-index: 2000;
   }
 `
@@ -98,6 +98,6 @@ export const NameSelect = styled.div`
   bottom: -3px;
   left: -3px;
   border-radius: 9px;
-  border: 2px solid ${props => props.theme.top0};
+  border: 2px solid ${(props) => props.theme.top0};
   z-index: 20000;
 `

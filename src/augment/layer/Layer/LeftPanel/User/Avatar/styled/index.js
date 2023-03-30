@@ -9,7 +9,7 @@ export const PopAvatarImg = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 6px;
-  background: ${props => props.theme.base2};
+  background: ${(props) => props.theme.base2};
 
   img {
     width: 100%;
@@ -25,30 +25,30 @@ export const PopAvatar = styled.div`
   height: 48px;
   position: relative;
   border-radius: 6px;
-  background: ${props => props.theme.base1};
+  background: ${(props) => props.theme.base1};
   cursor: pointer;
   user-select: none;
 
   &:hover {
-    // background: ${props => props.theme.base2};
+    // background: ${(props) => props.theme.base2};
     animation: 5s ${float} ease-in-out infinite alternate;
-    box-shadow: 0px 3px 5px 2px ${props => props.theme.base0};
-    background: ${props => props.theme.base2};
+    box-shadow: 0px 3px 5px 2px ${(props) => props.theme.base0};
+    background: ${(props) => props.theme.base2};
     z-index: 2000;
 
     ${PopAvatarImg} {
-      background: ${props => props.theme.base3};
+      background: ${(props) => props.theme.base3};
     }
   }
 
   &:active {
     animation: ${shake} 2s ease-in-out infinite;
-    box-shadow: 0px 2px 3px 2px ${props => props.theme.base0};
-    background: ${props => props.theme.base2};
+    box-shadow: 0px 2px 3px 2px ${(props) => props.theme.base0};
+    background: ${(props) => props.theme.base2};
     z-index: 2000;
 
     ${PopAvatarImg} {
-      background: ${props => props.theme.base3};
+      background: ${(props) => props.theme.base3};
     }
   }
 `
@@ -67,8 +67,7 @@ export const PopAvatarMeta = styled.div`
   font-size: 12px;
   font-weight: 600;
 `
-export const PopAvatarMetaName = styled.div`
-`
+export const PopAvatarMetaName = styled.div``
 export const PopAvatarMetaCollection = styled.div`
   font-size: 9px;
   font-weight: 400;
@@ -94,8 +93,8 @@ export const PopNameVerifed = styled.div`
   right: 11px;
   overflow: hidden;
   pointer-events: auto;
-  transition: 200ms cubic-bezier(.82,0,.12,1) all;
-  background: ${props => props.theme.base0};
+  transition: 200ms cubic-bezier(0.82, 0, 0.12, 1) all;
+  background: ${(props) => props.theme.base0};
 `
 
 export const PopNameVerifedIcon = styled.div`

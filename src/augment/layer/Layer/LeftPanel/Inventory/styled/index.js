@@ -50,8 +50,8 @@ export const InventoryHeaderBack = styled.div`
   width: 26px;
   height: 14px;
   border-radius: 7px;
-  background: ${props => props.theme.good};
-  color: ${props => props.theme.goodOver};
+  background: ${(props) => props.theme.good};
+  color: ${(props) => props.theme.goodOver};
   cursor: pointer;
 
   svg {
@@ -62,12 +62,12 @@ export const InventoryHeaderBack = styled.div`
 
   &:hover {
     animation: 5s ${float} ease-in-out infinite alternate;
-    box-shadow: 0px 3px 5px 0px ${props => props.theme.baseShadow};
+    box-shadow: 0px 3px 5px 0px ${(props) => props.theme.baseShadow};
   }
 
   &:active {
     animation: ${shake} 2s ease-in-out infinite;
-    box-shadow: 0px 1px 2px 0px ${props => props.theme.baseShadow};
+    box-shadow: 0px 1px 2px 0px ${(props) => props.theme.baseShadow};
   }
 `
 
@@ -82,7 +82,7 @@ export const ItemWrap = styled.div`
   bottom: 0px;
   right: 0px;
   border-radius: 6px;
-  background: ${props => props.theme.base1};
+  background: ${(props) => props.theme.base1};
 `
 export const ItemScroll = styled.div`
   position: absolute;

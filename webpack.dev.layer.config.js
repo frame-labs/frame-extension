@@ -1,6 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 module.exports = [
   {
@@ -11,9 +11,9 @@ module.exports = [
         {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
-          use: ['babel-loader'],
-        },
-      ],
+          use: ['babel-loader']
+        }
+      ]
     },
     resolve: {
       extensions: ['*', '.js', '.jsx']
@@ -25,9 +25,6 @@ module.exports = [
       hot: true,
       open: true
     },
-    plugins: [
-      new HtmlWebpackPlugin(),
-      new NodePolyfillPlugin()
-    ]
+    plugins: [new HtmlWebpackPlugin(), new NodePolyfillPlugin()]
   }
 ]

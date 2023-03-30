@@ -16,7 +16,6 @@ function setProvider() {
   }
 }
 
-
 function shimWeb3(provider, appearAsMetaMask) {
   let loggedCurrentProvider = false
 
@@ -28,30 +27,36 @@ function shimWeb3(provider, appearAsMetaMask) {
       value: true,
       enumerable: true,
       configurable: false,
-      writable: false,
+      writable: false
     })
 
     const web3Shim = new Proxy(shim, {
       get: (target, property, ...args) => {
         if (property === 'currentProvider' && !loggedCurrentProvider) {
           loggedCurrentProvider = true
-          console.warn('You are accessing the Frame window.web3.currentProvider shim. This property is deprecated; use window.ethereum instead.')
+          console.warn(
+            'You are accessing the Frame window.web3.currentProvider shim. This property is deprecated; use window.ethereum instead.'
+          )
         } else if (property !== 'currentProvider' && property !== SHIM_IDENTIFIER) {
-          console.error(`You are requesting the "${property}" property of window.web3 which no longer supported; use window.ethereum instead.`)
+          console.error(
+            `You are requesting the "${property}" property of window.web3 which no longer supported; use window.ethereum instead.`
+          )
         }
         return Reflect.get(target, property, ...args)
       },
       set: (...args) => {
-        console.warn('You are accessing the Frame window.web3 shim. This object is deprecated; use window.ethereum instead.');
+        console.warn(
+          'You are accessing the Frame window.web3 shim. This object is deprecated; use window.ethereum instead.'
+        )
         return Reflect.set(...args)
-      },
-    });
+      }
+    })
 
     Object.defineProperty(window, 'web3', {
       value: web3Shim,
       enumerable: false,
       configurable: true,
-      writable: true,
+      writable: true
     })
   }
 }
@@ -60,10 +65,10 @@ class ExtensionProvider extends EthereumProvider {
   // override the send method in order to add a flag that identifies messages
   // as "connection messages", meaning Frame won't track an origin that sends
   // these requests
-  doSend (method, params, targetChain, waitForConnection) {
+  doSend(method, params, targetChain, waitForConnection) {
     if (!waitForConnection && (method === 'eth_chainId' || method === 'net_version')) {
       const payload = { jsonrpc: '2.0', id: this.nextId++, method, params, __extensionConnecting: true }
-      
+
       return new Promise((resolve, reject) => {
         this.promises[payload.id] = { resolve, reject, method }
         this.connection.send(payload)
@@ -75,10 +80,10 @@ class ExtensionProvider extends EthereumProvider {
 }
 
 class Connection extends EventEmitter {
-  constructor () {
+  constructor() {
     super()
 
-    window.addEventListener('message', event => {
+    window.addEventListener('message', (event) => {
       if (event && event.source === window && event.data) {
         const { type } = event.data
 
@@ -95,16 +100,19 @@ class Connection extends EventEmitter {
     setTimeout(() => this.emit('connect'), 0)
   }
 
-  send (payload) {
+  send(payload) {
     window.postMessage({ type: 'eth:send', payload }, window.location.origin)
   }
 }
 
 let mmAppear = window.localStorage.getItem('__frameAppearAsMM__')
 
+console.log('u wot m8', mmAppear)
+
 try {
   mmAppear = JSON.parse(mmAppear)
 } catch (e) {
+  console.log('wut', e)
   mmAppear = false
 }
 
@@ -149,7 +157,7 @@ document.addEventListener('readystatechange', (e) => {
   }
 })
 
-window.addEventListener('message', async event => {
+window.addEventListener('message', async (event) => {
   if (event && event.source === window && event.data && event.data.type === 'embedded:action') {
     if (event.data.action) {
       const action = event.data.action

@@ -15,7 +15,7 @@ export const PopRight = styled.div`
   justify-content: center;
   align-items: center;
   overscroll-behavior: contain;
-  color: ${props => props.theme.top0};
+  color: ${(props) => props.theme.top0};
 `
 
 export const AssetSummaryWrap = styled.div`
@@ -33,7 +33,7 @@ export const AssetSummaryWrap = styled.div`
 export const PopRightLogo = styled(PopRight)`
   svg {
     height: 80px;
-    fill: ${props => props.theme.base1};
+    fill: ${(props) => props.theme.base1};
     opacity: 1;
   }
 `
@@ -61,12 +61,13 @@ export const CollectionSummaryImage = styled.div`
   font-weight: 600;
   border-radius: 56px;
   overflow: hidden;
-  background: ${props => props.theme.base1};
+  background: ${(props) => props.theme.base1};
   text-align: center;
   margin: 8px;
   position: relative;
 
-  img, video {
+  img,
+  video {
     width: 112px;
     height: 112px;
     object-fit: cover;
@@ -108,8 +109,8 @@ export const CollectionItemCountNumber = styled.div`
   borx-sizing: border-box;
   justify-content: center;
   align-items: center;
-  background: ${props => props.theme.base1};
-  color: ${props => props.theme.top0};
+  background: ${(props) => props.theme.base1};
+  color: ${(props) => props.theme.top0};
 `
 
 export const CollectionItemCountLabel = styled.div`
@@ -128,13 +129,15 @@ export const AssetSummaryImage = styled.div`
   text-align: center;
   position: relative;
 
-  img, video {
+  img,
+  video {
     max-width: 185px;
     max-height: 185px;
     border-radius: 6px;
   }
 
-  span, div {
+  span,
+  div {
     width: 185px;
     min-height: 185px;
     display: flex;
@@ -159,7 +162,7 @@ export const AssetSummaryName = styled.div`
   min-width: 60px;
   box-sizing: border-box;
   text-align: center;
-  background: ${props => props.theme.base1};
+  background: ${(props) => props.theme.base1};
   text-overflow: ellipsis;
 `
 
@@ -186,8 +189,8 @@ export const AssetLink = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: ${props => props.theme.good};
-  color: ${props => props.theme.goodOver};
+  background: ${(props) => props.theme.good};
+  color: ${(props) => props.theme.goodOver};
   cursor: pointer;
   user-select: none;
 
@@ -213,7 +216,7 @@ export const PopUser = styled.div`
   flex-direction: column;
   align-items: center;
   overscroll-behavior: contain;
-  color: ${props => props.theme.top0};
+  color: ${(props) => props.theme.top0};
 `
 
 export const Verified = styled.div`
@@ -230,20 +233,20 @@ export const Verified = styled.div`
 
 export const PopUserVerified = styled(Verified)`
   div {
-    background: ${props => props.theme.good};
-    color: ${props => props.theme.goodOver};
+    background: ${(props) => props.theme.good};
+    color: ${(props) => props.theme.goodOver};
   }
 `
 
 export const PopUserUnverified = styled(Verified)`
   div {
-    background: ${props => props.theme.bad};
-    color: ${props => props.theme.badOver};
+    background: ${(props) => props.theme.bad};
+    color: ${(props) => props.theme.badOver};
   }
 `
 
 export const PopUserLabel = styled.div`
-  background: ${props => props.theme.base1};
+  background: ${(props) => props.theme.base1};
   font-size: 10px;
   height: 22px;
   border-radius: 6px;
@@ -274,14 +277,15 @@ export const ProfileImage = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
-  background: ${props => props.theme.base2};
+  background: ${(props) => props.theme.base2};
   border-radius: 6px;
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 2px;
 
-  img, video {
+  img,
+  video {
     max-width: 185px;
     max-height: 185px;
     border-radius: 6px;
@@ -295,7 +299,7 @@ export const ProfileLinkIcon = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${props => props.theme.top0};
+  color: ${(props) => props.theme.top0};
   svg {
     max-height: 26px;
   }

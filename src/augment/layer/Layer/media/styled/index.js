@@ -16,9 +16,9 @@ export const LoadingSpinner = styled.div`
     z-index: 2;
     width: 26px;
     height: 26px;
-    
+
     & circle {
-      stroke: ${props => props.theme.top0};
+      stroke: ${(props) => props.theme.top0};
       stroke-linecap: round;
       animation: ${dash} 1.5s ease-in-out infinite;
     }

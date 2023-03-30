@@ -20,7 +20,7 @@ export const PopCollection = styled.div`
     height: 48px;
     object-fit: cover;
     border-radius: 3px;
-    background: ${props => props.theme.base0};
+    background: ${(props) => props.theme.base0};
   }
 
   video {
@@ -28,23 +28,25 @@ export const PopCollection = styled.div`
     height: 48px;
     object-fit: cover;
     border-radius: 3px;
-    background: ${props => props.theme.base0};
+    background: ${(props) => props.theme.base0};
   }
 
   &:hover {
     transform: scale(1.2);
     z-index: 2000;
-    img, div {
+    img,
+    div {
       animation: 5s ${float} ease-in-out infinite alternate;
-      box-shadow: 0px 8px 6px -2px ${props => props.theme.baseShadow};
+      box-shadow: 0px 8px 6px -2px ${(props) => props.theme.baseShadow};
     }
   }
 
   &:active {
     z-index: 2000;
-    img, div {
+    img,
+    div {
       animation: ${shake} 2s ease-in-out infinite;
-      box-shadow: 0px 1px 1px -2px ${props => props.theme.baseShadow};
+      box-shadow: 0px 1px 1px -2px ${(props) => props.theme.baseShadow};
     }
   }
 `
@@ -52,10 +54,10 @@ export const PopCollection = styled.div`
 export const ItemSelected = styled.div`
   position: absolute;
   top: 2px;
-  right: 1px; 
+  right: 1px;
   bottom: 1px;
   left: 2px;
-  border: 2px solid ${props => props.theme.top0};
+  border: 2px solid ${(props) => props.theme.top0};
   border-radius: 6px;
   z-index: 20000;
 `
@@ -70,6 +72,6 @@ export const TextImg = styled.div`
   font-size: 8px;
   padding: 5px;
   box-sizing: border-box;
-  background: ${props => props.theme.base0};
+  background: ${(props) => props.theme.base0};
   position: relative;
 `

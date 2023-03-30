@@ -1,5 +1,5 @@
 const path = require('path')
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 module.exports = [
   {
@@ -10,9 +10,9 @@ module.exports = [
         {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
-          use: ['babel-loader'],
-        },
-      ],
+          use: ['babel-loader']
+        }
+      ]
     },
     resolve: {
       extensions: ['*', '.js', '.jsx']
@@ -25,9 +25,7 @@ module.exports = [
     performance: {
       hints: false
     },
-    plugins: [
-      new NodePolyfillPlugin()
-    ],
+    plugins: [new NodePolyfillPlugin()],
     watch: true
   },
   {
@@ -38,9 +36,9 @@ module.exports = [
         {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
-          use: ['babel-loader'],
-        },
-      ],
+          use: ['babel-loader']
+        }
+      ]
     },
     resolve: {
       extensions: ['*', '.js', '.jsx']
@@ -53,9 +51,7 @@ module.exports = [
     performance: {
       hints: false
     },
-    plugins: [
-      new NodePolyfillPlugin()
-    ],
+    plugins: [new NodePolyfillPlugin()],
     watch: true
   }
 ]

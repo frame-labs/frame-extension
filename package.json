@@ -12,7 +12,9 @@
     "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js",
     "bundle": "webpack --config webpack.config.js",
     "watch": "npm run build && webpack --config webpack.dev.config.js",
-    "serve": "webpack serve --config webpack.dev.layer.config.js"
+    "serve": "webpack serve --config webpack.dev.layer.config.js",
+    "format": "prettier --write '**/*.{yml,json,md,html,ts,js}'",
+    "format:check": "prettier --check '**/*.{yml,json,md,html,ts,js}'"
   },
   "author": "Frame Labs, Inc.",
   "license": "",
@@ -21,8 +23,11 @@
     "@babel/plugin-transform-runtime": "7.18.2",
     "@babel/preset-react": "7.17.12",
     "html-webpack-plugin": "5.5.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0",
     "ncp": "2.0.0",
     "node-polyfill-webpack-plugin": "1.1.4",
+    "prettier": "^2.8.7",
     "rimraf": "3.0.2",
     "standard": "17.0.0",
     "terser-webpack-plugin": "5.3.3",
