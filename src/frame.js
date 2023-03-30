@@ -1,5 +1,7 @@
 import EventEmitter from 'events'
 import EthereumProvider from 'ethereum-provider'
+ 
+// hello, world!
 
 function setProvider() {
   const existingProvider = Object.getOwnPropertyDescriptor(window, 'ethereum')
