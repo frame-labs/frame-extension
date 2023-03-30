@@ -107,12 +107,9 @@ class Connection extends EventEmitter {
 
 let mmAppear = window.localStorage.getItem('__frameAppearAsMM__')
 
-console.log('u wot m8', mmAppear)
-
 try {
   mmAppear = JSON.parse(mmAppear)
 } catch (e) {
-  console.log('wut', e)
   mmAppear = false
 }
 
