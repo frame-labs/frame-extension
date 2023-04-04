@@ -277,7 +277,7 @@ const ChainButtonIcon = styled.div`
   left: 10px;
   width: 20px;
   height: 20px;
-  background: ${(props) => (props.isSelected ? 'var(--good)' : 'var(--ghostAZ)')};
+  background: ${(props) => (props.selected ? 'var(--good)' : 'var(--ghostAZ)')};
   border-radius: 10px;
   box-sizing: border-box;
   border: solid 3px var(--ghostZ);
@@ -315,6 +315,37 @@ function parseOrigin(origin) {
   }
 
   return (m.groups || {}).origin || origin
+}
+
+const chainConnected = ({ connected }) => connected === undefined || connected
+
+const ChainButton = ({ index, chain, tab, selected }) => {
+  const { chainId, name } = chain
+  const isSelectable = chainConnected(chain)
+  return (
+  <ClusterValue
+    style={{
+      flexGrow: 0,
+      width: 'calc(50% - 3px)',
+      borderBottomRightRadius: index === 0 ? '8px' : 'auto',
+      opacity: isSelectable ? 1 : 0.4,
+      cursor: isSelectable ? 'pointer' : 'default'
+    }}
+    onClick={() => {
+      if (isSelectable) {
+        chrome.runtime.sendMessage({
+          tab,
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId }]
+        })
+        updateCurrentChain(tab)
+      }
+    }}
+  >
+    <ChainButtonIcon selected={selected} />
+    <ChainButtonLabel>{name}</ChainButtonLabel>
+  </ClusterValue>
+  )
 }
 
 // const isFirefox = Boolean(window?.browser && browser?.runtime)
@@ -450,26 +481,7 @@ class _Settings extends React.Component {
 
     return rows.map((row) => (
       <ClusterRow style={{ justifyContent: 'flex-start' }}>
-        {row.map(({ chainId, name }, i) => (
-          <ClusterValue
-            style={{
-              flexGrow: 0,
-              width: 'calc(50% - 3px)',
-              borderBottomRightRadius: i === 0 ? '8px' : 'auto'
-            }}
-            onClick={() => {
-              chrome.runtime.sendMessage({
-                tab: this.props.tab,
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId }]
-              })
-              updateCurrentChain(this.props.tab)
-            }}
-          >
-            <ChainButtonIcon isSelected={chainId === parseInt(currentChain, 16)} />
-            <ChainButtonLabel>{name}</ChainButtonLabel>
-          </ClusterValue>
-        ))}
+        {row.map((chain, i) => <ChainButton index={i} chain={chain} tab={this.tab} selected={chain.chainId === parseInt(currentChain, 16)} />)}
       </ClusterRow>
     ))
   }
