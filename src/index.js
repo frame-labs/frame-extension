@@ -40,23 +40,23 @@ function initProvider() {
       .request({ method: 'wallet_getEthereumChains' })
       .then(setChains)
       .catch(() => setChains([]))
-  
+
     // change icon
     chrome.browserAction.setIcon({ path: 'icons/icon96good.png' })
-  
+
     sendEvent('connect')
   })
-  
+
   provider.on('disconnect', () => {
     frameState.connected = false
     if (settingsPanel) settingsPanel.postMessage(frameState)
-  
+
     // change icon
     chrome.browserAction.setIcon({ path: 'icons/icon96moon.png' })
-  
+
     sendEvent('close')
   })
-  
+
   provider.on('chainsChanged', (chains = []) => {
     if (chains[0] && chains[0] !== null && typeof chains[0] === 'object') {
       setChains(chains)

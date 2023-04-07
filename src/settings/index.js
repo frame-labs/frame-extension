@@ -323,28 +323,28 @@ const ChainButton = ({ index, chain, tab, selected }) => {
   const { chainId, name } = chain
   const isSelectable = chainConnected(chain)
   return (
-  <ClusterValue
-    style={{
-      flexGrow: 0,
-      width: 'calc(50% - 3px)',
-      borderBottomRightRadius: index === 0 ? '8px' : 'auto',
-      opacity: isSelectable ? 1 : 0.4,
-      cursor: isSelectable ? 'pointer' : 'default'
-    }}
-    onClick={() => {
-      if (isSelectable) {
-        chrome.runtime.sendMessage({
-          tab,
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId }]
-        })
-        updateCurrentChain(tab)
-      }
-    }}
-  >
-    <ChainButtonIcon selected={selected} />
-    <ChainButtonLabel>{name}</ChainButtonLabel>
-  </ClusterValue>
+    <ClusterValue
+      style={{
+        flexGrow: 0,
+        width: 'calc(50% - 3px)',
+        borderBottomRightRadius: index === 0 ? '8px' : 'auto',
+        opacity: isSelectable ? 1 : 0.4,
+        cursor: isSelectable ? 'pointer' : 'default'
+      }}
+      onClick={() => {
+        if (isSelectable) {
+          chrome.runtime.sendMessage({
+            tab,
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId }]
+          })
+          updateCurrentChain(tab)
+        }
+      }}
+    >
+      <ChainButtonIcon selected={selected} />
+      <ChainButtonLabel>{name}</ChainButtonLabel>
+    </ClusterValue>
   )
 }
 
@@ -481,7 +481,14 @@ class _Settings extends React.Component {
 
     return rows.map((row) => (
       <ClusterRow style={{ justifyContent: 'flex-start' }}>
-        {row.map((chain, i) => <ChainButton index={i} chain={chain} tab={this.tab} selected={chain.chainId === parseInt(currentChain, 16)} />)}
+        {row.map((chain, i) => (
+          <ChainButton
+            index={i}
+            chain={chain}
+            tab={this.tab}
+            selected={chain.chainId === parseInt(currentChain, 16)}
+          />
+        ))}
       </ClusterRow>
     ))
   }
