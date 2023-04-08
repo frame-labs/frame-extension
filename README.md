@@ -11,7 +11,7 @@
 
 ```bash
 # Clone
-› git clone https://github.com/floating/frame-extension-layers
+› git clone https://github.com/frame-labs/frame-extension
 
 # Install
 › npm install
