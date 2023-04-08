@@ -2,4 +2,3 @@ dist
 package-lock.json
 .cache
 cache
-.vscode
