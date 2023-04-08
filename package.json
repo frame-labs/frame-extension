@@ -28,7 +28,7 @@
     "@framelabs/config": "*",
     "eslint": "8.37.0",
     "eslint-config-prettier": "8.8.0",
-    "globals": "^13.20.0",
+    "globals": "13.20.0",
     "html-webpack-plugin": "5.5.0",
     "husky": "8.0.3",
     "jest": "29.5.0",
