@@ -16,8 +16,8 @@
     "serve": "webpack serve --config webpack.dev.layer.config.js",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs .",
     "lint:fix": "ESLINT_USE_FLAT_CONFIG=true eslint -c eslint.config.mjs --fix .",
-    "format": "prettier --write '**/*.{yml,json,md,html,ts,js}'",
-    "format:check": "prettier --check '**/*.{yml,json,md,html,ts,js}'"
+    "format": "prettier --write '**/*.{yml,json,md,html,ts,tsx,mjs,js,jsx}'",
+    "format:check": "prettier --check '**/*.{yml,json,md,html,ts,tsx,mjs,js,jsx}'"
   },
   "author": "Frame Labs, Inc.",
   "license": "",
