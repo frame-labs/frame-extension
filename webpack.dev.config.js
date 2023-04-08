@@ -4,7 +4,7 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 module.exports = [
   {
     mode: 'development',
-    entry: './src/augment/index.js',
+    entry: './src/augment/index.jsx',
     module: {
       rules: [
         {
@@ -30,7 +30,7 @@ module.exports = [
   },
   {
     mode: 'production',
-    entry: './src/settings',
+    entry: './src/settings/index.jsx',
     module: {
       rules: [
         {
