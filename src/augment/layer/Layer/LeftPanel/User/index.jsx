@@ -50,17 +50,17 @@ class User extends React.Component {
 
     return (
       <PopName
-        onMouseEnter={(e) => {
+        onMouseEnter={() => {
           this.store.setHover({ type: 'user', userId })
         }}
-        onClick={(e) => {
+        onClick={() => {
           if (this.store('select')?.type === 'user') {
             this.store.setSelect(false)
           } else {
             this.store.setSelect({ type: 'user', userId })
           }
         }}
-        onMouseLeave={(e) => {
+        onMouseLeave={() => {
           this.store.setHover(false)
         }}
       >

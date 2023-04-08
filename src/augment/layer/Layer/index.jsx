@@ -32,14 +32,14 @@ class Layer extends React.Component {
     e.stopPropagation()
   }
   render() {
-    const { active, position, userId, created } = this.store('layerPop')
+    const { active, position, userId } = this.store('layerPop')
     const user = this.store('users', userId)
     const theme = this.store('theme')
     if (active) {
       if (user && !user.error) {
         return (
           <ThemeProvider theme={theme}>
-            <PopWrap onClick={(e) => this.resetLayer()}>
+            <PopWrap onClick={() => this.resetLayer()}>
               <Pop
                 onClick={this.block}
                 style={{
@@ -57,7 +57,7 @@ class Layer extends React.Component {
       } else {
         return (
           <ThemeProvider theme={theme}>
-            <PopWrap onClick={(e) => this.resetLayer()}>
+            <PopWrap onClick={() => this.resetLayer()}>
               <Pop
                 onMouseDown={(e) => e.stopPropagation()}
                 onMouseOver={(e) => e.stopPropagation()}

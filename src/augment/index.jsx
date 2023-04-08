@@ -77,7 +77,7 @@ function findNameSectionInHeader(profileHeader) {
 }
 
 function parseEnsName(nameSpan) {
-  return ((((nameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
+  return ((((nameSpan || {}).textContent || '').match(/[\w_\-.]+.eth/) || [])[0] || '').toLowerCase()
 }
 
 function findNameSectionInTweet(tweet) {
@@ -291,7 +291,7 @@ const usersChecked = []
 let currentTheme = ''
 
 const callback = function (mutationsList) {
-  const composeTweet = document.querySelectorAll('[data-testid=SideNav_NewTweet_Button]')[0]
+  // const composeTweet = document.querySelectorAll('[data-testid=SideNav_NewTweet_Button]')[0]
   const { backgroundColor } = window.getComputedStyle(document.body)
   if (currentTheme !== backgroundColor) {
     store.setTheme(themes(backgroundColor))

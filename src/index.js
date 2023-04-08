@@ -1,6 +1,4 @@
-/* globals chrome */
-
-const ethProvider = require('eth-provider')
+import ethProvider from 'eth-provider'
 let provider
 
 const subs = {}
@@ -140,7 +138,7 @@ const subType = (pendingPayload) => {
   }
 }
 
-chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (extensionPayload, sender, _sendResponse) => {
   const { tab, ...payload } = extensionPayload
   const { method, params } = payload
 
@@ -157,10 +155,11 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
           code: `window.__setMediaBlob__("${blobURL}", "${location}");`
         })
       })
-      .catch((e) => {
-        chrome.tabs.executeScript(sender.tab.id, {
-          code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
-        })
+      .catch(() => {
+        // TODO: blobURL is undefined here
+        // chrome.tabs.executeScript(sender.tab.id, {
+        //   code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
+        // })
       })
   }
 
@@ -211,8 +210,8 @@ function sendEvent(event, args = [], tabSelector = {}) {
   })
 }
 
-chrome.tabs.onRemoved.addListener((tabId, removed) => unsubscribeTab(tabId))
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+chrome.tabs.onRemoved.addListener((tabId, _removed) => unsubscribeTab(tabId))
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, _tab) => {
   if (changeInfo.url) unsubscribeTab(tabId)
 })
 chrome.tabs.onActivated.addListener(({ tabId }) => {

@@ -1,5 +1,5 @@
-const { EventEmitter } = require('events')
-const ethProvider = require('eth-provider')
+import { EventEmitter } from 'events'
+import ethProvider from 'eth-provider'
 
 async function waitUntil(numTimes, check) {
   return new Promise((resolve) => {

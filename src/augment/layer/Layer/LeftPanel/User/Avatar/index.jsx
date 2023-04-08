@@ -26,13 +26,13 @@ class Avatar extends React.Component {
 
     return (
       <PopAvatar
-        onMouseEnter={(e) => {
+        onMouseEnter={() => {
           this.store.setHover({
             type: 'avatar',
             ensName: 'brantly.eth'
           })
         }}
-        onMouseLeave={(e) => {
+        onMouseLeave={() => {
           this.store.setHover(false)
         }}
       >

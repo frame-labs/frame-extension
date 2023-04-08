@@ -1,11 +1,25 @@
 import prettierConfig from 'eslint-config-prettier'
 import frameLabsConfig from '@framelabs/config/eslint'
+import globals from 'globals'
 
 export default [
-  // TODO: address linting errors and enable base config
-  //...frameLabsConfig,
-  // ---
-  // repo-specific config here
-  // ---
+  ...frameLabsConfig,
+  {
+    files: ['webpack.*.js', 'src/inline.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      }
+    }
+  },
+  {
+    files: ['src/**/*'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        chrome: true
+      }
+    }
+  },
   prettierConfig
 ]

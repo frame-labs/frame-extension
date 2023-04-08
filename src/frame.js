@@ -109,7 +109,7 @@ let mmAppear = window.localStorage.getItem('__frameAppearAsMM__')
 
 try {
   mmAppear = JSON.parse(mmAppear)
-} catch (e) {
+} catch (_e) {
   mmAppear = false
 }
 
@@ -148,7 +148,7 @@ const embedded = {
   getChainId: async () => ({ chainId: await window.ethereum.doSend('eth_chainId', [], undefined, false) })
 }
 
-document.addEventListener('readystatechange', (e) => {
+document.addEventListener('readystatechange', () => {
   if (document.readyState === 'interactive') {
     setProvider()
   }

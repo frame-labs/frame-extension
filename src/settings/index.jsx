@@ -1,5 +1,3 @@
-/* globals chrome */
-
 import React from 'react'
 import Restore from 'react-restore'
 import ReactDOM from 'react-dom'
@@ -310,7 +308,7 @@ const originDomainRegex = /^(?:.+(?::\/\/))?(?<origin>.*)/
 function parseOrigin(origin) {
   const m = origin.match(originDomainRegex)
   if (!m) {
-    log.warn(`could not parse origin: ${origin}`)
+    console.warn(`could not parse origin: ${origin}`)
     return origin
   }
 
@@ -479,10 +477,11 @@ class _Settings extends React.Component {
       return result
     }, [])
 
-    return rows.map((row) => (
-      <ClusterRow style={{ justifyContent: 'flex-start' }}>
+    return rows.map((row, i) => (
+      <ClusterRow key={i} style={{ justifyContent: 'flex-start' }}>
         {row.map((chain, i) => (
           <ChainButton
+            key={i}
             index={i}
             chain={chain}
             tab={this.tab}
