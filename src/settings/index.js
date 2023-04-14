@@ -481,7 +481,7 @@ class _Settings extends React.Component {
 
     return rows.map((row) => (
       <ClusterRow style={{ justifyContent: 'flex-start' }}>
-        {row.map((chain, i) => <ChainButton index={i} chain={chain} tab={this.tab} selected={chain.chainId === parseInt(currentChain, 16)} />)}
+        {row.map((chain, i) => <ChainButton index={i} chain={chain} tab={this.props.tab} selected={chain.chainId === parseInt(currentChain, 16)} />)}
       </ClusterRow>
     ))
   }
