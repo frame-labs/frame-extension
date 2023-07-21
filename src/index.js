@@ -7,10 +7,11 @@ const subs = {}
 const pending = {}
 
 const originFromUrl = (url) => {
+  if (!url) return ''
   const path = url.split('/')
   return `${path[0]}//${path[2]}`
 }
-const getOrigin = (tab = {}, sender = {}) => originFromUrl(tab.url || sender.url)
+const getOrigin = (sender = {}) => originFromUrl(sender.url)
 
 chrome.browserAction.setPopup({ popup: 'settings.html' })
 chrome.browserAction.setIcon({ path: 'icons/icon96moon.png' })
@@ -40,23 +41,23 @@ function initProvider() {
       .request({ method: 'wallet_getEthereumChains' })
       .then(setChains)
       .catch(() => setChains([]))
-  
+
     // change icon
     chrome.browserAction.setIcon({ path: 'icons/icon96good.png' })
-  
+
     sendEvent('connect')
   })
-  
+
   provider.on('disconnect', () => {
     frameState.connected = false
     if (settingsPanel) settingsPanel.postMessage(frameState)
-  
+
     // change icon
     chrome.browserAction.setIcon({ path: 'icons/icon96moon.png' })
-  
+
     sendEvent('close')
   })
-  
+
   provider.on('chainsChanged', (chains = []) => {
     if (chains[0] && chains[0] !== null && typeof chains[0] === 'object') {
       setChains(chains)
@@ -79,9 +80,16 @@ function initProvider() {
         }
         chrome.tabs.sendMessage(tabId, Object.assign({}, payload, { id: payloadId, type: 'eth:payload' }))
         if (pending[payload.id].method === 'eth_chainId' && pending[payload.id].tabId === activeTab) {
-          const chainId = payload.result
-          if (chainId) setCurrentChain(chainId)
+          const payloadOrigin = pending[payload.id].origin
+          chrome.tabs.get(activeTab, (activeTab) => {
+            const activeTabOrigin = originFromUrl(activeTab.url)
+            if (activeTabOrigin === payloadOrigin) {
+              const chainId = payload.result
+              if (chainId) setCurrentChain(chainId)
+            }
+          })
         }
+
         delete pending[payload.id]
       }
     } else if (
@@ -168,13 +176,21 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
     return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })
 
   const id = provider.nextId++
-  pending[id] = { tabId: sender?.tab?.id || tab.id, payloadId: payload.id, method, params }
+  const origin = getOrigin(sender)
+  if (!origin) return console.error('No origin found for sender')
+  pending[id] = {
+    tabId: sender?.tab?.id || tab.id,
+    payloadId: payload.id,
+    method,
+    params,
+    origin
+  }
 
   const load = {
     ...payload,
     jsonrpc: '2.0',
     id,
-    __frameOrigin: getOrigin(tab, sender),
+    __frameOrigin: origin,
     __extensionConnecting: payload.__extensionConnecting
   }
 
