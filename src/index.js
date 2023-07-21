@@ -176,7 +176,7 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
     return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })
 
   const id = provider.nextId++
-  const origin = getOrigin(sender)
+  const origin = getOrigin(tab || sender)
   if (!origin) return console.error('No origin found for sender')
   pending[id] = {
     tabId: sender?.tab?.id || tab.id,
