@@ -244,7 +244,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     const origin = originFromUrl(changeInfo.url)
     const tabOrigin = tabOrigins[tabId]
-    if (tabOrigin !== origin) unsubscribeTab(tabId)
+    if (tabOrigin !== origin) {
+      tabOrigins[tabId] = origin
+      unsubscribeTab(tabId)
+    }
   }
 })
 
