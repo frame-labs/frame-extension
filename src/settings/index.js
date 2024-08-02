@@ -50,23 +50,34 @@ const getScrollBarWidth = () => {
   return w1 - w2
 }
 
+const shouldAppearAsMM = () => localStorage.getItem('__frameAppearAsMM__')
+const shouldAugmentOff = () => localStorage.getItem('__frameAugmentOff__')
+
 function mmAppearToggle() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
-      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAppearAsMM__']" }, (results) => {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: shouldAppearAsMM
+      }, (results) => {
         let mmAppear = false
-        if (results) {
+        if (results && results.length > 0) {
           try {
-            mmAppear = JSON.parse(results[0])
+            mmAppear = JSON.parse(results[0].result)
           } catch (e) {
             mmAppear = false
           }
-          chrome.tabs.executeScript(tabs[0].id, {
-            code: `localStorage.setItem('__frameAppearAsMM__', ${JSON.stringify(
-              !mmAppear
-            )}); window.location.reload();`
-          })
+
+          chrome.scripting.executeScript({
+              target: { tabId: tabs[0].id },
+              func: (appear) => {
+              localStorage.setItem('__frameAppearAsMM__', appear)
+              window.location.reload()
+            },
+              args: [!mmAppear]
+            })
         }
+
         window.close()
       })
     }
@@ -76,24 +87,31 @@ function mmAppearToggle() {
 function augmentOffToggle() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
-      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAugmentOff__']" }, (results) => {
-        let augmentOff = true
-        if (results) {
-          try {
-            augmentOff = Boolean(JSON.parse(results[0]))
-          } catch (e) {
-            augmentOff = true
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: shouldAugmentOff
+      }, (results) => {
+          let augmentOff = true
+          if (results && results.length > 0) {
+            try {
+              augmentOff = Boolean(JSON.parse(results[0].result))
+            } catch (e) {
+              augmentOff = true
+            }
+
+            chrome.scripting.executeScript({
+              target: { tabId: tabs[0].id },
+              func: (augment) => {
+              localStorage.setItem('__frameAugmentOff__', augment)
+              window.location.reload()
+            }, args: [!augmentOff]
+            })
           }
-          chrome.tabs.executeScript(tabs[0].id, {
-            code: `localStorage.setItem('__frameAugmentOff__', ${JSON.stringify(
-              !augmentOff
-            )}); window.location.reload();`
-          })
-        }
-        window.close()
-      })
-    }
-  })
+
+          window.close()
+        })
+      }
+    })
 }
 
 const getOrigin = (url) => {
@@ -603,20 +621,27 @@ document.addEventListener('DOMContentLoaded', function () {
     setInterval(() => {
       updateCurrentChain(tabs[0])
     }, 1000)
-    chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAppearAsMM__']" }, (results) => {
+
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id },
+      func: shouldAppearAsMM
+    }, (results) => {
       let mmAppear = false
-      if (results) {
+      if (results && results.length > 0) {
         try {
-          mmAppear = JSON.parse(results[0])
+          mmAppear = JSON.parse(results[0].result)
         } catch (e) {
           mmAppear = false
         }
       }
-      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAugmentOff__']" }, (results) => {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: shouldAugmentOff
+      }, (results) => {
         let augmentOff = false
-        if (results) {
+        if (results && results.length > 0) {
           try {
-            augmentOff = JSON.parse(results[0])
+            augmentOff = JSON.parse(results[0].result)
           } catch (e) {
             augmentOff = false
           }

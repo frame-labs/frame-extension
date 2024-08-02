@@ -13,8 +13,8 @@ const originFromUrl = (url) => {
 }
 const getOrigin = (sender = {}) => originFromUrl(sender.url)
 
-chrome.browserAction.setPopup({ popup: 'settings.html' })
-chrome.browserAction.setIcon({ path: 'icons/icon96moon.png' })
+chrome.action.setPopup({ popup: 'settings.html' })
+chrome.action.setIcon({ path: 'icons/icon96moon.png' })
 
 const frameState = {
   connected: false,
@@ -22,38 +22,52 @@ const frameState = {
   currentChain: ''
 }
 
-function setChains(chains) {
-  frameState.availableChains = chains
-  if (settingsPanel) settingsPanel.postMessage(frameState)
+async function updateSettingsPanel () {
+  if (settingsPanel) {
+    settingsPanel.postMessage(frameState)
+  }
 }
 
-function setCurrentChain(chain) {
+async function setChains(chains) {
+  console.debug('Setting chains:', chains)
+  frameState.availableChains = chains
+  updateSettingsPanel()
+}
+
+async function setCurrentChain(chain) {
+  console.debug('Setting current chain:', chain)
   frameState.currentChain = chain
-  if (settingsPanel) settingsPanel.postMessage(frameState)
+  updateSettingsPanel()
 }
 
 function initProvider() {
+  console.log('Initializing provider connection to Frame')
+
   provider = ethProvider('ws://127.0.0.1:1248?identity=frame-extension')
+
   provider.on('connect', () => {
+    console.log('Connected to Frame')
+
     frameState.connected = true
-    if (settingsPanel) settingsPanel.postMessage(frameState)
+    updateSettingsPanel()
+
     provider
       .request({ method: 'wallet_getEthereumChains' })
       .then(setChains)
       .catch(() => setChains([]))
 
     // change icon
-    chrome.browserAction.setIcon({ path: 'icons/icon96good.png' })
+    chrome.action.setIcon({ path: 'icons/icon96good.png' })
 
     sendEvent('connect')
   })
 
   provider.on('disconnect', () => {
     frameState.connected = false
-    if (settingsPanel) settingsPanel.postMessage(frameState)
+    updateSettingsPanel()
 
     // change icon
-    chrome.browserAction.setIcon({ path: 'icons/icon96moon.png' })
+    chrome.action.setIcon({ path: 'icons/icon96moon.png' })
 
     sendEvent('close')
   })
@@ -121,7 +135,7 @@ chrome.runtime.onConnect.addListener((port) => {
 
   if (port.name === 'frame_connect') {
     settingsPanel = port
-    settingsPanel.postMessage(frameState)
+    updateSettingsPanel()
   }
 })
 
@@ -139,6 +153,7 @@ const subTypes = [
   'networkChanged',
   'message'
 ]
+
 const subType = (pendingPayload) => {
   try {
     const type = pendingPayload.params[0]
@@ -152,6 +167,8 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
   const { tab, ...payload } = extensionPayload
   const { method, params } = payload
 
+  console.debug('Message received from runtime:', payload)
+
   if (payload.method === 'embedded_action_res') {
     const [action, res] = params
     if (action.type === 'getChainId' && res.chainId) return setCurrentChain(res.chainId)
@@ -161,13 +178,22 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
       .then((res) => res.blob())
       .then((blob) => {
         const blobURL = URL.createObjectURL(blob)
-        chrome.tabs.executeScript(sender.tab.id, {
-          code: `window.__setMediaBlob__("${blobURL}", "${location}");`
+
+        function setMediaBlob (blobUrl, location, message) {
+          window.__setMediaBlob__(blobUrl, location, message)
+        }
+
+        chrome.scripting.executeScript({
+          target: { tabId: sender.tab.id },
+          func: setMediaBlob,
+          args: [blobURL, location]
         })
       })
       .catch((e) => {
-        chrome.tabs.executeScript(sender.tab.id, {
-          code: `window.__setMediaBlob__("${blobURL}", "${location}", "${e.message});`
+        chrome.scripting.executeScript({
+          target: { tabId: sender.tab.id },
+          func: setMediaBlob,
+          args: [blobURL, location, e.message]
         })
       })
   }
@@ -256,4 +282,25 @@ chrome.tabs.onActivated.addListener(({ tabId }) => {
   chrome.tabs.sendMessage(tabId, { type: 'embedded:action', action: { type: 'getChainId' } })
 })
 
+const CLIENT_STATUS_ALARM_KEY = 'check-client-status'
+
+async function setupClientStatusAlarm() {
+  const alarm = await chrome.alarms.get(CLIENT_STATUS_ALARM_KEY)
+
+  if (!alarm) {
+    await chrome.alarms.create(CLIENT_STATUS_ALARM_KEY, { delayInMinutes: 0, periodInMinutes: 0.5 })
+  }
+
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === CLIENT_STATUS_ALARM_KEY) {
+      if (provider && provider.isConnected()) {
+        provider.request({ jsonrpc: '2.0', id: 1, method: 'web3_clientVersion' })
+      } else {
+        initProvider()
+      }
+    }
+  })
+}
+
 initProvider()
+setupClientStatusAlarm()

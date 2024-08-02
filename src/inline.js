@@ -3,7 +3,6 @@ const path = require('path')
 const ncp = require('ncp')
 
 const inject = `
-  var frame = unescape('${escape(fs.readFileSync(path.join(__dirname, '../dist/frame.js')).toString())}')
   try {
     chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
       if (payload.type === 'eth:payload') {
@@ -24,9 +23,10 @@ const inject = `
     })
     let script = document.createElement('script')
     script.setAttribute('type', 'text/javascript')
-    script.innerText = frame
-    script.onload = function () { this.remove() }
-    document.head ? document.head.prepend(script) : document.documentElement.prepend(script)
+    script.src = chrome.runtime.getURL('frame.js')
+    script.onload = function () { script.parentNode.removeChild(script) }
+    const topLevel = document.head || document.documentElement
+    topLevel.appendChild(script)
   } catch (e) {
     console.log(e)
   }

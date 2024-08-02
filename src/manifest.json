@@ -1,13 +1,14 @@
 {
   "name": "Frame Companion",
-  "version": "0.11.0",
-  "manifest_version": 2,
+  "version": "0.12.0",
+  "manifest_version": 3,
+  "minimum_chrome_version": "116",
   "description": "Frame companion creates an injected connection to Frame desktop wallet (required) on macOS, Windows or Linux.",
   "homepage_url": "https://github.com/floating/frame",
   "background": {
-    "scripts": ["index.js"]
+    "service_worker": "index.js"
   },
-  "browser_action": {
+  "action": {
     "default_title": "Frame Companion",
     "default_icon": {
       "16": "icons/icon16.png",
@@ -29,7 +30,16 @@
       "all_frames": true
     }
   ],
-  "permissions": ["activeTab", "https://*/*", "http://*/*", "tabs", "idle"],
+  "web_accessible_resources": [{
+      "resources": [
+        "frame.js"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }],
+  "permissions": ["activeTab", "tabs", "idle", "scripting", "alarms"],
+  "host_permissions": ["https://*/*", "http://*/*"],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
