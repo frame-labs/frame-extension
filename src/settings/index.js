@@ -50,68 +50,79 @@ const getScrollBarWidth = () => {
   return w1 - w2
 }
 
-const shouldAppearAsMM = () => localStorage.getItem('__frameAppearAsMM__')
-const shouldAugmentOff = () => localStorage.getItem('__frameAugmentOff__')
+function shouldAppearAsMM () {
+  return localStorage.getItem('__frameAppearAsMM__')
+}
 
-function mmAppearToggle() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0]) {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        func: shouldAppearAsMM
-      }, (results) => {
-        let mmAppear = false
-        if (results && results.length > 0) {
-          try {
-            mmAppear = JSON.parse(results[0].result)
-          } catch (e) {
-            mmAppear = false
-          }
+function shouldAugmentOff () {
+  return localStorage.getItem('__frameAugmentOff__')
+}
 
-          chrome.scripting.executeScript({
-              target: { tabId: tabs[0].id },
-              func: (appear) => {
-              localStorage.setItem('__frameAppearAsMM__', appear)
-              window.location.reload()
-            },
-              args: [!mmAppear]
-            })
-        }
+function setAppearAsMM (appearAsMM) {
+  localStorage.setItem('__frameAppearAsMM__', appearAsMM)
+  window.location.reload()
+}
 
-        window.close()
-      })
-    }
+function setAugmentOff (augmentOff) {
+  localStorage.setItem('__frameAugmentOff__', augmentOff)
+  window.location.reload()
+}
+
+async function executeScript (tabId, func, args) {
+  return chrome.scripting.executeScript({
+    target: { tabId },
+    func,
+    args
   })
 }
 
-function augmentOffToggle() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0]) {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        func: shouldAugmentOff
-      }, (results) => {
-          let augmentOff = true
-          if (results && results.length > 0) {
-            try {
-              augmentOff = Boolean(JSON.parse(results[0].result))
-            } catch (e) {
-              augmentOff = true
-            }
+async function getLocalSetting (tabId, func) {
+  const results = await executeScript(tabId, func)
 
-            chrome.scripting.executeScript({
-              target: { tabId: tabs[0].id },
-              func: (augment) => {
-              localStorage.setItem('__frameAugmentOff__', augment)
-              window.location.reload()
-            }, args: [!augmentOff]
-            })
-          }
+  if (results && results.length > 0) {
+    try {
+      return JSON.parse(results[0].result || false)
+    } catch (e) {
+      return false
+    }
+  }
 
-          window.close()
-        })
-      }
-    })
+  return false
+}
+
+async function getActiveTab () {
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+  return tabs[0]
+}
+
+async function getAppearAsMM(tabId) {
+  return getLocalSetting(tabId, shouldAppearAsMM)
+}
+
+async function getFrameAugmentOff(tabId) {
+  return getLocalSetting(tabId, shouldAugmentOff)
+}
+
+async function mmAppearToggle() {
+  const activeTab = await getActiveTab()
+
+  if (activeTab) {
+    const mmAppear = await getAppearAsMM(activeTab.id)
+
+    executeScript(activeTab.id, setAppearAsMM, [!mmAppear])
+    window.close()
+  }
+}
+
+async function augmentOffToggle() {
+  const activeTab = await getActiveTab()
+
+  if (activeTab) {
+    const augmentOff = await getFrameAugmentOff(activeTab.id)
+
+    executeScript(activeTab.id, setAugmentOff, [!augmentOff])
+    window.close()
+  }
 }
 
 const getOrigin = (url) => {
@@ -616,41 +627,22 @@ const updateCurrentChain = (tab) => {
   })
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    setInterval(() => {
-      updateCurrentChain(tabs[0])
-    }, 1000)
+document.addEventListener('DOMContentLoaded', async function () {
+  console.info('Settings panel loaded')
 
-    chrome.scripting.executeScript({
-      target: { tabId: tabs[0].id },
-      func: shouldAppearAsMM
-    }, (results) => {
-      let mmAppear = false
-      if (results && results.length > 0) {
-        try {
-          mmAppear = JSON.parse(results[0].result)
-        } catch (e) {
-          mmAppear = false
-        }
-      }
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        func: shouldAugmentOff
-      }, (results) => {
-        let augmentOff = false
-        if (results && results.length > 0) {
-          try {
-            augmentOff = JSON.parse(results[0].result)
-          } catch (e) {
-            augmentOff = false
-          }
-        }
+  const activeTab = await getActiveTab()
+  const [mmAppear, augmentOff] = await Promise.all([
+    getAppearAsMM(activeTab.id),
+    getFrameAugmentOff(activeTab.id)
+  ])
 
-        const root = document.getElementById('root')
+  setInterval(() => {
+    updateCurrentChain(activeTab)
+  }, 1000)
 
-        ReactDOM.render(<Settings tab={tabs[0]} mmAppear={mmAppear} augmentOff={augmentOff} />, root)
-      })
-    })
-  })
+  console.debug('Initial settings', { mmAppear, augmentOff })
+
+  const root = document.getElementById('root')
+
+  ReactDOM.render(<Settings tab={activeTab} mmAppear={mmAppear} augmentOff={augmentOff} />, root)
 })

@@ -22,20 +22,22 @@ const frameState = {
   currentChain: ''
 }
 
-async function updateSettingsPanel () {
+function updateSettingsPanel () {
   if (settingsPanel) {
     settingsPanel.postMessage(frameState)
   }
 }
 
-async function setChains(chains) {
-  console.debug('Setting chains:', chains)
+function setChains(chains) {
+  console.debug('Setting available chains', { chains })
+
   frameState.availableChains = chains
   updateSettingsPanel()
 }
 
-async function setCurrentChain(chain) {
-  console.debug('Setting current chain:', chain)
+function setCurrentChain(chain) {
+  console.debug(`Setting current chain to ${chain}`)
+
   frameState.currentChain = chain
   updateSettingsPanel()
 }
@@ -163,11 +165,15 @@ const subType = (pendingPayload) => {
   }
 }
 
+function setMediaBlob (blobUrl, location, message) {
+  window.__setMediaBlob__(blobUrl, location, message)
+}
+
 chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendResponse) => {
   const { tab, ...payload } = extensionPayload
   const { method, params } = payload
 
-  console.debug('Message received from runtime:', payload)
+  console.debug('Message received from runtime', { tab, payload })
 
   if (payload.method === 'embedded_action_res') {
     const [action, res] = params
@@ -178,10 +184,6 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
       .then((res) => res.blob())
       .then((blob) => {
         const blobURL = URL.createObjectURL(blob)
-
-        function setMediaBlob (blobUrl, location, message) {
-          window.__setMediaBlob__(blobUrl, location, message)
-        }
 
         chrome.scripting.executeScript({
           target: { tabId: sender.tab.id },

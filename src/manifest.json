@@ -35,7 +35,8 @@
         "frame.js"
       ],
       "matches": [
-        "*://*/*"
+        "https://*/*",
+        "http://*/*"
       ]
     }],
   "permissions": ["activeTab", "tabs", "idle", "scripting", "alarms"],
