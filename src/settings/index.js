@@ -7,6 +7,9 @@ import styled from 'styled-components'
 
 import { Cluster, ClusterValue, ClusterRow, ClusterBoxMain } from './Cluster'
 
+const APPEAR_AS_MM = '__frameAppearAsMM__'
+const AUGMENT_OFF = '__frameAugmentOff__'
+
 const initialState = {
   frameConnected: false,
   appearAsMM: false,
@@ -84,39 +87,12 @@ async function setLocalSetting (tabId, setting, val) {
   }, [setting, val])
 }
 
-async function getAppearAsMM(tabId) {
-  return getLocalSetting(tabId, '__frameAppearAsMM__')
-}
-
-async function getFrameAugmentOff(tabId) {
-  return getLocalSetting(tabId, '__frameAugmentOff__')
-}
-
-async function setAppearAsMM(tabId, val) {
-  return setLocalSetting(tabId, '__frameAppearAsMM__', val)
-}
-
-async function setAugmentOff(tabId, val) {
-  return setLocalSetting(tabId, '__frameAugmentOff__', val)
-}
-
-async function mmAppearToggle() {
+async function toggleLocalSetting (key) {
   const activeTab = await getActiveTab()
 
   if (activeTab) {
-    const mmAppear = await getAppearAsMM(activeTab.id)
-    setAppearAsMM(activeTab.id, !mmAppear)
-
-    window.close()
-  }
-}
-
-async function augmentOffToggle() {
-  const activeTab = await getActiveTab()
-
-  if (activeTab) {
-    const augmentOff = await getFrameAugmentOff(activeTab.id)
-    setAugmentOff(activeTab.id, !augmentOff)
+    const currentValue = await getLocalSetting(activeTab.id, key)
+    setLocalSetting(activeTab.id, key, !currentValue)
 
     window.close()
   }
@@ -457,7 +433,7 @@ class _Settings extends React.Component {
           </ClusterValue>
         </ClusterRow>
         <ClusterRow>
-          <ClusterValue onClick={() => mmAppearToggle()}>
+          <ClusterValue onClick={() => toggleLocalSetting(APPEAR_AS_MM)}>
             <AppearToggle>
               <span>
                 Appear As <span className='frame'>Frame</span> Instead
@@ -484,7 +460,7 @@ class _Settings extends React.Component {
           </ClusterValue>
         </ClusterRow>
         <ClusterRow>
-          <ClusterValue onClick={() => mmAppearToggle()}>
+          <ClusterValue onClick={() => toggleLocalSetting(APPEAR_AS_MM)}>
             <AppearToggle>
               <span>
                 Appear As <span className='mm'>Metamask</span> Instead
@@ -565,7 +541,7 @@ class _Settings extends React.Component {
                       <ClusterValue>
                         <Augment>Verify ENS Names</Augment>
                       </ClusterValue>
-                      <ClusterValue onClick={() => augmentOffToggle()} style={{ flexGrow: '0' }}>
+                      <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
                         <FrameButton>
                           <AugmentStateOff>OFF</AugmentStateOff>
                         </FrameButton>
@@ -576,7 +552,7 @@ class _Settings extends React.Component {
                       <ClusterValue>
                         <Augment>Verify ENS Names</Augment>
                       </ClusterValue>
-                      <ClusterValue onClick={() => augmentOffToggle()} style={{ flexGrow: '0' }}>
+                      <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
                         <FrameButton>
                           <AugmentStateOn>ON</AugmentStateOn>
                         </FrameButton>
@@ -629,8 +605,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const activeTab = await getActiveTab()
   const [mmAppear, augmentOff] = await Promise.all([
-    getAppearAsMM(activeTab.id),
-    getFrameAugmentOff(activeTab.id)
+    getLocalSetting(activeTab.id, APPEAR_AS_MM),
+    getLocalSetting(activeTab.id, AUGMENT_OFF)
   ])
 
   setInterval(() => {
