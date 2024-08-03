@@ -50,22 +50,9 @@ const getScrollBarWidth = () => {
   return w1 - w2
 }
 
-function shouldAppearAsMM () {
-  return localStorage.getItem('__frameAppearAsMM__')
-}
-
-function shouldAugmentOff () {
-  return localStorage.getItem('__frameAugmentOff__')
-}
-
-function setAppearAsMM (appearAsMM) {
-  localStorage.setItem('__frameAppearAsMM__', appearAsMM)
-  window.location.reload()
-}
-
-function setAugmentOff (augmentOff) {
-  localStorage.setItem('__frameAugmentOff__', augmentOff)
-  window.location.reload()
+async function getActiveTab () {
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+  return tabs[0]
 }
 
 async function executeScript (tabId, func, args) {
@@ -76,8 +63,8 @@ async function executeScript (tabId, func, args) {
   })
 }
 
-async function getLocalSetting (tabId, func) {
-  const results = await executeScript(tabId, func)
+async function getLocalSetting (tabId, key) {
+  const results = await executeScript(tabId, (key) => localStorage.getItem(key), [key])
 
   if (results && results.length > 0) {
     try {
@@ -90,17 +77,27 @@ async function getLocalSetting (tabId, func) {
   return false
 }
 
-async function getActiveTab () {
-  const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
-  return tabs[0]
+async function setLocalSetting (tabId, setting, val) {
+  return executeScript(tabId, (key, val) => {
+    localStorage.setItem(key, val)
+    window.location.reload()
+  }, [setting, val])
 }
 
 async function getAppearAsMM(tabId) {
-  return getLocalSetting(tabId, shouldAppearAsMM)
+  return getLocalSetting(tabId, '__frameAppearAsMM__')
 }
 
 async function getFrameAugmentOff(tabId) {
-  return getLocalSetting(tabId, shouldAugmentOff)
+  return getLocalSetting(tabId, '__frameAugmentOff__')
+}
+
+async function setAppearAsMM(tabId, val) {
+  return setLocalSetting(tabId, '__frameAppearAsMM__', val)
+}
+
+async function setAugmentOff(tabId, val) {
+  return setLocalSetting(tabId, '__frameAugmentOff__', val)
 }
 
 async function mmAppearToggle() {
@@ -108,8 +105,8 @@ async function mmAppearToggle() {
 
   if (activeTab) {
     const mmAppear = await getAppearAsMM(activeTab.id)
+    setAppearAsMM(activeTab.id, !mmAppear)
 
-    executeScript(activeTab.id, setAppearAsMM, [!mmAppear])
     window.close()
   }
 }
@@ -119,8 +116,8 @@ async function augmentOffToggle() {
 
   if (activeTab) {
     const augmentOff = await getFrameAugmentOff(activeTab.id)
+    setAugmentOff(activeTab.id, !augmentOff)
 
-    executeScript(activeTab.id, setAugmentOff, [!augmentOff])
     window.close()
   }
 }
