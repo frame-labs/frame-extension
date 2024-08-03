@@ -80,7 +80,7 @@ function initProvider() {
     }
   })
 
-  provider.connection.on('payload', (payload) => {
+  provider.connection.on('payload', async (payload) => {
     if (typeof payload.id !== 'undefined') {
       if (pending[payload.id]) {
         const { tabId, payloadId } = pending[payload.id]
@@ -95,15 +95,14 @@ function initProvider() {
           params.forEach((sub) => delete subs[sub])
         }
         chrome.tabs.sendMessage(tabId, Object.assign({}, payload, { id: payloadId, type: 'eth:payload' }))
-        if (pending[payload.id].method === 'eth_chainId' && pending[payload.id].tabId === activeTab) {
+        if (pending[payload.id].method === 'eth_chainId' && pending[payload.id].tabId === activeTabId) {
           const payloadOrigin = pending[payload.id].origin
-          chrome.tabs.get(activeTab, (activeTab) => {
-            const activeTabOrigin = originFromUrl(activeTab.url)
-            if (activeTabOrigin === payloadOrigin) {
-              const chainId = payload.result
-              if (chainId) setCurrentChain(chainId)
-            }
-          })
+          const activeTab = await chrome.tabs.get(activeTabId)
+          const activeTabOrigin = originFromUrl(activeTab.url)
+          if (activeTabOrigin === payloadOrigin) {
+            const chainId = payload.result
+            if (chainId) setCurrentChain(chainId)
+          }
         }
 
         delete pending[payload.id]
@@ -117,7 +116,7 @@ function initProvider() {
       const sub = subs[payload.params.subscription]
       payload.type = 'eth:payload'
       sub.send(payload)
-      if (sub.type === 'chainChanged' && sub.tabId === activeTab) {
+      if (sub.type === 'chainChanged' && sub.tabId === activeTabId) {
         const chainId = payload.params?.result
         if (chainId) setCurrentChain(chainId)
       }
@@ -125,7 +124,7 @@ function initProvider() {
   })
 }
 
-let settingsPanel, activeTab
+let settingsPanel, activeTabId
 
 function portDisconnected(port) {
   settingsPanel = null
@@ -247,11 +246,10 @@ const unsubscribeTab = (tabId) => {
   })
 }
 
-function sendEvent(event, args = [], tabSelector = {}) {
-  chrome.tabs.query(tabSelector, (tabs) => {
-    tabs.forEach((tab) => {
-      chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
-    })
+async function sendEvent(event, args = [], tabSelector = {}) {
+  const tabs = await chrome.tabs.query(tabSelector)
+  tabs.forEach((tab) => {
+    chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
   })
 }
 
@@ -280,7 +278,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 })
 
 chrome.tabs.onActivated.addListener(({ tabId }) => {
-  activeTab = tabId
+  activeTabId = tabId
   chrome.tabs.sendMessage(tabId, { type: 'embedded:action', action: { type: 'getChainId' } })
 })
 
