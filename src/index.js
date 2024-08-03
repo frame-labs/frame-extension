@@ -246,8 +246,14 @@ const unsubscribeTab = (tabId) => {
   })
 }
 
-async function sendEvent(event, args = [], tabSelector = {}) {
+async function sendEvent(event, args = [], selector = {}) {
+  const tabSelector = {
+    ...selector,
+    url: ['http://*/*', 'https://*/*', 'file://*/*']
+  }
+
   const tabs = await chrome.tabs.query(tabSelector)
+
   tabs.forEach((tab) => {
     chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
   })
@@ -277,9 +283,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 })
 
-chrome.tabs.onActivated.addListener(({ tabId }) => {
+chrome.tabs.onActivated.addListener(async ({ tabId }) => {
   activeTabId = tabId
-  chrome.tabs.sendMessage(tabId, { type: 'embedded:action', action: { type: 'getChainId' } })
+
+  const tab = await chrome.tabs.get(tabId)
+  const tabOrigin = getOrigin(tab.url)
+  if (tabOrigin.startsWith('http') || tabOrigin.startsWith('file')) {
+    chrome.tabs.sendMessage(tabId, { type: 'embedded:action', action: { type: 'getChainId' } })
+  }
 })
 
 const CLIENT_STATUS_ALARM_KEY = 'check-client-status'
