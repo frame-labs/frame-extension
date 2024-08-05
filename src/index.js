@@ -6,6 +6,10 @@ let provider
 const subs = {}
 const pending = {}
 
+const tabOriginSelector = {
+  url: ['http://*/*', 'https://*/*', 'file://*/*']
+}
+
 const originFromUrl = (url) => {
   if (!url) return ''
   const path = url.split('/')
@@ -172,31 +176,31 @@ chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendRespon
   const { tab, ...payload } = extensionPayload
   const { method, params } = payload
 
-  console.debug('Message received from runtime', { tab, payload })
+  console.debug('Message received from tab', { tab, payload })
 
   if (payload.method === 'embedded_action_res') {
     const [action, res] = params
     if (action.type === 'getChainId' && res.chainId) return setCurrentChain(res.chainId)
   } else if (payload.method === 'media_blob') {
     const location = payload.location
-    fetch(payload.src)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const blobURL = URL.createObjectURL(blob)
 
-        chrome.scripting.executeScript({
-          target: { tabId: sender.tab.id },
-          func: setMediaBlob,
-          args: [blobURL, location]
-        })
+    try {
+      const res = await fetch(payload.src)
+      const blob = await res.blob()
+      const blobURL = URL.createObjectURL(blob)
+
+      chrome.scripting.executeScript({
+        target: { tabId: sender.tab.id },
+        func: setMediaBlob,
+        args: [blobURL, location]
       })
-      .catch((e) => {
-        chrome.scripting.executeScript({
-          target: { tabId: sender.tab.id },
-          func: setMediaBlob,
-          args: [blobURL, location, e.message]
-        })
+    } catch (e) {
+      chrome.scripting.executeScript({
+        target: { tabId: sender.tab.id },
+        func: setMediaBlob,
+        args: ['', location, e.message]
       })
+    }
   }
 
   if (payload.method === 'frame_summon')
@@ -247,51 +251,49 @@ const unsubscribeTab = (tabId) => {
 }
 
 async function sendEvent(event, args = [], selector = {}) {
-  const tabSelector = {
-    ...selector,
-    url: ['http://*/*', 'https://*/*', 'file://*/*']
-  }
-
-  const tabs = await chrome.tabs.query(tabSelector)
+  const tabs = await chrome.tabs.query({
+    ...tabOriginSelector,
+    ...selector
+  })
 
   tabs.forEach((tab) => {
     chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
   })
 }
 
+async function addTabListeners () {
+  // Query for all existing tabs and store their origins
+  const tabs = await chrome.tabs.query({})
+
 // Create an object to store the last known origin for each tab
-const tabOrigins = {}
+  const tabOrigins = Object.fromEntries(tabs.map(tab => [tab.id, originFromUrl(tab.url)]))
 
-// Query for all existing tabs and store their origins
-chrome.tabs.query({}, (tabs) => {
-  for (let tab of tabs) tabOrigins[tab.id] = originFromUrl(tab.url)
-})
+  chrome.tabs.onRemoved.addListener((tabId) => {
+    delete tabOrigins[tabId]
+    unsubscribeTab(tabId)
+  })
 
-chrome.tabs.onRemoved.addListener((tabId, removed) => {
-  delete tabOrigins[tabId]
-  unsubscribeTab(tabId)
-})
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url) {
-    const origin = originFromUrl(changeInfo.url)
-    const tabOrigin = tabOrigins[tabId]
-    if (tabOrigin !== origin) {
-      tabOrigins[tabId] = origin
-      unsubscribeTab(tabId)
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.url) {
+      const origin = originFromUrl(changeInfo.url)
+      const tabOrigin = tabOrigins[tabId]
+      if (tabOrigin !== origin) {
+        tabOrigins[tabId] = origin
+        unsubscribeTab(tabId)
+      }
     }
-  }
-})
+  })
 
-chrome.tabs.onActivated.addListener(async ({ tabId }) => {
-  activeTabId = tabId
+  chrome.tabs.onActivated.addListener(async ({ tabId }) => {
+    activeTabId = tabId
 
-  const tab = await chrome.tabs.get(tabId)
-  const tabOrigin = getOrigin(tab.url)
-  if (tabOrigin.startsWith('http') || tabOrigin.startsWith('file')) {
-    chrome.tabs.sendMessage(tabId, { type: 'embedded:action', action: { type: 'getChainId' } })
-  }
-})
+    const tab = await chrome.tabs.get(tabId)
+    const tabOrigin = getOrigin(tab.url)
+    if (tabOrigin.startsWith('http') || tabOrigin.startsWith('file')) {
+      chrome.tabs.sendMessage(tabId, { type: 'embedded:action', action: { type: 'getChainId' } })
+    }
+  })
+}
 
 const CLIENT_STATUS_ALARM_KEY = 'check-client-status'
 
@@ -313,5 +315,6 @@ async function setupClientStatusAlarm() {
   })
 }
 
-initProvider()
+addTabListeners()
 setupClientStatusAlarm()
+initProvider()
