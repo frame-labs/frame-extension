@@ -1,24 +1,26 @@
 /* globals chrome */
-
 const ethProvider = require('eth-provider')
-let provider
 
-const subs = {}
-const pending = {}
-
+// constants
 const tabOriginSelector = {
   url: ['http://*/*', 'https://*/*', 'file://*/*']
 }
 
-const originFromUrl = (url) => {
-  if (!url) return ''
-  const path = url.split('/')
-  return `${path[0]}//${path[2]}`
-}
-const getOrigin = (sender = {}) => originFromUrl(sender.url)
+const subTypes = [
+  'chainChanged',
+  'chainsChanged',
+  'accountsChanged',
+  'assetsChanged',
+  'networkChanged',
+  'message'
+]
 
-chrome.action.setPopup({ popup: 'settings.html' })
-chrome.action.setIcon({ path: 'icons/icon96moon.png' })
+// extension state
+let provider
+let settingsPanel, activeTabId
+
+const subs = {}
+const pending = {}
 
 const frameState = {
   connected: false,
@@ -26,10 +28,46 @@ const frameState = {
   currentChain: ''
 }
 
+// helper functions
+const originFromUrl = (url) => {
+  if (!url) return ''
+  const path = url.split('/')
+  return `${path[0]}//${path[2]}`
+}
+const getOrigin = (sender = {}) => originFromUrl(sender.url)
+
+const subType = (pendingPayload) => {
+  try {
+    const type = pendingPayload.params[0]
+    return subTypes.includes(type) ? type : 'unknown'
+  } catch (e) {
+    return 'unknown'
+  }
+}
+
+const unsubscribeTab = (tabId) => {
+  Object.keys(pending).forEach((id) => {
+    if (pending[id].tabId === tabId) delete pending[id]
+  })
+  Object.keys(subs).forEach((sub) => {
+    if (subs[sub].tabId === tabId) {
+      provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
+      delete subs[sub]
+    }
+  })
+}
+
 function updateSettingsPanel () {
   if (settingsPanel) {
     settingsPanel.postMessage(frameState)
   }
+}
+
+function setConnected (connected) {
+  console.debug(`Setting connected to ${connected}`)
+
+  frameState.connected = connected
+  updateSettingsPanel()
 }
 
 function setChains(chains) {
@@ -46,40 +84,59 @@ function setCurrentChain(chain) {
   updateSettingsPanel()
 }
 
+function setIcon (path) {
+  chrome.action.setIcon({ path })
+}
+
+function setPopup (popup) {
+  chrome.action.setPopup({ popup })
+}
+
+async function fetchAvailableChains () {
+  try {
+    const chains = await provider.request({ method: 'wallet_getEthereumChains' })
+    setChains(chains)
+  } catch (e) {
+    console.error('Error fetching chains', e)
+    setChains([])
+  }
+}
+
+async function sendEvent(event, args = [], selector = {}) {
+  const tabs = await chrome.tabs.query({
+    ...tabOriginSelector,
+    ...selector
+  })
+
+  tabs.forEach((tab) => {
+    chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
+  })
+}
+
 function initProvider() {
   console.log('Initializing provider connection to Frame')
 
   provider = ethProvider('ws://127.0.0.1:1248?identity=frame-extension')
 
-  provider.on('connect', () => {
+  provider.on('connect', async () => {
     console.log('Connected to Frame')
 
-    frameState.connected = true
-    updateSettingsPanel()
+    setConnected(true)
+    fetchAvailableChains()
 
-    provider
-      .request({ method: 'wallet_getEthereumChains' })
-      .then(setChains)
-      .catch(() => setChains([]))
-
-    // change icon
-    chrome.action.setIcon({ path: 'icons/icon96good.png' })
-
+    setIcon('icons/icon96good.png')
     sendEvent('connect')
   })
 
   provider.on('disconnect', () => {
-    frameState.connected = false
-    updateSettingsPanel()
+    setConnected(false)
 
-    // change icon
-    chrome.action.setIcon({ path: 'icons/icon96moon.png' })
-
+    setIcon('icons/icon96moon.png')
     sendEvent('close')
   })
 
   provider.on('chainsChanged', (chains = []) => {
-    if (chains[0] && chains[0] !== null && typeof chains[0] === 'object') {
+    if (chains[0] && typeof chains[0] === 'object') {
       setChains(chains)
     }
   })
@@ -128,136 +185,85 @@ function initProvider() {
   })
 }
 
-let settingsPanel, activeTabId
-
-function portDisconnected(port) {
-  settingsPanel = null
-  port.onDisconnect.removeListener(portDisconnected)
-}
-
-chrome.runtime.onConnect.addListener((port) => {
-  port.onDisconnect.addListener(portDisconnected)
-
-  if (port.name === 'frame_connect') {
-    settingsPanel = port
-    updateSettingsPanel()
+function addStateListeners() {
+  function onPortDisconnected(port) {
+    settingsPanel = null
+    port.onDisconnect.removeListener(onPortDisconnected)
   }
-})
 
-chrome.idle.onStateChanged.addListener((state) => {
-  if (state === 'active') {
-    initProvider()
+  function setMediaBlob (blobUrl, location, message) {
+    window.__setMediaBlob__(blobUrl, location, message)
   }
-})
 
-const subTypes = [
-  'chainChanged',
-  'chainsChanged',
-  'accountsChanged',
-  'assetsChanged',
-  'networkChanged',
-  'message'
-]
+  chrome.runtime.onMessage.addListener(async (extensionPayload, sender) => {
+    const { tab, ...payload } = extensionPayload
+    const { method, params } = payload
 
-const subType = (pendingPayload) => {
-  try {
-    const type = pendingPayload.params[0]
-    return subTypes.includes(type) ? type : 'unknown'
-  } catch (e) {
-    return 'unknown'
-  }
-}
+    console.debug('Message received from tab', { tab, payload })
 
-function setMediaBlob (blobUrl, location, message) {
-  window.__setMediaBlob__(blobUrl, location, message)
-}
+    if (payload.method === 'embedded_action_res') {
+      const [action, res] = params
+      if (action.type === 'getChainId' && res.chainId) return setCurrentChain(res.chainId)
+    } else if (payload.method === 'media_blob') {
+      const location = payload.location
 
-chrome.runtime.onMessage.addListener(async (extensionPayload, sender, sendResponse) => {
-  const { tab, ...payload } = extensionPayload
-  const { method, params } = payload
+      try {
+        const res = await fetch(payload.src)
+        const blob = await res.blob()
+        const blobURL = URL.createObjectURL(blob)
 
-  console.debug('Message received from tab', { tab, payload })
-
-  if (payload.method === 'embedded_action_res') {
-    const [action, res] = params
-    if (action.type === 'getChainId' && res.chainId) return setCurrentChain(res.chainId)
-  } else if (payload.method === 'media_blob') {
-    const location = payload.location
-
-    try {
-      const res = await fetch(payload.src)
-      const blob = await res.blob()
-      const blobURL = URL.createObjectURL(blob)
-
-      chrome.scripting.executeScript({
-        target: { tabId: sender.tab.id },
-        func: setMediaBlob,
-        args: [blobURL, location]
-      })
-    } catch (e) {
-      chrome.scripting.executeScript({
-        target: { tabId: sender.tab.id },
-        func: setMediaBlob,
-        args: ['', location, e.message]
-      })
+        chrome.scripting.executeScript({
+          target: { tabId: sender.tab.id },
+          func: setMediaBlob,
+          args: [blobURL, location]
+        })
+      } catch (e) {
+        chrome.scripting.executeScript({
+          target: { tabId: sender.tab.id },
+          func: setMediaBlob,
+          args: ['', location, e.message]
+        })
+      }
     }
-  }
 
-  if (payload.method === 'frame_summon')
-    return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })
+    if (payload.method === 'frame_summon')
+      return provider.connection.send({ jsonrpc: '2.0', id: 1, method, params })
 
-  const id = provider.nextId++
-  const origin = getOrigin(tab || sender)
-  if (!origin) return console.error('No origin found for sender')
-  pending[id] = {
-    tabId: sender?.tab?.id || tab.id,
-    payloadId: payload.id,
-    method,
-    params,
-    origin
-  }
+    const id = provider.nextId++
+    const origin = getOrigin(tab || sender)
+    if (!origin) return console.error('No origin found for sender')
+    pending[id] = {
+      tabId: sender?.tab?.id || tab.id,
+      payloadId: payload.id,
+      method,
+      params,
+      origin
+    }
 
-  const load = {
-    ...payload,
-    jsonrpc: '2.0',
-    id,
-    __frameOrigin: origin,
-    __extensionConnecting: payload.__extensionConnecting
-  }
+    const load = {
+      ...payload,
+      jsonrpc: '2.0',
+      id,
+      __frameOrigin: origin,
+      __extensionConnecting: payload.__extensionConnecting
+    }
 
-  provider.connection.send(load)
-})
-
-// chrome.browserAction.onClicked.addListener(tab => {
-//   if (provider.connected) {
-//     const load = { jsonrpc: '2.0', id: 1, method: 'frame_summon', params: [] }
-//     provider.connection.send(load)
-//   } else {
-//     if (provider && provider.close) provider.close()
-//     provider = ethProvider('ws://127.0.0.1:1248?identity=frame-extension')
-//   }
-// })
-
-const unsubscribeTab = (tabId) => {
-  Object.keys(pending).forEach((id) => {
-    if (pending[id].tabId === tabId) delete pending[id]
+    provider.connection.send(load)
   })
-  Object.keys(subs).forEach((sub) => {
-    if (subs[sub].tabId === tabId) {
-      provider.send({ jsonrpc: '2.0', id: 1, method: 'eth_unsubscribe', params: [sub] })
-      delete subs[sub]
+
+  chrome.runtime.onConnect.addListener((port) => {
+    port.onDisconnect.addListener(onPortDisconnected)
+
+    if (port.name === 'frame_connect') {
+      settingsPanel = port
+      updateSettingsPanel()
     }
   })
-}
 
-async function sendEvent(event, args = [], selector = {}) {
-  const tabs = await chrome.tabs.query({
-    ...tabOriginSelector,
-    ...selector
-  })
-
-  tabs.forEach((tab) => {
-    chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
+  chrome.idle.onStateChanged.addListener((state) => {
+    if (state === 'active') {
+      initProvider()
+    }
   })
 }
 
@@ -315,6 +321,10 @@ async function setupClientStatusAlarm() {
   })
 }
 
+setIcon('icons/icon96moon.png')
+setPopup('settings.html')
+
+addStateListeners()
 addTabListeners()
 setupClientStatusAlarm()
 initProvider()
