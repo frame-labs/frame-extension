@@ -59,11 +59,19 @@ async function getActiveTab () {
 }
 
 async function executeScript (tabId, func, args) {
-  return chrome.scripting.executeScript({
-    target: { tabId },
-    func,
-    args
-  })
+  try {
+    const result = await chrome.scripting.executeScript({
+      target: { tabId },
+      func,
+      args
+    })
+
+    return result
+  } catch (e) {
+    // this can happen when trying to open the settings panel while on a tab that doesn't support
+    // script injection, such as a chrome:// tab
+    return []
+  }
 }
 
 async function getLocalSetting (tabId, key) {
