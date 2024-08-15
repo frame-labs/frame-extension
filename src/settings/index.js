@@ -235,7 +235,7 @@ const CannotConnectSub = styled.div`
   font-size: 14px;
 `
 
-const UninjectedTab = styled.div`
+const UnsupportedTab = styled.div`
   padding: 32px;
   display: flex;
   justify-content: center;
@@ -328,13 +328,7 @@ function parseOrigin(url = '') {
     return url
   }
 
-  const { protocol, origin } = m.groups || { origin: url }
-
-  if (!isInjectedUrl(url)) {
-    return protocol + origin
-  }
-
-  return origin
+  return m.groups || { origin: url, protocol: '' }
 }
 
 const chainConnected = ({ connected }) => connected === undefined || connected
@@ -396,14 +390,15 @@ class _Settings extends React.Component {
     )
   }
 
-  uninjectedTab (origin) {
+  unsupportedTab (origin) {
     const message = `Frame does not have access to ${origin} tabs in this browser`
+
     return (
       <Cluster>
         <ClusterRow>
           <ClusterValue>
             <div style={{ paddingBottom: '32px' }}>
-              <UninjectedTab>Unsupported tab</UninjectedTab>
+              <UnsupportedTab>Unsupported tab</UnsupportedTab>
               <CannotConnectSub>{message}</CannotConnectSub>
             </div>
           </ClusterValue>
@@ -547,11 +542,22 @@ class _Settings extends React.Component {
 
   renderMainPanel() {
     const isConnected = this.store('frameConnected')
-    const isInjectedTab = isInjectedUrl(this.props.tab.url)
-    const origin = parseOrigin(this.props.tab.url)
+    const { tab: { url }, isSupportedTab, augmentOff } = this.props
+    const { protocol, origin } = parseOrigin(url)
 
-    return isInjectedTab ? 
-      isConnected ? (
+    if (!isSupportedTab) {
+      return (
+        <ClusterBoxMain style={{ marginTop: '12px' }}>{this.unsupportedTab(protocol + origin)}</ClusterBoxMain>
+      )
+    }
+
+    if (!isConnected) {
+      return (
+        <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
+      )
+    }
+
+    return (
       <>
         <ClusterBoxMain style={{ marginTop: '12px' }}>
           <CurrentOriginTitle>
@@ -575,7 +581,7 @@ class _Settings extends React.Component {
                 <>
                   <div style={{ height: '9px' }} />
                   <ClusterRow>
-                    {this.props.augmentOff ? (
+                    {augmentOff ? (
                       <>
                         <ClusterValue>
                           <Augment>Verify ENS Names</Augment>
@@ -605,11 +611,7 @@ class _Settings extends React.Component {
           
         </ClusterBoxMain>
       </>
-    ) : (
-      <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
-    ):  (
-              <ClusterBoxMain style={{ marginTop: '12px' }}>{this.uninjectedTab(origin)}</ClusterBoxMain>
-            )
+    )
   }
 
   render() {
@@ -667,5 +669,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const root = document.getElementById('root')
 
-  ReactDOM.render(<Settings tab={activeTab} mmAppear={mmAppear} augmentOff={augmentOff} />, root)
+  ReactDOM.render(<Settings
+    tab={activeTab}
+    isSupportedTab={isInjectedTab}
+    mmAppear={mmAppear}
+    augmentOff={augmentOff} />,
+  root)
 })
