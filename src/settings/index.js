@@ -106,11 +106,6 @@ async function toggleLocalSetting (key) {
   }
 }
 
-const getOrigin = (url) => {
-  const path = url.split('/')
-  return path[0] + '//' + path[2]
-}
-
 const SettingsScroll = styled.div`
   overflow-x: hidden;
   overflow-y: scroll;
@@ -232,12 +227,20 @@ const NotConnected = styled.div`
   font-size: 18px;
 `
 
-const NotConnectedSub = styled.div`
+const CannotConnectSub = styled.div`
   padding: 0px 32px 0px 32px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 14px;
+`
+
+const UninjectedTab = styled.div`
+  padding: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
 `
 
 const Download = styled.a`
@@ -315,19 +318,28 @@ const Overlay = styled.div`
   pointer-events: none;
 `
 
-const originDomainRegex = /^(?:.+(?::\/\/))?(?<origin>.*)/
+const originDomainRegex = /^(?<protocol>.+(?::\/\/))?(?<origin>[^\/]*)/
 
-function parseOrigin(origin) {
-  const m = origin.match(originDomainRegex)
+function parseOrigin(url = '') {
+  const m = url.match(originDomainRegex)
+
   if (!m) {
-    log.warn(`could not parse origin: ${origin}`)
-    return origin
+    console.warn(`could not parse origin: ${url}`)
+    return url
   }
 
-  return (m.groups || {}).origin || origin
+  const { protocol, origin } = m.groups || { origin: url }
+
+  if (!isInjectedUrl(url)) {
+    return protocol + origin
+  }
+
+  return origin
 }
 
 const chainConnected = ({ connected }) => connected === undefined || connected
+
+const isInjectedUrl = (url = '') => url.startsWith('http') || url.startsWith('file')
 
 const ChainButton = ({ index, chain, tab, selected }) => {
   const { chainId, name } = chain
@@ -368,8 +380,8 @@ class _Settings extends React.Component {
           <ClusterValue>
             <div style={{ paddingBottom: '32px' }}>
               <NotConnected>Unable to connect to Frame</NotConnected>
-              <NotConnectedSub>Make sure the Frame desktop app is running</NotConnectedSub>
-              <NotConnectedSub>on your machine or download it below</NotConnectedSub>
+              <CannotConnectSub>Make sure the Frame desktop app is running</CannotConnectSub>
+              <CannotConnectSub>on your machine or download it below</CannotConnectSub>
             </div>
           </ClusterValue>
         </ClusterRow>
@@ -384,8 +396,25 @@ class _Settings extends React.Component {
     )
   }
 
+  uninjectedTab (origin) {
+    const message = `Frame does not have access to ${origin} tabs in this browser`
+    return (
+      <Cluster>
+        <ClusterRow>
+          <ClusterValue>
+            <div style={{ paddingBottom: '32px' }}>
+              <UninjectedTab>Unsupported tab</UninjectedTab>
+              <CannotConnectSub>{message}</CannotConnectSub>
+            </div>
+          </ClusterValue>
+        </ClusterRow>
+      </Cluster>
+    )
+  }
+
   frameConnected() {
     const isConnected = this.store('frameConnected')
+
     return (
       <Cluster>
         <ClusterRow>
@@ -518,9 +547,11 @@ class _Settings extends React.Component {
 
   renderMainPanel() {
     const isConnected = this.store('frameConnected')
-    const origin = parseOrigin(getOrigin(this.props.tab.url))
+    const isInjectedTab = isInjectedUrl(this.props.tab.url)
+    const origin = parseOrigin(this.props.tab.url)
 
-    return isConnected ? (
+    return isInjectedTab ? 
+      isConnected ? (
       <>
         <ClusterBoxMain style={{ marginTop: '12px' }}>
           <CurrentOriginTitle>
@@ -532,50 +563,53 @@ class _Settings extends React.Component {
             </svg>
             {origin}
           </CurrentOriginTitle>
-          <Cluster>
-            {this.store('availableChains').length ? (
-              <>
-                {this.chainSelect()}
-                <div style={{ height: '9px' }} />
-              </>
-            ) : null}
-            {this.appearAsMMToggle()}
-            {origin === 'twitter.com' ? (
-              <>
-                <div style={{ height: '9px' }} />
-                <ClusterRow>
-                  {this.props.augmentOff ? (
-                    <>
-                      <ClusterValue>
-                        <Augment>Verify ENS Names</Augment>
-                      </ClusterValue>
-                      <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
-                        <FrameButton>
-                          <AugmentStateOff>OFF</AugmentStateOff>
-                        </FrameButton>
-                      </ClusterValue>
-                    </>
-                  ) : (
-                    <>
-                      <ClusterValue>
-                        <Augment>Verify ENS Names</Augment>
-                      </ClusterValue>
-                      <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
-                        <FrameButton>
-                          <AugmentStateOn>ON</AugmentStateOn>
-                        </FrameButton>
-                      </ClusterValue>
-                    </>
-                  )}
-                </ClusterRow>
-              </>
-            ) : null}
-          </Cluster>
+              <Cluster>
+              {this.store('availableChains').length ? (
+                <>
+                  {this.chainSelect()}
+                  <div style={{ height: '9px' }} />
+                </>
+              ) : null}
+              {this.appearAsMMToggle()}
+              {origin === 'twitter.com' ? (
+                <>
+                  <div style={{ height: '9px' }} />
+                  <ClusterRow>
+                    {this.props.augmentOff ? (
+                      <>
+                        <ClusterValue>
+                          <Augment>Verify ENS Names</Augment>
+                        </ClusterValue>
+                        <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
+                          <FrameButton>
+                            <AugmentStateOff>OFF</AugmentStateOff>
+                          </FrameButton>
+                        </ClusterValue>
+                      </>
+                    ) : (
+                      <>
+                        <ClusterValue>
+                          <Augment>Verify ENS Names</Augment>
+                        </ClusterValue>
+                        <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
+                          <FrameButton>
+                            <AugmentStateOn>ON</AugmentStateOn>
+                          </FrameButton>
+                        </ClusterValue>
+                      </>
+                    )}
+                  </ClusterRow>
+                </>
+              ) : null}
+            </Cluster>
+          
         </ClusterBoxMain>
       </>
     ) : (
       <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
-    )
+    ):  (
+              <ClusterBoxMain style={{ marginTop: '12px' }}>{this.uninjectedTab(origin)}</ClusterBoxMain>
+            )
   }
 
   render() {
@@ -608,20 +642,28 @@ const updateCurrentChain = (tab) => {
   })
 }
 
+async function getInitialSettings (tabId) {
+  return Promise.all([
+    getLocalSetting(tabId, APPEAR_AS_MM),
+    getLocalSetting(tabId, AUGMENT_OFF)
+  ])
+}
+
 document.addEventListener('DOMContentLoaded', async function () {
   console.info('Settings panel loaded')
 
   const activeTab = await getActiveTab()
-  const [mmAppear, augmentOff] = await Promise.all([
-    getLocalSetting(activeTab.id, APPEAR_AS_MM),
-    getLocalSetting(activeTab.id, AUGMENT_OFF)
-  ])
+  const isInjectedTab = isInjectedUrl(activeTab?.url)
 
-  setInterval(() => {
-    updateCurrentChain(activeTab)
-  }, 1000)
+  const [mmAppear, augmentOff] = isInjectedTab ? await getInitialSettings(activeTab.id) : [false, false]
 
-  console.debug('Initial settings', { mmAppear, augmentOff })
+  if (isInjectedTab) {
+    setInterval(() => {
+      updateCurrentChain(activeTab)
+    }, 1000)
+  }
+
+  console.debug('Initial settings', { activeTab, isInjectedTab, mmAppear, augmentOff })
 
   const root = document.getElementById('root')
 
