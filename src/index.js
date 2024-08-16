@@ -314,8 +314,6 @@ async function setupClientStatusAlarm() {
     if (alarm.name === CLIENT_STATUS_ALARM_KEY) {
       if (provider && provider.isConnected()) {
         provider.request({ jsonrpc: '2.0', id: 1, method: 'web3_clientVersion' })
-      } else {
-        initProvider()
       }
     }
   })
