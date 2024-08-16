@@ -545,15 +545,15 @@ class _Settings extends React.Component {
     const { tab: { url }, isSupportedTab, augmentOff } = this.props
     const { protocol, origin } = parseOrigin(url)
 
-    if (!isSupportedTab) {
-      return (
-        <ClusterBoxMain style={{ marginTop: '12px' }}>{this.unsupportedTab(protocol + origin)}</ClusterBoxMain>
-      )
-    }
-
     if (!isConnected) {
       return (
         <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
+      )
+    }
+
+    if (!isSupportedTab) {
+      return (
+        <ClusterBoxMain style={{ marginTop: '12px' }}>{this.unsupportedTab(protocol + origin)}</ClusterBoxMain>
       )
     }
 
