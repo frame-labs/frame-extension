@@ -41,6 +41,9 @@
         "http://*/*"
       ]
     }],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' ws://127.0.0.1:1248 ws://localhost:1248"
+  },
   "permissions": ["activeTab", "tabs", "idle", "scripting", "alarms"],
   "host_permissions": ["https://*/*", "http://*/*"],
   "icons": {
