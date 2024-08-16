@@ -6,7 +6,8 @@
   "description": "Frame companion creates an injected connection to Frame desktop wallet (required) on macOS, Windows or Linux.",
   "homepage_url": "https://github.com/floating/frame",
   "background": {
-    "service_worker": "index.js"
+    "service_worker": "index.js",
+    "scripts": ["index.js"]
   },
   "action": {
     "default_title": "Frame Companion",
