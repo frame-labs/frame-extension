@@ -233,6 +233,7 @@ const CannotConnectSub = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 14px;
+  flex-direction: column;
 `
 
 const UnsupportedTab = styled.div`
@@ -240,6 +241,13 @@ const UnsupportedTab = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 18px;
+`
+
+const UnsupportedOrigin = styled.div`
+  color: var(--moon);
+  padding-top: 4px;
+  padding-bottom: 4px;
   font-size: 18px;
 `
 
@@ -318,7 +326,7 @@ const Overlay = styled.div`
   pointer-events: none;
 `
 
-const originDomainRegex = /^(?<protocol>.+(?::\/\/))?(?<origin>[^\/]*)/
+const originDomainRegex = /^(?<protocol>.+:(?:\/\/)?)(?<origin>[^\#\/]*)/
 
 function parseOrigin(url = '') {
   const m = url.match(originDomainRegex)
@@ -391,15 +399,17 @@ class _Settings extends React.Component {
   }
 
   unsupportedTab (origin) {
-    const message = `Frame does not have access to ${origin} tabs in this browser`
-
     return (
       <Cluster>
         <ClusterRow>
           <ClusterValue>
             <div style={{ paddingBottom: '32px' }}>
               <UnsupportedTab>Unsupported tab</UnsupportedTab>
-              <CannotConnectSub>{message}</CannotConnectSub>
+              <CannotConnectSub>
+                <div>Frame does not have access to</div>
+                <UnsupportedOrigin>{origin}</UnsupportedOrigin>
+                <div>tabs in this browser</div>
+              </CannotConnectSub>
             </div>
           </ClusterValue>
         </ClusterRow>
