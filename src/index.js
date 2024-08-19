@@ -185,6 +185,13 @@ function initProvider() {
   })
 }
 
+function destroyProvider () {
+  if (provider) {
+    provider.close()
+    provider = null
+  }
+}
+
 function addStateListeners() {
   function onPortDisconnected(port) {
     settingsPanel = null
@@ -262,6 +269,7 @@ function addStateListeners() {
 
   chrome.idle.onStateChanged.addListener((state) => {
     if (state === 'active') {
+      destroyProvider()
       initProvider()
     }
   })
