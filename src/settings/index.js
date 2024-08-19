@@ -7,6 +7,9 @@ import styled from 'styled-components'
 
 import { Cluster, ClusterValue, ClusterRow, ClusterBoxMain } from './Cluster'
 
+const APPEAR_AS_MM = '__frameAppearAsMM__'
+const AUGMENT_OFF = '__frameAugmentOff__'
+
 const initialState = {
   frameConnected: false,
   appearAsMM: false,
@@ -50,55 +53,57 @@ const getScrollBarWidth = () => {
   return w1 - w2
 }
 
-function mmAppearToggle() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0]) {
-      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAppearAsMM__']" }, (results) => {
-        let mmAppear = false
-        if (results) {
-          try {
-            mmAppear = JSON.parse(results[0])
-          } catch (e) {
-            mmAppear = false
-          }
-          chrome.tabs.executeScript(tabs[0].id, {
-            code: `localStorage.setItem('__frameAppearAsMM__', ${JSON.stringify(
-              !mmAppear
-            )}); window.location.reload();`
-          })
-        }
-        window.close()
-      })
-    }
-  })
+async function getActiveTab () {
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+  return tabs[0]
 }
 
-function augmentOffToggle() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0]) {
-      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAugmentOff__']" }, (results) => {
-        let augmentOff = true
-        if (results) {
-          try {
-            augmentOff = Boolean(JSON.parse(results[0]))
-          } catch (e) {
-            augmentOff = true
-          }
-          chrome.tabs.executeScript(tabs[0].id, {
-            code: `localStorage.setItem('__frameAugmentOff__', ${JSON.stringify(
-              !augmentOff
-            )}); window.location.reload();`
-          })
-        }
-        window.close()
-      })
-    }
-  })
+async function executeScript (tabId, func, args) {
+  try {
+    const result = await chrome.scripting.executeScript({
+      target: { tabId },
+      func,
+      args
+    })
+
+    return result
+  } catch (e) {
+    // this can happen when trying to open the settings panel while on a tab that doesn't support
+    // script injection, such as a chrome:// tab
+    return []
+  }
 }
 
-const getOrigin = (url) => {
-  const path = url.split('/')
-  return path[0] + '//' + path[2]
+async function getLocalSetting (tabId, key) {
+  const results = await executeScript(tabId, (key) => localStorage.getItem(key), [key])
+
+  if (results && results.length > 0) {
+    try {
+      return JSON.parse(results[0].result || false)
+    } catch (e) {
+      return false
+    }
+  }
+
+  return false
+}
+
+async function setLocalSetting (tabId, setting, val) {
+  return executeScript(tabId, (key, val) => {
+    localStorage.setItem(key, val)
+    window.location.reload()
+  }, [setting, val])
+}
+
+async function toggleLocalSetting (key) {
+  const activeTab = await getActiveTab()
+
+  if (activeTab) {
+    const currentValue = await getLocalSetting(activeTab.id, key)
+    setLocalSetting(activeTab.id, key, !currentValue)
+
+    window.close()
+  }
 }
 
 const SettingsScroll = styled.div`
@@ -222,12 +227,28 @@ const NotConnected = styled.div`
   font-size: 18px;
 `
 
-const NotConnectedSub = styled.div`
+const CannotConnectSub = styled.div`
   padding: 0px 32px 0px 32px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 14px;
+  flex-direction: column;
+`
+
+const UnsupportedTab = styled.div`
+  padding: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+`
+
+const UnsupportedOrigin = styled.div`
+  color: var(--moon);
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: 18px;
 `
 
 const Download = styled.a`
@@ -305,19 +326,22 @@ const Overlay = styled.div`
   pointer-events: none;
 `
 
-const originDomainRegex = /^(?:.+(?::\/\/))?(?<origin>.*)/
+const originDomainRegex = /^(?<protocol>.+:(?:\/\/)?)(?<origin>[^\#\/]*)/
 
-function parseOrigin(origin) {
-  const m = origin.match(originDomainRegex)
+function parseOrigin(url = '') {
+  const m = url.match(originDomainRegex)
+
   if (!m) {
-    log.warn(`could not parse origin: ${origin}`)
-    return origin
+    console.warn(`could not parse origin: ${url}`)
+    return url
   }
 
-  return (m.groups || {}).origin || origin
+  return m.groups || { origin: url, protocol: '' }
 }
 
 const chainConnected = ({ connected }) => connected === undefined || connected
+
+const isInjectedUrl = (url = '') => url.startsWith('http') || url.startsWith('file')
 
 const ChainButton = ({ index, chain, tab, selected }) => {
   const { chainId, name } = chain
@@ -358,8 +382,8 @@ class _Settings extends React.Component {
           <ClusterValue>
             <div style={{ paddingBottom: '32px' }}>
               <NotConnected>Unable to connect to Frame</NotConnected>
-              <NotConnectedSub>Make sure the Frame desktop app is running</NotConnectedSub>
-              <NotConnectedSub>on your machine or download it below</NotConnectedSub>
+              <CannotConnectSub>Make sure the Frame desktop app is running</CannotConnectSub>
+              <CannotConnectSub>on your machine or download it below</CannotConnectSub>
             </div>
           </ClusterValue>
         </ClusterRow>
@@ -374,8 +398,28 @@ class _Settings extends React.Component {
     )
   }
 
+  unsupportedTab (origin) {
+    return (
+      <Cluster>
+        <ClusterRow>
+          <ClusterValue>
+            <div style={{ paddingBottom: '32px' }}>
+              <UnsupportedTab>Unsupported tab</UnsupportedTab>
+              <CannotConnectSub>
+                <div>Frame does not have access to</div>
+                <UnsupportedOrigin>{origin}</UnsupportedOrigin>
+                <div>tabs in this browser</div>
+              </CannotConnectSub>
+            </div>
+          </ClusterValue>
+        </ClusterRow>
+      </Cluster>
+    )
+  }
+
   frameConnected() {
     const isConnected = this.store('frameConnected')
+
     return (
       <Cluster>
         <ClusterRow>
@@ -431,7 +475,7 @@ class _Settings extends React.Component {
           </ClusterValue>
         </ClusterRow>
         <ClusterRow>
-          <ClusterValue onClick={() => mmAppearToggle()}>
+          <ClusterValue onClick={() => toggleLocalSetting(APPEAR_AS_MM)}>
             <AppearToggle>
               <span>
                 Appear As <span className='frame'>Frame</span> Instead
@@ -458,7 +502,7 @@ class _Settings extends React.Component {
           </ClusterValue>
         </ClusterRow>
         <ClusterRow>
-          <ClusterValue onClick={() => mmAppearToggle()}>
+          <ClusterValue onClick={() => toggleLocalSetting(APPEAR_AS_MM)}>
             <AppearToggle>
               <span>
                 Appear As <span className='mm'>Metamask</span> Instead
@@ -508,9 +552,22 @@ class _Settings extends React.Component {
 
   renderMainPanel() {
     const isConnected = this.store('frameConnected')
-    const origin = parseOrigin(getOrigin(this.props.tab.url))
+    const { tab: { url }, isSupportedTab, augmentOff } = this.props
+    const { protocol, origin } = parseOrigin(url)
 
-    return isConnected ? (
+    if (!isConnected) {
+      return (
+        <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
+      )
+    }
+
+    if (!isSupportedTab) {
+      return (
+        <ClusterBoxMain style={{ marginTop: '12px' }}>{this.unsupportedTab(protocol + origin)}</ClusterBoxMain>
+      )
+    }
+
+    return (
       <>
         <ClusterBoxMain style={{ marginTop: '12px' }}>
           <CurrentOriginTitle>
@@ -522,49 +579,48 @@ class _Settings extends React.Component {
             </svg>
             {origin}
           </CurrentOriginTitle>
-          <Cluster>
-            {this.store('availableChains').length ? (
-              <>
-                {this.chainSelect()}
-                <div style={{ height: '9px' }} />
-              </>
-            ) : null}
-            {this.appearAsMMToggle()}
-            {origin === 'twitter.com' ? (
-              <>
-                <div style={{ height: '9px' }} />
-                <ClusterRow>
-                  {this.props.augmentOff ? (
-                    <>
-                      <ClusterValue>
-                        <Augment>Verify ENS Names</Augment>
-                      </ClusterValue>
-                      <ClusterValue onClick={() => augmentOffToggle()} style={{ flexGrow: '0' }}>
-                        <FrameButton>
-                          <AugmentStateOff>OFF</AugmentStateOff>
-                        </FrameButton>
-                      </ClusterValue>
-                    </>
-                  ) : (
-                    <>
-                      <ClusterValue>
-                        <Augment>Verify ENS Names</Augment>
-                      </ClusterValue>
-                      <ClusterValue onClick={() => augmentOffToggle()} style={{ flexGrow: '0' }}>
-                        <FrameButton>
-                          <AugmentStateOn>ON</AugmentStateOn>
-                        </FrameButton>
-                      </ClusterValue>
-                    </>
-                  )}
-                </ClusterRow>
-              </>
-            ) : null}
-          </Cluster>
+              <Cluster>
+              {this.store('availableChains').length ? (
+                <>
+                  {this.chainSelect()}
+                  <div style={{ height: '9px' }} />
+                </>
+              ) : null}
+              {this.appearAsMMToggle()}
+              {origin === 'twitter.com' ? (
+                <>
+                  <div style={{ height: '9px' }} />
+                  <ClusterRow>
+                    {augmentOff ? (
+                      <>
+                        <ClusterValue>
+                          <Augment>Verify ENS Names</Augment>
+                        </ClusterValue>
+                        <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
+                          <FrameButton>
+                            <AugmentStateOff>OFF</AugmentStateOff>
+                          </FrameButton>
+                        </ClusterValue>
+                      </>
+                    ) : (
+                      <>
+                        <ClusterValue>
+                          <Augment>Verify ENS Names</Augment>
+                        </ClusterValue>
+                        <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
+                          <FrameButton>
+                            <AugmentStateOn>ON</AugmentStateOn>
+                          </FrameButton>
+                        </ClusterValue>
+                      </>
+                    )}
+                  </ClusterRow>
+                </>
+              ) : null}
+            </Cluster>
+          
         </ClusterBoxMain>
       </>
-    ) : (
-      <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
     )
   }
 
@@ -598,34 +654,35 @@ const updateCurrentChain = (tab) => {
   })
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+async function getInitialSettings (tabId) {
+  return Promise.all([
+    getLocalSetting(tabId, APPEAR_AS_MM),
+    getLocalSetting(tabId, AUGMENT_OFF)
+  ])
+}
+
+document.addEventListener('DOMContentLoaded', async function () {
+  console.info('Settings panel loaded')
+
+  const activeTab = await getActiveTab()
+  const isInjectedTab = isInjectedUrl(activeTab?.url)
+
+  const [mmAppear, augmentOff] = isInjectedTab ? await getInitialSettings(activeTab.id) : [false, false]
+
+  if (isInjectedTab) {
     setInterval(() => {
-      updateCurrentChain(tabs[0])
+      updateCurrentChain(activeTab)
     }, 1000)
-    chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAppearAsMM__']" }, (results) => {
-      let mmAppear = false
-      if (results) {
-        try {
-          mmAppear = JSON.parse(results[0])
-        } catch (e) {
-          mmAppear = false
-        }
-      }
-      chrome.tabs.executeScript(tabs[0].id, { code: "localStorage['__frameAugmentOff__']" }, (results) => {
-        let augmentOff = false
-        if (results) {
-          try {
-            augmentOff = JSON.parse(results[0])
-          } catch (e) {
-            augmentOff = false
-          }
-        }
+  }
 
-        const root = document.getElementById('root')
+  console.debug('Initial settings', { activeTab, isInjectedTab, mmAppear, augmentOff })
 
-        ReactDOM.render(<Settings tab={tabs[0]} mmAppear={mmAppear} augmentOff={augmentOff} />, root)
-      })
-    })
-  })
+  const root = document.getElementById('root')
+
+  ReactDOM.render(<Settings
+    tab={activeTab}
+    isSupportedTab={isInjectedTab}
+    mmAppear={mmAppear}
+    augmentOff={augmentOff} />,
+  root)
 })

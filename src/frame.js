@@ -82,25 +82,33 @@ class Connection extends EventEmitter {
   constructor() {
     super()
 
-    window.addEventListener('message', (event) => {
-      if (event && event.source === window && event.data) {
-        const { type } = event.data
+    this.handleMessage = this.handleMessage.bind(this)
 
-        if (type === 'eth:payload') {
-          this.emit('payload', event.data.payload)
-        }
-
-        if (type === 'eth:event') {
-          this.emit(event.data.event, ...event.data.args)
-        }
-      }
-    })
+    window.addEventListener('message', this.handleMessage)
 
     setTimeout(() => this.emit('connect'), 0)
   }
 
+  handleMessage (event) {
+    if (event && event.source === window && event.data) {
+      const { type } = event.data
+
+      if (type === 'eth:payload') {
+        this.emit('payload', event.data.payload)
+      }
+
+      if (type === 'eth:event') {
+        this.emit(event.data.event, ...event.data.args)
+      }
+    }
+  }
+
   send(payload) {
     window.postMessage({ type: 'eth:send', payload }, window.location.origin)
+  }
+
+  close () {
+    window.removeEventListener('message', this.handleMessage)
   }
 }
 
