@@ -1,11 +1,6 @@
 /* globals chrome */
 const ethProvider = require('eth-provider')
 
-// constants
-const tabOriginSelector = {
-  url: ['http://*/*', 'https://*/*', 'file://*/*']
-}
-
 const subTypes = [
   'chainChanged',
   'chainsChanged',
@@ -102,15 +97,20 @@ async function fetchAvailableChains () {
   }
 }
 
-async function sendEvent(event, args = [], selector = {}) {
-  const tabs = await chrome.tabs.query({
-    ...tabOriginSelector,
-    ...selector
-  })
+async function sendEventToTab (tabId, event, args) {
+  try {
+    return await chrome.tabs.sendMessage(tabId, { type: 'eth:event', event, args })
+  } catch (e) {
+    console.error(`Error sending event "${event}"`, e)
+  }
+}
 
-  tabs.forEach((tab) => {
-    chrome.tabs.sendMessage(tab.id, { type: 'eth:event', event, args })
-  })
+async function sendEvent(event, args = [], selector = {}) {
+  const tabs = await chrome.tabs.query(selector)
+
+  tabs
+    .filter((tab) => !!tab.url)
+    .forEach((tab) => sendEventToTab(tab.id, event, args))
 }
 
 function initProvider() {
