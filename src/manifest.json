@@ -44,7 +44,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' ws://127.0.0.1:1248"
   },
-  "permissions": ["activeTab", "tabs", "idle", "scripting", "alarms"],
+  "permissions": ["activeTab", "alarms", "idle", "scripting"],
   "host_permissions": ["https://*/*", "http://*/*"],
   "icons": {
     "16": "icons/icon16.png",
