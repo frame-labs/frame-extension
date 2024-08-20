@@ -31,18 +31,19 @@
       "all_frames": true
     }
   ],
-  "web_accessible_resources": [{
-      "resources": [
-        "frame.js"
-      ],
-      "matches": [
-        "file://*/*",
-        "https://*/*",
-        "http://*/*"
-      ]
-    }],
+  "web_accessible_resources": [
+    {
+      "resources": ["frame.js"],
+      "matches": ["file://*/*", "https://*/*", "http://*/*"]
+    }
+  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' ws://127.0.0.1:1248"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{77691beb-4c53-48de-ab20-6589a537717a}"
+    }
   },
   "permissions": ["activeTab", "alarms", "idle", "scripting"],
   "host_permissions": ["https://*/*", "http://*/*"],
