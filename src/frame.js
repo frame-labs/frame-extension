@@ -1,6 +1,8 @@
 import EventEmitter from 'events'
 import EthereumProvider from 'ethereum-provider'
 
+console.debug('Frame in-page connection script loaded', { readyState: document.readyState })
+
 function setProvider() {
   const existingProvider = Object.getOwnPropertyDescriptor(window, 'ethereum')
 
@@ -154,23 +156,22 @@ const info = {
   rdns: 'sh.frame'
 }
 
-window.addEventListener('eip6963:requestProvider', () => {
+function broadcastEvent (eventName, detail) {
+  console.debug(`Frame broadcasting ${eventName} event`)
+
   try {
-    window.dispatchEvent(
-      new CustomEvent('eip6963:announceProvider', {
-        detail: Object.freeze({ info, provider })
-      })
-    )
+    const event = new CustomEvent(eventName, { detail })
+    window.dispatchEvent(event)
   } catch (err) {
-    console.error("Frame could not dispatch 'eip6963:announceProvider' event:", err)
+    console.error(`Frame could not dispatch ${eventName} event`, err)
   }
+}
+
+window.addEventListener('eip6963:requestProvider', () => {
+  broadcastEvent('eip6963:announceProvider', Object.freeze({ info, provider }))
 })
 
-window.dispatchEvent(
-  new CustomEvent('eip6963:announceProvider', {
-    detail: Object.freeze({ info, provider })
-  })
-)
+broadcastEvent('eip6963:announceProvider', Object.freeze({ info, provider }))
 
 setProvider()
 
