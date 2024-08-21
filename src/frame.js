@@ -1,8 +1,6 @@
 import EventEmitter from 'events'
 import EthereumProvider from 'ethereum-provider'
 
-console.debug('Frame in-page connection script loaded', { readyState: document.readyState })
-
 function setProvider() {
   const existingProvider = Object.getOwnPropertyDescriptor(window, 'ethereum')
 
@@ -157,8 +155,6 @@ const info = {
 }
 
 function broadcastEvent (eventName, detail) {
-  console.debug(`Frame broadcasting ${eventName} event`)
-
   try {
     const event = new CustomEvent(eventName, { detail })
     window.dispatchEvent(event)
