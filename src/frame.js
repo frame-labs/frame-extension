@@ -89,7 +89,7 @@ class Connection extends EventEmitter {
     setTimeout(() => this.emit('connect'), 0)
   }
 
-  handleMessage (event) {
+  handleMessage(event) {
     if (event && event.source === window && event.data) {
       const { type } = event.data
 
@@ -107,7 +107,7 @@ class Connection extends EventEmitter {
     window.postMessage({ type: 'eth:send', payload }, window.location.origin)
   }
 
-  close () {
+  close() {
     window.removeEventListener('message', this.handleMessage)
   }
 }
@@ -147,6 +147,28 @@ if (mmAppear) {
   }
 }
 
+const info = {
+  uuid: 'd7acc008-6411-5486-bb2d-0c0cfcddbb92',
+  name: 'Frame',
+  icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDcuNSIgaGVpZ2h0PSIzMDYiIHZpZXdCb3g9IjAgMCAzMDcuNSAzMDYiPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiMyODI3MmEiPjwvcmVjdD4KICA8cGF0aCBmaWxsPScjMDBkMmJlJyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3NywgNzYuNSkiIGQ9Ik0xNDUuMSw3NS42VjE3LjZjMC01LjEtNC4yLTkuMy05LjMtOS4zaC01OC4xYy0uNiwwLTEuMS0uMi0xLjYtLjZsLTctN2MtLjQtLjQtMS0uNy0xLjYtLjdIOS4zQzQuMiwwLDAsNC4xLDAsOS4zaDB2NThjMCwuNi4yLDEuMS42LDEuNmw3LDdjLjQuNC43LDEsLjcsMS42djU4YzAsNS4xLDQuMiw5LjMsOS4zLDkuM2g1OC4yYy42LDAsMS4xLjIsMS42LjZsNyw3Yy40LjQsMSwuNiwxLjYuNmg1OC4yYzUuMSwwLDkuMy00LjEsOS4zLTkuM2gwdi01OGMwLS42LS4yLTEuMS0uNi0xLjZsLTctN2MtLjUtLjQtLjgtLjktLjgtMS41Wk0xMDUuNiwxMDYuNmgtNTcuN2MtLjcsMC0xLjMtLjYtMS4zLTEuM3YtNTcuNmMwLS43LjYtMS4zLDEuMy0xLjNoNTcuN2MuNywwLDEuMy42LDEuMywxLjN2NTcuNmMuMS43LS41LDEuMy0xLjMsMS4zWiIvPgo8L3N2Zz4K',
+  rdns: 'sh.frame'
+}
+
+function broadcastEvent (eventName, detail) {
+  try {
+    const event = new CustomEvent(eventName, { detail })
+    window.dispatchEvent(event)
+  } catch (err) {
+    console.error(`Frame could not dispatch ${eventName} event`, err)
+  }
+}
+
+window.addEventListener('eip6963:requestProvider', () => {
+  broadcastEvent('eip6963:announceProvider', Object.freeze({ info, provider }))
+})
+
+broadcastEvent('eip6963:announceProvider', Object.freeze({ info, provider }))
+
 setProvider()
 
 shimWeb3(window.ethereum, mmAppear)
@@ -179,24 +201,5 @@ window.addEventListener('message', async (event) => {
         console.warn(`Could not find embedded action ${action.type}`)
       }
     }
-  }
-})
-
-const info = {
-  uuid: 'd7acc008-6411-5486-bb2d-0c0cfcddbb92',
-  name: 'Frame',
-  icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDcuNSIgaGVpZ2h0PSIzMDYiIHZpZXdCb3g9IjAgMCAzMDcuNSAzMDYiPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiMyODI3MmEiPjwvcmVjdD4KICA8cGF0aCBmaWxsPScjMDBkMmJlJyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3NywgNzYuNSkiIGQ9Ik0xNDUuMSw3NS42VjE3LjZjMC01LjEtNC4yLTkuMy05LjMtOS4zaC01OC4xYy0uNiwwLTEuMS0uMi0xLjYtLjZsLTctN2MtLjQtLjQtMS0uNy0xLjYtLjdIOS4zQzQuMiwwLDAsNC4xLDAsOS4zaDB2NThjMCwuNi4yLDEuMS42LDEuNmw3LDdjLjQuNC43LDEsLjcsMS42djU4YzAsNS4xLDQuMiw5LjMsOS4zLDkuM2g1OC4yYy42LDAsMS4xLjIsMS42LjZsNyw3Yy40LjQsMSwuNiwxLjYuNmg1OC4yYzUuMSwwLDkuMy00LjEsOS4zLTkuM2gwdi01OGMwLS42LS4yLTEuMS0uNi0xLjZsLTctN2MtLjUtLjQtLjgtLjktLjgtMS41Wk0xMDUuNiwxMDYuNmgtNTcuN2MtLjcsMC0xLjMtLjYtMS4zLTEuM3YtNTcuNmMwLS43LjYtMS4zLDEuMy0xLjNoNTcuN2MuNywwLDEuMy42LDEuMywxLjN2NTcuNmMuMS43LS41LDEuMy0xLjMsMS4zWiIvPgo8L3N2Zz4K',
-  rdns: 'sh.frame'
-}
-
-window.addEventListener('eip6963:requestProvider', () => {
-  try {
-    window.dispatchEvent(
-      new CustomEvent('eip6963:announceProvider', {
-        detail: Object.freeze({ info, provider })
-      })
-    )
-  } catch (err) {
-    console.error("Frame could not dispatch 'eip6963:announceProvider' event:", err)
   }
 })
