@@ -16,27 +16,26 @@ const nftSpec = /erc(?:721|1155):(?<address>0x\w+)\/(?<tokenId>\d+)/
 const fallbackProvider = provider(ethProvider())
 const nebula = n('https://ipfs.nebula.land', fallbackProvider)
 
-
 const firstChild = (element, count, i = 0) => {
   element = element.children[0]
   if (++i === count) return element
   return firstChild(element, count, i)
 }
 
-function trim (string = '', prefix = '@') {
+function trim(string = '', prefix = '@') {
   if (string.startsWith(prefix)) string = string.slice(prefix.length)
   return string
 }
 
-function equalsTwitter (s1, s2) {
+function equalsTwitter(s1, s2) {
   return trim(s1.toLowerCase(), '@') === trim(s2.toLowerCase(), '@')
 }
 
-function equalsIgnoreCase (s1, s2) {
+function equalsIgnoreCase(s1, s2) {
   return s1.toLowerCase() === s2.toLowerCase()
 }
 
-function parseAvatarNft (avatar = '') {
+function parseAvatarNft(avatar = '') {
   const nftFields = avatar.match(nftSpec)
 
   return {
@@ -45,7 +44,7 @@ function parseAvatarNft (avatar = '') {
   }
 }
 
-function findNameSectionInHeader (profileHeader) {
+function findNameSectionInHeader(profileHeader) {
   let handle, ensName, targetElement
 
   const headerPhoto = profileHeader.getElementsByTagName('a')[0]
@@ -57,10 +56,10 @@ function findNameSectionInHeader (profileHeader) {
 
     const infoSection = profileHeader.children[1]
 
-    const nameSection = [...infoSection.children].find(block => {
+    const nameSection = [...infoSection.children].find((block) => {
       const spans = [...block.getElementsByTagName('span')]
 
-      return spans.some(span => {
+      return spans.some((span) => {
         const text = span.textContent || ''
         return text.startsWith('@') && equalsIgnoreCase(text.substring(1), handle)
       })
@@ -77,41 +76,47 @@ function findNameSectionInHeader (profileHeader) {
   return { targetElement, ensName, handle }
 }
 
-function parseEnsName (nameSpan) {
+function parseEnsName(nameSpan) {
   return ((((nameSpan || {}).textContent || '').match(/[\w_\-\.]+.eth/) || [])[0] || '').toLowerCase()
 }
 
-function findNameSectionInTweet (tweet) {
+function findNameSectionInTweet(tweet) {
   const tweetLinks = [...tweet.querySelectorAll('a[role=link]')]
 
   const target = {}
   tweetLinks.some((link, i) => {
     const spans = [...link.querySelectorAll('span')]
-    return spans.some(span => {
-      const text = span.textContent 
+    return spans.some((span) => {
+      const text = span.textContent
       if (text.startsWith('@')) {
         const handle = text.substring(1)
-        if (handle && /^[a-zA-Z0-9_]{1,15}$/.test(handle) && equalsIgnoreCase(link.href, 'https://twitter.com/' + handle)) {
+        if (
+          handle &&
+          /^[a-zA-Z0-9_]{1,15}$/.test(handle) &&
+          equalsIgnoreCase(link.href, 'https://twitter.com/' + handle)
+        ) {
           target.handleLink = link
           target.handle = handle
           target.nameLink = tweetLinks[i - 1]
           target.name = target.nameLink.textContent
-          const nameSpan = [...target.nameLink.querySelectorAll('span')].find(block => (block.textContent || '').includes('.eth'))
+          const nameSpan = [...target.nameLink.querySelectorAll('span')].find((block) =>
+            (block.textContent || '').includes('.eth')
+          )
           target.ensName = parseEnsName(nameSpan)
           return true
         }
       }
-    }) 
+    })
   })
 
-  return { 
-    targetElement: target.nameLink, 
-    ensName: target.ensName, 
-    handle: target.handle 
+  return {
+    targetElement: target.nameLink,
+    ensName: target.ensName,
+    handle: target.handle
   }
 }
 
-function updateHeaderBadge (root = document.querySelector('main')) {
+function updateHeaderBadge(root = document.querySelector('main')) {
   const nav = root && root.querySelector('[data-testid=primaryColumn] nav')
   if (nav) {
     const profileHeader = nav.previousElementSibling
@@ -138,8 +143,8 @@ function updateHeaderBadge (root = document.querySelector('main')) {
   }
 }
 
-async function insertBadge (targetElement, ensName, handle) {
-  const userId = ensName.replace(/\./g,'-')
+async function insertBadge(targetElement, ensName, handle) {
+  const userId = ensName.replace(/\./g, '-')
   const mount = document.createElement('div')
   mount.setAttribute('handle', handle)
   mount.className = '__frameMount__'
@@ -169,7 +174,7 @@ async function insertBadge (targetElement, ensName, handle) {
     if (!record) return
 
     const twitter = record.text && record.text['com.twitter'] ? record.text['com.twitter'] : ''
-    
+
     const user = {
       name: record.name || '',
       avatar: '',
@@ -205,15 +210,15 @@ const Container = styled.div`
 `
 
 class Badge extends React.Component {
-  constructor () {
+  constructor() {
     super()
     this.state = {
       showEthPanel: false
     }
   }
-  badge (size) {
+  badge(size) {
     const theme = store('theme')
-    const { userId  } = this.props
+    const { userId } = this.props
     const user = userId ? this.store('users', userId) : ''
     let color, background
     if (user && !user.error && user.verified.name) {
@@ -228,44 +233,53 @@ class Badge extends React.Component {
     }
 
     return (
-      <svg style={{ height: `${size}px`, width: `${size}px` }}  viewBox='0 0 84 84'>
-        <path fill={background} d='M84,44a16.1,16.1,0,0,0-8.59-14.4,16.63,16.63,0,0,0,1-5.6c0-8.84-6.84-16-15.27-16a14.2,14.2,0,0,0-5.34,1A15,15,0,0,0,28.26,9a14.45,14.45,0,0,0-5.35-1C14.47,8,7.64,15.16,7.64,24a16.63,16.63,0,0,0,1,5.6,16.38,16.38,0,0,0-.82,28.34A17.53,17.53,0,0,0,7.64,60c0,8.84,6.83,16,15.27,16a14.4,14.4,0,0,0,5.34-1,15,15,0,0,0,27.5,0,14.6,14.6,0,0,0,5.34,1c8.44,0,15.27-7.16,15.27-16a15.57,15.57,0,0,0-.13-2.05A16.16,16.16,0,0,0,84,44Z'/>
-        <path fill={color} d='M60.08,39.1,43,16.13a1,1,0,0,0-1.77,0l-17.08,23a1,1,0,0,0,.35,1.4l17.08,8.69a1,1,0,0,0,1.08,0L59.74,40.5A1,1,0,0,0,60.08,39.1Zm-1.4,8.25L42.74,56.47a1.18,1.18,0,0,1-1.25,0L25.55,47.35A.41.41,0,0,0,25,48L41.14,68a1.19,1.19,0,0,0,2,0L59.21,48A.41.41,0,0,0,58.68,47.35Z'/>
+      <svg style={{ height: `${size}px`, width: `${size}px` }} viewBox='0 0 84 84'>
+        <path
+          fill={background}
+          d='M84,44a16.1,16.1,0,0,0-8.59-14.4,16.63,16.63,0,0,0,1-5.6c0-8.84-6.84-16-15.27-16a14.2,14.2,0,0,0-5.34,1A15,15,0,0,0,28.26,9a14.45,14.45,0,0,0-5.35-1C14.47,8,7.64,15.16,7.64,24a16.63,16.63,0,0,0,1,5.6,16.38,16.38,0,0,0-.82,28.34A17.53,17.53,0,0,0,7.64,60c0,8.84,6.83,16,15.27,16a14.4,14.4,0,0,0,5.34-1,15,15,0,0,0,27.5,0,14.6,14.6,0,0,0,5.34,1c8.44,0,15.27-7.16,15.27-16a15.57,15.57,0,0,0-.13-2.05A16.16,16.16,0,0,0,84,44Z'
+        />
+        <path
+          fill={color}
+          d='M60.08,39.1,43,16.13a1,1,0,0,0-1.77,0l-17.08,23a1,1,0,0,0,.35,1.4l17.08,8.69a1,1,0,0,0,1.08,0L59.74,40.5A1,1,0,0,0,60.08,39.1Zm-1.4,8.25L42.74,56.47a1.18,1.18,0,0,1-1.25,0L25.55,47.35A.41.41,0,0,0,25,48L41.14,68a1.19,1.19,0,0,0,2,0L59.21,48A.41.41,0,0,0,58.68,47.35Z'
+        />
       </svg>
     )
   }
-  render () {
+  render() {
     return (
-      <Container onClick={e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-      onMouseOver={e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-      onMouseEnter={e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
-      onMouseLeave={e => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}>
-        <div 
+      <Container
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        onMouseOver={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        onMouseEnter={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        onMouseLeave={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+      >
+        <div
           style={{ pointerEvents: 'auto' }}
-          onMouseOver={e => {
+          onMouseOver={(e) => {
             e.preventDefault()
             e.stopPropagation()
             const pos = e.target.getBoundingClientRect()
             const position = { x: pos.x, y: pos.y }
             this.store.setLayerPop({ position, active: true, userId: this.props.userId, created: Date.now() })
-          }
-        }>
+          }}
+        >
           {this.badge(16)}
         </div>
       </Container>
-  )}
+    )
+  }
 }
 
 const insertAfter = (newNode, referenceNode) => {
@@ -284,7 +298,7 @@ const callback = function (mutationsList) {
     currentTheme = backgroundColor
   }
 
-  mutationsList.forEach(async mutation => {
+  mutationsList.forEach(async (mutation) => {
     if (mutation.type === 'childList') {
       if (mutation.addedNodes.length > 0) {
         const addedNode = mutation.addedNodes[0]
@@ -305,7 +319,6 @@ const callback = function (mutationsList) {
     }
   })
 }
-
 
 let augmentOff = false
 
