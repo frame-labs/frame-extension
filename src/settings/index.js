@@ -53,12 +53,12 @@ const getScrollBarWidth = () => {
   return w1 - w2
 }
 
-async function getActiveTab () {
+async function getActiveTab() {
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
   return tabs[0]
 }
 
-async function executeScript (tabId, func, args) {
+async function executeScript(tabId, func, args) {
   try {
     const result = await chrome.scripting.executeScript({
       target: { tabId },
@@ -74,7 +74,7 @@ async function executeScript (tabId, func, args) {
   }
 }
 
-async function getLocalSetting (tabId, key) {
+async function getLocalSetting(tabId, key) {
   const results = await executeScript(tabId, (key) => localStorage.getItem(key), [key])
 
   if (results && results.length > 0) {
@@ -88,14 +88,18 @@ async function getLocalSetting (tabId, key) {
   return false
 }
 
-async function setLocalSetting (tabId, setting, val) {
-  return executeScript(tabId, (key, val) => {
-    localStorage.setItem(key, val)
-    window.location.reload()
-  }, [setting, val])
+async function setLocalSetting(tabId, setting, val) {
+  return executeScript(
+    tabId,
+    (key, val) => {
+      localStorage.setItem(key, val)
+      window.location.reload()
+    },
+    [setting, val]
+  )
 }
 
-async function toggleLocalSetting (key) {
+async function toggleLocalSetting(key) {
   const activeTab = await getActiveTab()
 
   if (activeTab) {
@@ -347,28 +351,28 @@ const ChainButton = ({ index, chain, tab, selected }) => {
   const { chainId, name } = chain
   const isSelectable = chainConnected(chain)
   return (
-  <ClusterValue
-    style={{
-      flexGrow: 0,
-      width: 'calc(50% - 3px)',
-      borderBottomRightRadius: index === 0 ? '8px' : 'auto',
-      opacity: isSelectable ? 1 : 0.4,
-      cursor: isSelectable ? 'pointer' : 'default'
-    }}
-    onClick={() => {
-      if (isSelectable) {
-        chrome.runtime.sendMessage({
-          tab,
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId }]
-        })
-        updateCurrentChain(tab)
-      }
-    }}
-  >
-    <ChainButtonIcon selected={selected} />
-    <ChainButtonLabel>{name}</ChainButtonLabel>
-  </ClusterValue>
+    <ClusterValue
+      style={{
+        flexGrow: 0,
+        width: 'calc(50% - 3px)',
+        borderBottomRightRadius: index === 0 ? '8px' : 'auto',
+        opacity: isSelectable ? 1 : 0.4,
+        cursor: isSelectable ? 'pointer' : 'default'
+      }}
+      onClick={() => {
+        if (isSelectable) {
+          chrome.runtime.sendMessage({
+            tab,
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId }]
+          })
+          updateCurrentChain(tab)
+        }
+      }}
+    >
+      <ChainButtonIcon selected={selected} />
+      <ChainButtonLabel>{name}</ChainButtonLabel>
+    </ClusterValue>
   )
 }
 
@@ -398,7 +402,7 @@ class _Settings extends React.Component {
     )
   }
 
-  unsupportedTab (origin) {
+  unsupportedTab(origin) {
     return (
       <Cluster>
         <ClusterRow>
@@ -525,7 +529,14 @@ class _Settings extends React.Component {
 
     return rows.map((row) => (
       <ClusterRow style={{ justifyContent: 'flex-start' }}>
-        {row.map((chain, i) => <ChainButton index={i} chain={chain} tab={this.props.tab} selected={chain.chainId === parseInt(currentChain, 16)} />)}
+        {row.map((chain, i) => (
+          <ChainButton
+            index={i}
+            chain={chain}
+            tab={this.props.tab}
+            selected={chain.chainId === parseInt(currentChain, 16)}
+          />
+        ))}
       </ClusterRow>
     ))
   }
@@ -552,18 +563,22 @@ class _Settings extends React.Component {
 
   renderMainPanel() {
     const isConnected = this.store('frameConnected')
-    const { tab: { url }, isSupportedTab, augmentOff } = this.props
+    const {
+      tab: { url },
+      isSupportedTab,
+      augmentOff
+    } = this.props
     const { protocol, origin } = parseOrigin(url)
 
     if (!isConnected) {
-      return (
-        <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
-      )
+      return <ClusterBoxMain style={{ marginTop: '12px' }}>{this.notConnected()}</ClusterBoxMain>
     }
 
     if (!isSupportedTab) {
       return (
-        <ClusterBoxMain style={{ marginTop: '12px' }}>{this.unsupportedTab(protocol + origin)}</ClusterBoxMain>
+        <ClusterBoxMain style={{ marginTop: '12px' }}>
+          {this.unsupportedTab(protocol + origin)}
+        </ClusterBoxMain>
       )
     }
 
@@ -579,46 +594,45 @@ class _Settings extends React.Component {
             </svg>
             {origin}
           </CurrentOriginTitle>
-              <Cluster>
-              {this.store('availableChains').length ? (
-                <>
-                  {this.chainSelect()}
-                  <div style={{ height: '9px' }} />
-                </>
-              ) : null}
-              {this.appearAsMMToggle()}
-              {origin === 'twitter.com' ? (
-                <>
-                  <div style={{ height: '9px' }} />
-                  <ClusterRow>
-                    {augmentOff ? (
-                      <>
-                        <ClusterValue>
-                          <Augment>Verify ENS Names</Augment>
-                        </ClusterValue>
-                        <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
-                          <FrameButton>
-                            <AugmentStateOff>OFF</AugmentStateOff>
-                          </FrameButton>
-                        </ClusterValue>
-                      </>
-                    ) : (
-                      <>
-                        <ClusterValue>
-                          <Augment>Verify ENS Names</Augment>
-                        </ClusterValue>
-                        <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
-                          <FrameButton>
-                            <AugmentStateOn>ON</AugmentStateOn>
-                          </FrameButton>
-                        </ClusterValue>
-                      </>
-                    )}
-                  </ClusterRow>
-                </>
-              ) : null}
-            </Cluster>
-          
+          <Cluster>
+            {this.store('availableChains').length ? (
+              <>
+                {this.chainSelect()}
+                <div style={{ height: '9px' }} />
+              </>
+            ) : null}
+            {this.appearAsMMToggle()}
+            {origin === 'twitter.com' ? (
+              <>
+                <div style={{ height: '9px' }} />
+                <ClusterRow>
+                  {augmentOff ? (
+                    <>
+                      <ClusterValue>
+                        <Augment>Verify ENS Names</Augment>
+                      </ClusterValue>
+                      <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
+                        <FrameButton>
+                          <AugmentStateOff>OFF</AugmentStateOff>
+                        </FrameButton>
+                      </ClusterValue>
+                    </>
+                  ) : (
+                    <>
+                      <ClusterValue>
+                        <Augment>Verify ENS Names</Augment>
+                      </ClusterValue>
+                      <ClusterValue onClick={() => toggleLocalSetting(AUGMENT_OFF)} style={{ flexGrow: '0' }}>
+                        <FrameButton>
+                          <AugmentStateOn>ON</AugmentStateOn>
+                        </FrameButton>
+                      </ClusterValue>
+                    </>
+                  )}
+                </ClusterRow>
+              </>
+            ) : null}
+          </Cluster>
         </ClusterBoxMain>
       </>
     )
@@ -654,11 +668,8 @@ const updateCurrentChain = (tab) => {
   })
 }
 
-async function getInitialSettings (tabId) {
-  return Promise.all([
-    getLocalSetting(tabId, APPEAR_AS_MM),
-    getLocalSetting(tabId, AUGMENT_OFF)
-  ])
+async function getInitialSettings(tabId) {
+  return Promise.all([getLocalSetting(tabId, APPEAR_AS_MM), getLocalSetting(tabId, AUGMENT_OFF)])
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
@@ -679,10 +690,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const root = document.getElementById('root')
 
-  ReactDOM.render(<Settings
-    tab={activeTab}
-    isSupportedTab={isInjectedTab}
-    mmAppear={mmAppear}
-    augmentOff={augmentOff} />,
-  root)
+  ReactDOM.render(
+    <Settings tab={activeTab} isSupportedTab={isInjectedTab} mmAppear={mmAppear} augmentOff={augmentOff} />,
+    root
+  )
 })

@@ -52,13 +52,13 @@ const unsubscribeTab = (tabId) => {
   })
 }
 
-function updateSettingsPanel () {
+function updateSettingsPanel() {
   if (settingsPanel) {
     settingsPanel.postMessage(frameState)
   }
 }
 
-function setConnected (connected) {
+function setConnected(connected) {
   console.debug(`Setting connected to ${connected}`)
 
   frameState.connected = connected
@@ -79,15 +79,15 @@ function setCurrentChain(chain) {
   updateSettingsPanel()
 }
 
-function setIcon (path) {
+function setIcon(path) {
   chrome.action.setIcon({ path })
 }
 
-function setPopup (popup) {
+function setPopup(popup) {
   chrome.action.setPopup({ popup })
 }
 
-async function fetchAvailableChains () {
+async function fetchAvailableChains() {
   try {
     const chains = await provider.request({ method: 'wallet_getEthereumChains' })
     setChains(chains)
@@ -97,7 +97,7 @@ async function fetchAvailableChains () {
   }
 }
 
-async function sendEventToTab (tabId, event, args) {
+async function sendEventToTab(tabId, event, args) {
   try {
     return await chrome.tabs.sendMessage(tabId, { type: 'eth:event', event, args })
   } catch (e) {
@@ -108,9 +108,7 @@ async function sendEventToTab (tabId, event, args) {
 async function sendEvent(event, args = [], selector = {}) {
   const tabs = await chrome.tabs.query(selector)
 
-  tabs
-    .filter((tab) => !!tab.url)
-    .forEach((tab) => sendEventToTab(tab.id, event, args))
+  tabs.filter((tab) => !!tab.url).forEach((tab) => sendEventToTab(tab.id, event, args))
 }
 
 function initProvider() {
@@ -185,7 +183,7 @@ function initProvider() {
   })
 }
 
-function destroyProvider () {
+function destroyProvider() {
   if (provider) {
     provider.close()
     provider = null
@@ -198,7 +196,7 @@ function addStateListeners() {
     port.onDisconnect.removeListener(onPortDisconnected)
   }
 
-  function setMediaBlob (blobUrl, location, message) {
+  function setMediaBlob(blobUrl, location, message) {
     window.__setMediaBlob__(blobUrl, location, message)
   }
 
@@ -275,12 +273,12 @@ function addStateListeners() {
   })
 }
 
-async function addTabListeners () {
+async function addTabListeners() {
   // Query for all existing tabs and store their origins
   const tabs = await chrome.tabs.query({})
 
-// Create an object to store the last known origin for each tab
-  const tabOrigins = Object.fromEntries(tabs.map(tab => [tab.id, originFromUrl(tab.url)]))
+  // Create an object to store the last known origin for each tab
+  const tabOrigins = Object.fromEntries(tabs.map((tab) => [tab.id, originFromUrl(tab.url)]))
 
   chrome.tabs.onRemoved.addListener((tabId) => {
     delete tabOrigins[tabId]

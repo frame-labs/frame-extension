@@ -154,7 +154,7 @@ const info = {
   rdns: 'sh.frame'
 }
 
-function broadcastEvent (eventName, detail) {
+function broadcastEvent(eventName, detail) {
   try {
     const event = new CustomEvent(eventName, { detail })
     window.dispatchEvent(event)
